@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>ResumeWise AI | Strategist Command</title>
+    <meta name="description" content="Your precision career analysis dashboard. View ATS scores, skill gaps, and career trajectory intelligence."/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300..900&display=swap" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        :root { --bezier-standard: cubic-bezier(0.32, 0.72, 0, 1); }
+        body { background-color: #050505; color: #e5e2e1; overflow-x: hidden; perspective: 1500px; }
+        .vanguard-heading { font-family: 'Fraunces', serif; font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -0.03em; }
+        .vanguard-card { transform-style: preserve-3d; transition: transform 0.5s var(--bezier-standard); }
+        .vanguard-card:hover { transform: scale(1.01) translateZ(15px); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 25px rgba(78,222,163,0.15); }
+        .reveal-up { opacity: 0; transform: translateY(40px); filter: blur(15px); transition: all 1.2s var(--bezier-standard); }
+        .reveal-up.active { opacity: 1; transform: translateY(0); filter: blur(0); }
+        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .island-button:active { transform: scale(0.96); }
+        .floating-3d { animation: subtle-float 8s ease-in-out infinite; transform-style: preserve-3d; }
+        @keyframes subtle-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes ats-ring { from { stroke-dashoffset: 283; } }
+        .ats-ring-animated { animation: ats-ring 2s var(--bezier-standard) forwards; }
+        .score-counter { font-variant-numeric: tabular-nums; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @media (max-width: 767px) {
+            .mobile-hidden { display: none !important; }
+            .mobile-visible { display: flex !important; }
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary": "#4edea3", "primary": "#c9c6c5", "on-background": "#e5e2e1",
+                        "background": "#050505", "surface-card": "#0A0A0A",
+                        "glass-border": "rgba(255, 255, 255, 0.15)", "glass-highlight": "rgba(255, 255, 255, 0.15)",
+                        "on-surface-variant": "#c4c7c7", "on-secondary": "#003824",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    spacing: { "gutter": "24px", "container-padding": "2rem", "section-gap": "160px", "bezel-inner": "6px", "bezel-outer": "8px" },
+                    fontFamily: { "body-lg": ["Plus Jakarta Sans"], "label-sm": ["Geist"], "headline-lg": ["Geist"], "body-md": ["Plus Jakarta Sans"], "headline-md": ["Geist"], "display-xl": ["Geist"] },
+                    fontSize: {
+                        "body-lg": ["18px", {"lineHeight": "32px", "fontWeight": "300"}],
+                        "label-sm": ["10px", {"lineHeight": "16px", "letterSpacing": "0.2em", "fontWeight": "500"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "28px", "fontWeight": "300"}],
+                        "display-xl": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background">
+<canvas id="global-canvas"></canvas>
+
+<!-- Navigation -->
+<nav class="bg-background/40 backdrop-blur-3xl sticky top-0 z-50 border-b border-glass-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+    <div class="flex justify-between items-center w-full px-container-padding max-w-7xl mx-auto py-4">
+        <a href="index.html" class="vanguard-heading text-headline-md font-bold tracking-tighter text-on-background">ResumeWise AI</a>
+        <div class="mobile-hidden hidden md:flex items-center space-x-8">
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors text-body-md font-body-md" href="index.html">Dashboard</a>
+            <a class="text-secondary font-medium border-b-2 border-secondary pb-1 text-body-md font-body-md" href="dashboard.html">Analysis</a>
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors text-body-md font-body-md" href="roadmap.html">Roadmap</a>
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors text-body-md font-body-md" href="resources.html">Resources</a>
+        </div>
+        <div class="mobile-hidden hidden md:flex items-center gap-4" id="nav-auth">
+            <a href="signin.html" class="text-on-surface-variant hover:text-on-surface transition-colors font-label-sm text-label-sm">Sign In</a>
+            <a href="signup.html" class="island-button bg-on-background text-background px-6 py-2.5 rounded-full font-label-sm text-label-sm font-bold flex items-center group transition-all duration-300">
+                Get Started
+                <span class="ml-2 w-6 h-6 bg-background/10 rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </span>
+            </a>
+        </div>
+        <!-- Hamburger Button (Mobile only) -->
+        <button id="mobile-menu-toggle" class="mobile-visible flex md:hidden text-on-background hover:text-secondary focus:outline-none transition-colors" aria-label="Toggle Menu">
+            <span class="material-symbols-outlined text-[28px]" id="mobile-menu-icon">menu</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Drawer Overlay -->
+<div id="mobile-drawer" class="fixed inset-x-0 z-40 bg-background/95 backdrop-blur-2xl transition-all duration-300 ease-in-out opacity-0 pointer-events-none md:hidden border-b border-glass-border shadow-2xl" style="top: 72px;">
+    <div class="flex flex-col p-8 space-y-6">
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="index.html">Dashboard</a>
+        <a class="text-secondary font-medium text-lg pb-1" href="dashboard.html">Analysis</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="roadmap.html">Roadmap</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="resources.html">Resources</a>
+        <div class="h-px bg-glass-border my-2"></div>
+        <div class="flex flex-col gap-4" id="mobile-nav-auth">
+            <a href="signin.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">Sign In</a>
+            <a href="signup.html" class="island-button bg-on-background text-background px-6 py-3 rounded-full text-center font-bold">
+                Get Started
+            </a>
+        </div>
+    </div>
+</div>
+
+<main>
+    <!-- Hero / Analysis Header -->
+    <section class="pt-20 pb-16 px-container-padding max-w-7xl mx-auto">
+        <div class="reveal-up active">
+            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.4em] mb-4 block">Precision Analyzed 2024</span>
+            <h1 class="vanguard-heading text-[56px] md:text-display-xl leading-tight mb-6">
+                Engineering<br/>
+                <span class="text-on-surface-variant/40 italic">The Trajectory</span><br/>
+                of Success.
+            </h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-12">
+                Our AI strategist has deconstructed your professional footprint. We've mapped your trajectory against the top 0.1% of industry leaders to reveal the high-impact gaps in your current technical stack.
+            </p>
+        </div>
+    </section>
+
+    <!-- ATS & Qualification Cards -->
+    <section class="px-container-padding max-w-7xl mx-auto mb-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal-up active" style="transition-delay: 200ms;">
+            <!-- ATS Card -->
+            <div class="p-2 rounded-[2rem] bg-white/5 vanguard-card">
+                <div class="bg-surface-card rounded-[1.75rem] p-8 border border-white/10 flex items-center gap-8 h-full">
+                    <!-- ATS Ring -->
+                    <div class="relative w-24 h-24 flex-shrink-0">
+                        <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"/>
+                            <circle id="ats-ring" cx="50" cy="50" r="45" fill="none" stroke="#4edea3" stroke-width="8" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" class="ats-ring-animated"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <span id="ats-score" class="text-3xl font-bold score-counter text-on-background">--</span>
+                                <span class="block text-[8px] text-on-surface-variant uppercase tracking-widest">Score</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-on-background mb-1">ATS Precision</h3>
+                        <p id="ats-label" class="font-body-md text-body-md text-on-surface-variant">Analyzing your resume data...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Qualification Card -->
+            <div class="p-2 rounded-[2rem] bg-white/5 vanguard-card animate-pulse" id="qualification-card">
+                <div class="bg-surface-card rounded-[1.75rem] p-8 border border-white/10 flex items-center gap-8 h-full">
+                    <div class="w-24 h-24 flex-shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-4xl text-secondary" id="qual-icon">verified_user</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.2em]">Profile Target</span>
+                            <span id="qual-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-secondary/10 text-secondary border border-secondary/20">Analyzing</span>
+                        </div>
+                        <h3 id="qual-major-field" class="text-2xl vanguard-heading text-on-background">Major Field Detection...</h3>
+                        <p id="qual-label" class="font-body-md text-body-md text-on-surface-variant mt-1">Extracting academic & skills major trajectory...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Analytics Grid -->
+    <section class="px-container-padding max-w-7xl mx-auto pb-24">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <!-- Skill Ecosystem -->
+            <div class="md:col-span-7 reveal-up" style="transition-delay: 300ms;">
+                <div class="p-1.5 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/10">
+                        <div class="flex justify-between items-start mb-8">
+                            <div>
+                                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.2em] block mb-2">Framework 01</span>
+                                <h3 class="vanguard-heading text-headline-md">Skill Ecosystem</h3>
+                            </div>
+                            <button id="fill-gaps-btn" class="island-button bg-secondary/10 text-secondary px-5 py-2 rounded-full font-label-sm text-label-sm font-bold flex items-center gap-2 hover:bg-secondary/20 transition-all border border-secondary/20">
+                                Fill Gaps
+                                <span class="material-symbols-outlined text-[16px]">add</span>
+                            </button>
+                        </div>
+                        <div id="skills-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <!-- Skills populated by JS -->
+                            <div class="skeleton h-24 rounded-xl"></div>
+                            <div class="skeleton h-24 rounded-xl"></div>
+                            <div class="skeleton h-24 rounded-xl"></div>
+                            <div class="skeleton h-24 rounded-xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Estimate -->
+            <div class="md:col-span-5 reveal-up" style="transition-delay: 400ms;">
+                <div class="p-1.5 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/10 flex flex-col justify-between">
+                        <div>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.2em] block mb-2">Market Estimate</span>
+                            <div class="vanguard-heading text-[48px] font-bold tracking-tight" id="salary-estimate">
+                                <span class="skeleton inline-block w-48 h-12 rounded-lg"></span>
+                            </div>
+                            <p class="font-body-md text-body-md text-on-surface-variant mt-2">Based on your current skill-density and roadmap potential.</p>
+                        </div>
+                        <div class="mt-8 flex items-center gap-2 text-secondary">
+                            <span class="material-symbols-outlined text-[20px]">trending_up</span>
+                            <span class="font-label-sm text-label-sm" id="market-trend">+12% VS LAST QUARTER</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skill Gap Analysis -->
+            <div class="md:col-span-8 reveal-up" style="transition-delay: 500ms;">
+                <div class="p-1.5 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 class="vanguard-heading text-headline-md">Gap Intelligence</h3>
+                            <span class="bg-secondary/10 text-secondary text-[10px] px-2 py-0.5 rounded border border-secondary/20 font-bold uppercase tracking-widest">Active Node</span>
+                        </div>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-8">Key areas identified for maximum career velocity.</p>
+                        <div id="gap-bars" class="space-y-6">
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-label-sm font-label-sm"><span>Loading...</span><span class="text-secondary">--</span></div>
+                                <div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-secondary rounded-full skeleton" style="width:0%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="md:col-span-4 reveal-up" style="transition-delay: 600ms;">
+                <div class="p-1.5 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/10 flex flex-col">
+                        <span class="material-symbols-outlined text-secondary text-3xl mb-4">alt_route</span>
+                        <h3 class="vanguard-heading text-headline-md mb-2">Trajectory Mapper</h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-1">Your personalized career evolution paths based on this analysis.</p>
+                        <a id="explore-paths-btn" href="roadmap.html" class="flex items-center gap-2 text-label-sm font-label-sm text-secondary hover:gap-3 transition-all">
+                            <span class="material-symbols-outlined text-[14px]">bolt</span>
+                            EXPLORE OPTIMIZED PATHS
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-secondary/5 blur-[120px] rounded-full scale-150 translate-y-1/2"></div>
+        <div class="px-container-padding max-w-5xl mx-auto text-center relative z-10 reveal-up">
+            <h2 class="vanguard-heading text-headline-lg md:text-[56px] mb-6">Ready to deploy your <span class="text-secondary">Career 2.0</span>?</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-10">
+                Join 12,000+ elite engineers using ResumeWise AI to navigate the shifting sands of the technical job market.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="index.html" class="island-button bg-white/5 border border-white/15 text-on-surface px-10 py-4 rounded-full font-label-sm text-label-sm font-bold flex items-center group transition-all hover:bg-white/10">
+                    Apply Analysis
+                </a>
+                <a id="view-roadmap-btn" href="roadmap.html" class="island-button bg-white/5 border border-white/15 text-on-surface px-10 py-4 rounded-full font-label-sm text-label-sm font-bold flex items-center group transition-all hover:bg-white/10">
+                    View Full Roadmap
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full py-20 border-t border-glass-border relative z-10" style="background:#0e0e0e;">
+    <div class="max-w-7xl mx-auto px-container-padding flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="flex flex-col items-center md:items-start">
+            <div class="vanguard-heading text-headline-md text-primary mb-1">ResumeWise AI</div>
+            <p class="text-on-surface-variant text-label-sm font-label-sm">© 2024 ResumeWise AI. Precision Career Engineering.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-8">
+            <a class="text-on-surface-variant hover:text-primary text-sm transition-all" href="#">Privacy Policy</a>
+            <a class="text-on-surface-variant hover:text-primary text-sm transition-all" href="#">Terms</a>
+            <a class="text-on-surface-variant hover:text-primary text-sm transition-all" href="resources.html">Resources</a>
+        </div>
+    </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+    // Auth check
+    (function() {
+        const authContainer = document.getElementById('nav-auth');
+        const mobileAuthContainer = document.getElementById('mobile-nav-auth');
+        
+        const updateAuthUI = (container, isMobile = false) => {
+            if (!container) return;
+            if (ResumeWiseAPI.isAuthenticated()) {
+                const user = ResumeWiseAPI.getUser();
+                if (isMobile) {
+                    container.innerHTML = `
+                        <span class="text-on-surface-variant text-base py-1">Logged in as: <strong class="text-secondary">${user?.name || 'Strategist'}</strong></span>
+                        <a href="dashboard.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">MY ANALYSIS</a>
+                        <button onclick="ResumeWiseAPI.logout()" class="island-button bg-white/5 border border-white/15 text-on-surface px-6 py-3 rounded-full font-bold w-full">
+                            LOGOUT
+                        </button>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <span class="text-on-surface-variant font-label-sm text-label-sm">${user?.name || 'Strategist'}</span>
+                        <button onclick="ResumeWiseAPI.logout()" class="island-button bg-white/5 border border-white/15 text-on-surface px-5 py-2 rounded-full font-label-sm text-label-sm font-bold hover:bg-white/10 transition-all">LOGOUT</button>
+                    `;
+                }
+            }
+        };
+
+        updateAuthUI(authContainer, false);
+        updateAuthUI(mobileAuthContainer, true);
+    })();
+
+    // Mobile menu toggle logic
+    (function() {
+        const toggleBtn = document.getElementById('mobile-menu-toggle');
+        const drawer = document.getElementById('mobile-drawer');
+        const icon = document.getElementById('mobile-menu-icon');
+        if (toggleBtn && drawer && icon) {
+            toggleBtn.addEventListener('click', () => {
+                const isOpen = drawer.classList.contains('opacity-100');
+                if (isOpen) {
+                    drawer.classList.remove('opacity-100', 'pointer-events-auto');
+                    drawer.classList.add('opacity-0', 'pointer-events-none');
+                    icon.textContent = 'menu';
+                } else {
+                    drawer.classList.remove('opacity-0', 'pointer-events-none');
+                    drawer.classList.add('opacity-100', 'pointer-events-auto');
+                    icon.textContent = 'close';
+                }
+            });
+        }
+    })();
+
+    function updateRoadmapLinks(detectedTrack) {
+        const exploreBtn = document.getElementById('explore-paths-btn');
+        const viewBtn = document.getElementById('view-roadmap-btn');
+        const href = "roadmap.html?track=" + encodeURIComponent(detectedTrack);
+        if (exploreBtn) exploreBtn.href = href;
+        if (viewBtn) viewBtn.href = href;
+    }
+
+    // Load analysis data
+    async function loadAnalysis() {
+        const resumeId = localStorage.getItem('rw_last_analyzed_id');
+        const localScore = localStorage.getItem('rw_last_score');
+        const localTrack = localStorage.getItem('rw_detected_track');
+
+        let score = localScore !== null ? parseInt(localScore, 10) : null;
+        let track = localTrack || null;
+
+        if (resumeId && ResumeWiseAPI.isAuthenticated()) {
+            try {
+                const analysisResult = await ResumeWiseAPI.getAnalysis(resumeId);
+                if (analysisResult.success && analysisResult.data) {
+                    const analysis = analysisResult.data.analysis || analysisResult.data;
+                    
+                    // Determine the ATS score
+                    if (analysis.ats_score) {
+                        score = typeof analysis.ats_score === 'object' ? (analysis.ats_score.total || 78) : analysis.ats_score;
+                    } else if (analysis.total_ats_score) {
+                        score = analysis.total_ats_score;
+                    } else if (analysis.overall_score) {
+                        score = analysis.overall_score;
+                    }
+                    
+                    if (analysis.detected_track || analysis.goalRole || analysis.targetRole) {
+                        track = analysis.detected_track || analysis.goalRole || analysis.targetRole;
+                    }
+
+                    populateATS(score || 78);
+                    
+                    // Determine skills list
+                    const skillsList = (analysis.skills && typeof analysis.skills === 'object')
+                        ? (analysis.skills.matching || [])
+                        : (analysis.skills || analysis.matched_skills || []);
+                    populateSkills(skillsList);
+                    
+                    // Determine gaps list
+                    const gapsList = (analysis.skills && typeof analysis.skills === 'object')
+                        ? (analysis.skills.missing || [])
+                        : (analysis.skill_gaps || analysis.missing_skills || []);
+                    populateGaps(gapsList);
+                    
+                    populateSalary(analysis.salary_estimate || (analysis.market_data && analysis.market_data.salary_data && analysis.market_data.salary_data.average_salary));
+                    
+                    // Populate Qualification card
+                    populateQualification({
+                        detected_track: track || 'Full Stack',
+                        qualification_status: 'Qualified',
+                        qualification_label: 'Meets Track Entry Criteria'
+                    });
+                    updateRoadmapLinks(track || 'Full Stack');
+                    return;
+                }
+            } catch (err) {
+                console.warn('Analysis fetch error, attempting local storage fallback:', err);
+            }
+        }
+
+        // Fallback to local storage if available
+        if (score !== null && track !== null) {
+            populateATS(score);
+            populateSkills(['RustLang', 'VectorDB', 'K8s Scaling', 'OIDC/Auth']);
+            populateGaps([
+                { name: 'Cloud Architecture', level: 75, status: 'Critical Gap' },
+                { name: 'Neural Networks', level: 50, status: 'Node Missing' },
+                { name: 'System Design', level: 83, status: 'Partial Match' },
+                { name: 'DevOps Pipelines', level: 60, status: 'Emerging' }
+            ]);
+            populateSalary(null);
+            populateQualification({
+                detected_track: track,
+                qualification_status: 'Qualified',
+                qualification_label: 'Meets Track Entry Criteria'
+            });
+            updateRoadmapLinks(track);
+        } else {
+            setDemoData();
+        }
+    }
+
+    function setDemoData() {
+        populateATS(92);
+        populateSkills(['RustLang', 'VectorDB', 'K8s Scaling', 'OIDC/Auth']);
+        populateGaps([
+            { name: 'Cloud Architecture', level: 75, status: 'Critical Gap' },
+            { name: 'Neural Networks', level: 50, status: 'Node Missing' },
+            { name: 'System Design', level: 83, status: 'Partial Match' },
+            { name: 'DevOps Pipelines', level: 60, status: 'Emerging' }
+        ]);
+        populateSalary(null);
+        populateQualification({
+            detected_track: 'AI / ML',
+            qualification_status: 'Qualified',
+            qualification_label: 'Meets Track Entry Criteria'
+        });
+        updateRoadmapLinks('AI / ML');
+    }
+
+    function populateQualification(analysis) {
+        const card = document.getElementById('qualification-card');
+        const badge = document.getElementById('qual-badge');
+        const field = document.getElementById('qual-major-field');
+        const label = document.getElementById('qual-label');
+        const icon = document.getElementById('qual-icon');
+
+        if (!card) return;
+
+        // Remove pulse animation
+        card.classList.remove('animate-pulse');
+
+        const track = analysis.detected_track || 'Full Stack';
+        const status = analysis.qualification_status || 'Qualified';
+        const statusLabel = analysis.qualification_label || 'Meets Track Entry Criteria';
+
+        field.textContent = track;
+        label.textContent = statusLabel;
+        badge.textContent = status;
+
+        if (status === 'Qualified') {
+            badge.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-secondary/10 text-secondary border border-secondary/20";
+            icon.textContent = "workspace_premium";
+            icon.className = "material-symbols-outlined text-4xl text-secondary";
+        } else {
+            badge.className = "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-amber-500/10 text-amber-400 border border-amber-500/20";
+            icon.textContent = "autorenew";
+            icon.className = "material-symbols-outlined text-4xl text-amber-400";
+        }
+
+        updateRoadmapLinks(track);
+    }
+
+    function populateATS(score) {
+        const ring = document.getElementById('ats-ring');
+        const scoreEl = document.getElementById('ats-score');
+        const label = document.getElementById('ats-label');
+        const offset = 283 - (283 * score / 100);
+        ring.style.strokeDashoffset = offset;
+
+        let current = 0;
+        const interval = setInterval(() => {
+            current++;
+            scoreEl.textContent = current;
+            if (current >= score) clearInterval(interval);
+        }, 20);
+
+        if (score >= 90) label.textContent = 'Ranked Elite for FAANG technical roles.';
+        else if (score >= 70) label.textContent = 'Strong match. Minor optimization needed.';
+        else label.textContent = 'Significant gaps detected. Action required.';
+    }
+
+    function populateSkills(skills) {
+        const grid = document.getElementById('skills-grid');
+        const icons = ['code', 'database', 'cloud', 'security', 'terminal', 'memory', 'hub', 'analytics'];
+        const statuses = ['Critical Gap', 'Emerging', 'Expert', 'High Proficiency', 'Growing', 'Advanced'];
+
+        if (typeof skills[0] === 'string') {
+            grid.innerHTML = skills.slice(0, 8).map((skill, i) => `
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-secondary/30 transition-all cursor-default">
+                    <span class="material-symbols-outlined text-secondary text-2xl mb-3 block">${icons[i % icons.length]}</span>
+                    <div class="text-sm font-medium text-on-background truncate">${skill}</div>
+                    <div class="text-[10px] text-on-surface-variant mt-1">${statuses[i % statuses.length]}</div>
+                </div>
+            `).join('');
+        } else {
+            grid.innerHTML = skills.slice(0, 8).map((s, i) => `
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-secondary/30 transition-all cursor-default">
+                    <span class="material-symbols-outlined text-secondary text-2xl mb-3 block">${icons[i % icons.length]}</span>
+                    <div class="text-sm font-medium text-on-background truncate">${s.name || s}</div>
+                    <div class="text-[10px] text-on-surface-variant mt-1">${s.level || statuses[i % statuses.length]}</div>
+                </div>
+            `).join('');
+        }
+    }
+
+    function populateGaps(gaps) {
+        const container = document.getElementById('gap-bars');
+        const colors = ['bg-secondary', 'bg-purple-500', 'bg-secondary/50', 'bg-amber-400'];
+        const statusColors = ['text-secondary', 'text-purple-500', 'text-secondary/50', 'text-amber-400'];
+
+        if (typeof gaps[0] === 'string') {
+            container.innerHTML = gaps.slice(0, 5).map((gap, i) => `
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-label-sm font-label-sm"><span>${gap}</span><span class="${statusColors[i % statusColors.length]}">Gap Detected</span></div>
+                    <div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="h-full ${colors[i % colors.length]} rounded-full transition-all duration-1000" style="width:${60 + Math.random() * 30}%"></div></div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = gaps.slice(0, 5).map((gap, i) => `
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-label-sm font-label-sm"><span>${gap.name}</span><span class="${statusColors[i % statusColors.length]}">${gap.status}</span></div>
+                    <div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div class="h-full ${colors[i % colors.length]} rounded-full transition-all duration-1000" style="width:${gap.level}%"></div></div>
+                </div>
+            `).join('');
+        }
+    }
+
+    function populateSalary(estimate) {
+        const el = document.getElementById('salary-estimate');
+        const salary = estimate || '$185k+';
+        el.innerHTML = `<span class="text-on-background">${typeof salary === 'number' ? '$' + Math.round(salary/1000) + 'k+' : salary}</span>`;
+    }
+
+    loadAnalysis();
+
+    // Fill Gaps button
+    document.getElementById('fill-gaps-btn').addEventListener('click', () => {
+        window.location.href = 'resources.html';
+    });
+
+    // WebGL Shader (same fluid background)
+    const globalCanvas = document.getElementById('global-canvas');
+    const gl = globalCanvas.getContext('webgl');
+    if (gl) {
+        const vs = `attribute vec2 position; varying vec2 v_texCoord; void main() { v_texCoord = position * 0.5 + 0.5; gl_Position = vec4(position, 0.0, 1.0); }`;
+        const fs = `precision highp float; varying vec2 v_texCoord; uniform float u_time; uniform vec2 u_resolution;
+        float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+        float noise(vec2 p) { vec2 i = floor(p); vec2 f = fract(p); float a = hash(i); float b = hash(i + vec2(1.0, 0.0)); float c = hash(i + vec2(0.0, 1.0)); float d = hash(i + vec2(1.0, 1.0)); vec2 u = f * f * (3.0 - 2.0 * f); return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y; }
+        float fbm(vec2 p) { float v = 0.0; float a = 0.5; mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5)); for (int i = 0; i < 4; ++i) { v += a * noise(p); p = rot * p * 2.0 + vec2(100.0); a *= 0.5; } return v; }
+        void main() { vec2 p = (v_texCoord - 0.5) * 2.0; p.x *= u_resolution.x / u_resolution.y; float t = u_time * 0.12;
+        float f = fbm(p + fbm(p + t)); vec3 color = vec3(0.015); color = mix(color, vec3(0.0, 0.4, 0.25), clamp(f * f * 3.0, 0.0, 1.0) * 0.6); color = mix(color, vec3(0.3, 0.08, 0.5), clamp(f * 0.5, 0.0, 1.0) * 0.2);
+        color += (hash(v_texCoord + u_time) - 0.5) * 0.015; gl_FragColor = vec4(color, 1.0); }`;
+
+        function cs(gl, type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+        const prog = gl.createProgram(); gl.attachShader(prog, cs(gl, gl.VERTEX_SHADER, vs)); gl.attachShader(prog, cs(gl, gl.FRAGMENT_SHADER, fs)); gl.linkProgram(prog);
+        const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+        const pLoc = gl.getAttribLocation(prog, 'position'), tLoc = gl.getUniformLocation(prog, 'u_time'), rLoc = gl.getUniformLocation(prog, 'u_resolution');
+        function render(time) { globalCanvas.width = window.innerWidth; globalCanvas.height = window.innerHeight; gl.viewport(0,0,globalCanvas.width,globalCanvas.height); gl.useProgram(prog); gl.enableVertexAttribArray(pLoc); gl.vertexAttribPointer(pLoc,2,gl.FLOAT,false,0,0); gl.uniform1f(tLoc, time*0.001); gl.uniform2f(rLoc, globalCanvas.width, globalCanvas.height); gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(render); }
+        requestAnimationFrame(render);
+    }
+
+    // Reveal observer
+    const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); }), { threshold: 0.1 });
+    document.querySelectorAll('.reveal-up').forEach(el => obs.observe(el));
+
+    // Card tilt
+    document.querySelectorAll('.vanguard-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const r = card.getBoundingClientRect(), rx = (e.clientY - r.top - r.height/2) / 25, ry = (r.width/2 - (e.clientX - r.left)) / 25;
+            card.style.transform = `scale(1.01) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(15px)`;
+        });
+        card.addEventListener('mouseleave', () => { card.style.transform = ''; card.style.boxShadow = ''; });
+    });
+</script>
+</body>
+</html>

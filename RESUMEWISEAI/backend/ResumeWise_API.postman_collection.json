@@ -1,0 +1,612 @@
+{
+  "info": {
+    "_postman_id": "resumewise-backend-api",
+    "name": "ResumeWise AI - Backend API",
+    "description": "Complete API collection for ResumeWise AI backend testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"access_token\", jsonData.data.access_token);",
+                  "    pm.environment.set(\"refresh_token\", jsonData.data.refresh_token);",
+                  "    console.log(\"Token saved to environment\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"TestPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"1234567890\",\n  \"bio\": \"Software Developer\",\n  \"target_role\": \"Senior Backend Developer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"TestPassword123!\",\n  \"new_password\": \"NewPassword123!\",\n  \"confirm_password\": \"NewPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resume Management",
+      "item": [
+        {
+          "name": "Upload Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "target_role",
+                  "value": "Python Developer",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/resume/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "upload"]
+            }
+          }
+        },
+        {
+          "name": "List Resumes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume/list?page=1&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "list"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Resume",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume/{{resume_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "{{resume_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Parse Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume/{{resume_id}}/parse",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "{{resume_id}}", "parse"]
+            }
+          }
+        },
+        {
+          "name": "Delete Resume",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/resume/{{resume_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "resume", "{{resume_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resume Analysis",
+      "item": [
+        {
+          "name": "Analyze Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resume_id\": \"{{resume_id}}\",\n  \"target_role\": \"Python Developer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analyze/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Analysis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analyze/{{analysis_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze", "{{analysis_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Skill Gap",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analyze/{{analysis_id}}/skill-gap",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze", "{{analysis_id}}", "skill-gap"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Career Roadmap",
+      "item": [
+        {
+          "name": "Generate Roadmap",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_skills\": [\"Python\", \"Flask\", \"SQL\"],\n  \"goal_role\": \"Senior Backend Developer\",\n  \"months\": 12\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/roadmap/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "roadmap", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Generate Learning Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\"Docker\", \"Kubernetes\", \"AWS\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/roadmap/learning-plan",
+              "host": ["{{base_url}}"],
+              "path": ["api", "roadmap", "learning-plan"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Interview Preparation",
+      "item": [
+        {
+          "name": "Generate Interview Questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"job_title\": \"Backend Developer\",\n  \"company\": \"Tech Company\",\n  \"skills\": [\"Python\", \"Flask\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/interview/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "interview", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Get Behavioral Questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/interview/behavioral-questions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "interview", "behavioral-questions"]
+            }
+          }
+        },
+        {
+          "name": "Get Technical Questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/interview/technical-questions?topic=Python",
+              "host": ["{{base_url}}"],
+              "path": ["api", "interview", "technical-questions"],
+              "query": [
+                {
+                  "key": "topic",
+                  "value": "Python"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Interview Tips",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/interview/tips",
+              "host": ["{{base_url}}"],
+              "path": ["api", "interview", "tips"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Report Generation",
+      "item": [
+        {
+          "name": "Generate Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resume_id\": \"{{resume_id}}\",\n  \"include_components\": [\"ats_score\", \"skills_analysis\", \"ai_feedback\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/report/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "report", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Get Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/report/{{report_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "report", "{{report_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Download PDF Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/report/{{report_id}}/download",
+              "host": ["{{base_url}}"],
+              "path": ["api", "report", "{{report_id}}", "download"]
+            }
+          }
+        },
+        {
+          "name": "List Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/report/list?page=1&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "report", "list"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resume_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "analysis_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "report_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

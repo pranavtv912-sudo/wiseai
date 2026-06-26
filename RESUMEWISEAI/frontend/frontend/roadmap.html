@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeWise AI | Career Roadmap</title>
+<meta name="description" content="Interactive roadmap.sh-style career path visualizer powered by AI."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300..900&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config={darkMode:"class",theme:{extend:{
+    colors:{"secondary":"#4edea3","primary":"#c9c6c5","on-background":"#e5e2e1","background":"#050505","surface-card":"#0A0A0A","glass-border":"rgba(255,255,255,0.1)","on-surface-variant":"#c4c7c7","on-secondary":"#003824"},
+    fontFamily:{"body-md":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"headline-md":["Geist"],"label-sm":["Geist"]},
+    spacing:{"container-padding":"2rem"}
+  }}}
+</script>
+<style>
+  :root{--bezier:cubic-bezier(0.32,0.72,0,1);--em:#4edea3;--pu:#a78bfa;--am:#fbbf24;}
+  body{background:#050505;color:#e5e2e1;overflow-x:hidden;font-family:'Plus Jakarta Sans',sans-serif;}
+  .vanguard{font-family:'Fraunces',serif;font-variation-settings:'SOFT' 100,'WONK' 1;letter-spacing:-.03em;}
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;}
+
+  /* ── ROADMAP CANVAS ── */
+  #roadmap-canvas{position:relative;overflow:hidden;}
+  #roadmap-svg{position:absolute;inset:0;pointer-events:none;z-index:0;}
+
+  /* ── NODES ── */
+  .rnode{
+    position:absolute;
+    background:rgba(10,10,10,.95);
+    border:1.5px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    padding:14px 18px;
+    cursor:pointer;
+    transition:transform .35s var(--bezier),box-shadow .35s var(--bezier),border-color .35s var(--bezier);
+    backdrop-filter:blur(20px);
+    z-index:10;
+    user-select:none;
+    min-width:160px;
+    max-width:220px;
+    text-align:center;
+  }
+  .rnode:hover{transform:translateY(-4px) scale(1.04);z-index:20;}
+  .rnode.status-done{border-color:rgba(78,222,163,.5);box-shadow:0 0 20px rgba(78,222,163,.15);}
+  .rnode.status-doing{border-color:rgba(251,191,36,.5);box-shadow:0 0 20px rgba(251,191,36,.12);}
+  .rnode.status-todo{border-color:rgba(255,255,255,.1);}
+  .rnode.status-optional{border-color:rgba(167,139,250,.35);opacity:.75;}
+  .rnode-icon{font-size:22px;margin-bottom:6px;display:block;}
+  .rnode-title{font-family:'Geist',sans-serif;font-size:12px;font-weight:600;letter-spacing:.02em;line-height:1.3;}
+  .rnode-sub{font-size:10px;color:#c4c7c7;margin-top:3px;letter-spacing:.05em;}
+  /* status dot */
+  .sdot{width:8px;height:8px;border-radius:50%;position:absolute;top:8px;right:10px;}
+  .status-done .sdot{background:var(--em);}
+  .status-doing .sdot{background:var(--am);animation:pulse-am 2s infinite;}
+  .status-todo .sdot{background:rgba(255,255,255,.2);}
+  .status-optional .sdot{background:var(--pu);}
+  @keyframes pulse-am{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.4);}50%{box-shadow:0 0 0 6px rgba(251,191,36,0);}}
+
+  /* ── PANEL (detail drawer) ── */
+  #detail-panel{
+    position:fixed;right:-440px;top:0;bottom:0;width:420px;
+    background:#0a0a0a;border-left:1px solid rgba(255,255,255,.08);
+    z-index:100;transition:right .45s var(--bezier);
+    overflow-y:auto;padding:32px 28px;
+  }
+  #detail-panel.open{right:0;}
+
+  /* ── LEGEND ── */
+  .leg{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+
+  /* ── SIDEBAR TRACKS ── */
+  .track-btn{
+    width:100%;text-align:left;padding:10px 14px;border-radius:10px;
+    transition:background .25s,color .25s;cursor:pointer;
+    font-size:12px;font-family:'Geist',sans-serif;font-weight:500;letter-spacing:.04em;
+    border:1px solid transparent;
+    color:#c4c7c7;background:transparent;
+  }
+  .track-btn:hover{background:rgba(255,255,255,.05);color:#e5e2e1;}
+  .track-btn.active{background:rgba(78,222,163,.1);border-color:rgba(78,222,163,.3);color:#4edea3;}
+
+  /* ── ZOOM CONTROLS ── */
+  #canvas-wrap{overflow:auto;position:relative;cursor:grab;}
+  #canvas-wrap:active{cursor:grabbing;}
+  #roadmap-canvas{transform-origin:0 0;}
+
+  /* ── TOOLTIP ── */
+  #tooltip{
+    position:fixed;pointer-events:none;z-index:200;
+    background:#111;border:1px solid rgba(78,222,163,.3);
+    border-radius:10px;padding:8px 14px;font-size:11px;
+    color:#e5e2e1;opacity:0;transition:opacity .2s;max-width:240px;
+    box-shadow:0 8px 30px rgba(0,0,0,.5);
+  }
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(20px);filter:blur(6px);transition:all .8s var(--bezier);}
+  .reveal.on{opacity:1;transform:none;filter:blur(0);}
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:4px;height:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(78,222,163,.2);border-radius:4px;}
+  @media (max-width: 767px) {
+      .mobile-hidden { display: none !important; }
+      .mobile-visible { display: flex !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TOOLTIP ── -->
+<div id="tooltip"></div>
+
+<!-- ── NAV ── -->
+<nav class="bg-background/80 backdrop-blur-2xl border-b border-glass-border sticky top-0 z-50">
+  <div class="flex justify-between items-center w-full px-container-padding max-w-full mx-auto py-4">
+    <a href="index.html" class="vanguard text-2xl font-bold tracking-tighter text-on-background">ResumeWise <span class="text-secondary">AI</span></a>
+    <div class="mobile-hidden hidden md:flex items-center gap-7 text-sm">
+      <a class="text-on-surface-variant hover:text-white transition-colors" href="index.html">Dashboard</a>
+      <a class="text-on-surface-variant hover:text-white transition-colors" href="dashboard.html">Analysis</a>
+      <a class="text-secondary font-medium border-b-2 border-secondary pb-1" href="roadmap.html">Roadmap</a>
+      <a class="text-on-surface-variant hover:text-white transition-colors" href="resources.html">Resources</a>
+    </div>
+    <div class="mobile-hidden hidden md:flex items-center gap-3" id="nav-auth">
+      <a href="signin.html" class="text-on-surface-variant hover:text-white text-sm transition-colors">Sign In</a>
+      <a href="signup.html" class="bg-primary text-on-primary px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-95 transition-all">Get Started</a>
+    </div>
+    <!-- Hamburger Button (Mobile only) -->
+    <button id="mobile-menu-toggle" class="mobile-visible flex md:hidden text-on-background hover:text-secondary focus:outline-none transition-colors" aria-label="Toggle Menu">
+        <span class="material-symbols-outlined text-[28px]" id="mobile-menu-icon">menu</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Overlay -->
+<div id="mobile-drawer" class="fixed inset-x-0 z-40 bg-background/95 backdrop-blur-2xl transition-all duration-300 ease-in-out opacity-0 pointer-events-none md:hidden border-b border-glass-border shadow-2xl" style="top: 65px;">
+    <div class="flex flex-col p-8 space-y-6">
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="index.html">Dashboard</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="dashboard.html">Analysis</a>
+        <a class="text-secondary font-medium text-lg pb-1" href="roadmap.html">Roadmap</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="resources.html">Resources</a>
+        <div class="h-px bg-glass-border my-2"></div>
+        <div class="flex flex-col gap-4" id="mobile-nav-auth">
+            <a href="signin.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">Sign In</a>
+            <a href="signup.html" class="bg-primary text-on-primary px-6 py-3 rounded-full text-center font-bold text-xs uppercase tracking-widest">
+                Get Started
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ── LAYOUT ── -->
+<div class="flex h-[calc(100vh-65px)]" id="app">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="w-64 flex-shrink-0 border-r border-glass-border bg-surface-card/50 flex flex-col overflow-hidden">
+    <!-- Hero text -->
+    <div class="p-6 border-b border-glass-border">
+      <div class="vanguard text-xl font-bold text-on-background mb-1">Career Roadmap</div>
+      <p class="text-xs text-on-surface-variant leading-relaxed">Interactive path — click any node to explore</p>
+    </div>
+
+    <!-- Tracks -->
+    <div class="p-4 border-b border-glass-border">
+      <div class="text-[10px] font-label-sm uppercase tracking-widest text-on-surface-variant mb-3">Career Tracks</div>
+      <div id="track-list" class="space-y-1"></div>
+    </div>
+
+    <!-- Legend -->
+    <div class="p-4 border-b border-glass-border space-y-2">
+      <div class="text-[10px] font-label-sm uppercase tracking-widest text-on-surface-variant mb-3">Legend</div>
+      <div class="leg"><div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>Completed</div>
+      <div class="leg"><div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>In Progress</div>
+      <div class="leg"><div class="w-2.5 h-2.5 rounded-full bg-white/20"></div>To Learn</div>
+      <div class="leg"><div class="w-2.5 h-2.5 rounded-full bg-purple-400"></div>Optional</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="p-4 mt-auto">
+      <div class="rounded-xl border border-glass-border p-4 space-y-2">
+        <div class="text-[10px] font-label-sm uppercase tracking-widest text-on-surface-variant">Progress</div>
+        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div id="progress-bar" class="h-full bg-secondary rounded-full transition-all duration-700" style="width:0%"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-on-surface-variant"><span id="prog-done">0 done</span><span id="prog-total">0 total</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CANVAS AREA -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <!-- Toolbar -->
+    <div class="flex items-center gap-3 px-5 py-3 border-b border-glass-border bg-surface-card/30 flex-shrink-0">
+      <button id="zoom-in" class="w-8 h-8 rounded-lg bg-white/5 border border-glass-border flex items-center justify-center hover:bg-white/10 transition-all" title="Zoom In">
+        <span class="material-symbols-outlined text-[16px]">add</span>
+      </button>
+      <button id="zoom-out" class="w-8 h-8 rounded-lg bg-white/5 border border-glass-border flex items-center justify-center hover:bg-white/10 transition-all" title="Zoom Out">
+        <span class="material-symbols-outlined text-[16px]">remove</span>
+      </button>
+      <button id="zoom-reset" class="w-8 h-8 rounded-lg bg-white/5 border border-glass-border flex items-center justify-center hover:bg-white/10 transition-all" title="Reset">
+        <span class="material-symbols-outlined text-[16px]">center_focus_strong</span>
+      </button>
+      <div class="w-px h-5 bg-glass-border mx-1"></div>
+      <span class="text-xs text-on-surface-variant" id="track-label">Full Stack Developer</span>
+      <div class="ml-auto flex items-center gap-2">
+        <a href="resources.html" class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-[10px] font-label-sm uppercase tracking-widest hover:bg-secondary/20 transition-all">
+          <span class="material-symbols-outlined text-[14px]">play_circle</span>Resources
+        </a>
+      </div>
+    </div>
+
+    <!-- Scrollable canvas -->
+    <div id="canvas-wrap" class="flex-1 overflow-auto relative">
+      <div id="roadmap-canvas">
+        <svg id="roadmap-svg"></svg>
+        <div id="nodes-layer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div id="detail-panel">
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <div class="text-secondary text-[10px] font-label-sm uppercase tracking-widest mb-1" id="dp-category">Topic</div>
+        <h2 class="vanguard text-2xl text-on-background" id="dp-title">Select a node</h2>
+      </div>
+      <button onclick="closePanel()" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors flex-shrink-0 ml-3">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+
+    <!-- Status selector -->
+    <div class="flex gap-2 mb-6" id="dp-status-row">
+      <button onclick="setStatus('done')"     class="status-pill flex-1 py-2 rounded-full text-[10px] font-label-sm uppercase tracking-widest border border-secondary/30 text-secondary bg-secondary/10 hover:bg-secondary/20 transition-all">✓ Done</button>
+      <button onclick="setStatus('doing')"    class="status-pill flex-1 py-2 rounded-full text-[10px] font-label-sm uppercase tracking-widest border border-amber-400/30 text-amber-400 bg-amber-400/10 hover:bg-amber-400/20 transition-all">⟳ Doing</button>
+      <button onclick="setStatus('todo')"     class="status-pill flex-1 py-2 rounded-full text-[10px] font-label-sm uppercase tracking-widest border border-white/10 text-on-surface-variant bg-white/5 hover:bg-white/10 transition-all">○ Todo</button>
+    </div>
+
+    <p class="text-on-surface-variant text-sm leading-relaxed mb-8" id="dp-desc"></p>
+
+    <!-- Resources -->
+    <div class="mb-8">
+      <div class="text-[10px] font-label-sm uppercase tracking-widest text-on-surface-variant mb-4">Learning Resources</div>
+      <div id="dp-resources" class="space-y-3">
+        <div class="text-xs text-on-surface-variant">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Topics -->
+    <div>
+      <div class="text-[10px] font-label-sm uppercase tracking-widest text-on-surface-variant mb-4">Key Topics</div>
+      <div id="dp-topics" class="flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+// ════════════════════════════════════════════════
+// ROADMAP DATA  — roadmap.sh style tracks
+// ════════════════════════════════════════════════
+const TRACKS = {
+  'Full Stack': {
+    color:'#4edea3',
+    nodes:[
+      // Row 0 — root
+      {id:'root', title:'Full Stack Dev', icon:'code', col:4, row:0, status:'done', desc:'The complete path from zero to a production-ready full-stack engineer.', topics:['HTML','CSS','JavaScript','Git'], category:'Start Here'},
+      // Row 1 — fundamentals
+      {id:'internet', title:'How the Internet Works', icon:'wifi',        col:1, row:1, status:'done', desc:'TCP/IP, DNS, HTTP, HTTPS, SSL/TLS and how browsers render pages.', topics:['HTTP/HTTPS','DNS','TCP/IP'], category:'Fundamentals'},
+      {id:'html',     title:'HTML & CSS',             icon:'language',    col:3, row:1, status:'done', desc:'Semantic HTML, accessibility, responsive design, Flexbox, Grid.', topics:['HTML5','CSS3','Flexbox','Grid','Accessibility'], category:'Fundamentals'},
+      {id:'js',       title:'JavaScript',             icon:'terminal',    col:5, row:1, status:'done', desc:'ES6+, DOM, async/await, fetch API, event loop.', topics:['ES6+','DOM','Async','Fetch','Promises'], category:'Fundamentals'},
+      {id:'git',      title:'Version Control',        icon:'history',     col:7, row:1, status:'done', desc:'Git, GitHub, branching strategies, PR workflow.', topics:['Git','GitHub','Branching','PRs'], category:'Fundamentals'},
+      // Row 2
+      {id:'react',    title:'React / Vue / Angular',  icon:'hub',         col:2, row:2, status:'doing', desc:'Component architecture, state management, hooks, routing.', topics:['React','Hooks','Redux','Vue','Router'], category:'Frontend'},
+      {id:'ts',       title:'TypeScript',             icon:'data_object', col:5, row:2, status:'doing', desc:'Static typing, interfaces, generics, strict mode.', topics:['Types','Interfaces','Generics'], category:'Frontend'},
+      {id:'node',     title:'Node.js',                icon:'deployed_code',col:7, row:2, status:'todo', desc:'Event-driven, non-blocking I/O, npm ecosystem.', topics:['Express','npm','EventLoop','Streams'], category:'Backend'},
+      // Row 3
+      {id:'rest',     title:'REST APIs',              icon:'api',         col:2, row:3, status:'done', desc:'HTTP methods, status codes, API design best practices.', topics:['REST','CRUD','Status Codes','Swagger'], category:'Backend'},
+      {id:'db-rel',   title:'SQL / PostgreSQL',       icon:'database',    col:5, row:3, status:'doing', desc:'Relational databases, joins, indexes, transactions, ORMs.', topics:['SQL','Joins','Indexes','Prisma','Drizzle'], category:'Backend'},
+      {id:'db-nosql', title:'NoSQL — MongoDB',        icon:'storage',     col:7, row:3, status:'todo', desc:'Document model, aggregations, Atlas, Redis caching.', topics:['MongoDB','Redis','Atlas','Aggregation'], category:'Backend'},
+      // Row 4
+      {id:'auth',     title:'Auth & Security',        icon:'lock',        col:1, row:4, status:'todo', desc:'JWT, OAuth2, RBAC, hashing, XSS/CSRF protection.', topics:['JWT','OAuth2','RBAC','Bcrypt','HTTPS'], category:'Security'},
+      {id:'docker',   title:'Docker',                 icon:'inventory_2', col:3, row:4, status:'todo', desc:'Containerisation, Docker Compose, multi-stage builds.', topics:['Containers','Dockerfile','Compose'], category:'DevOps'},
+      {id:'cloud',    title:'AWS / GCP / Azure',      icon:'cloud',       col:6, row:4, status:'todo', desc:'EC2, S3, Lambda, RDS, CDN, IAM roles.', topics:['EC2','S3','Lambda','IAM','CloudFront'], category:'Cloud'},
+      {id:'ci',       title:'CI / CD Pipelines',      icon:'loop',        col:8, row:4, status:'optional', desc:'GitHub Actions, Jenkins, automated testing & deployment.', topics:['GitHub Actions','Docker Hub','Helm'], category:'DevOps'},
+      // Row 5
+      {id:'test',     title:'Testing',                icon:'bug_report',  col:2, row:5, status:'todo', desc:'Unit, integration, E2E testing with Jest, Vitest, Playwright.', topics:['Jest','Vitest','Playwright','TDD'], category:'Quality'},
+      {id:'perf',     title:'Performance',            icon:'speed',       col:5, row:5, status:'optional', desc:'Core Web Vitals, lazy loading, code splitting, CDN, caching.', topics:['LCP','FID','CLS','Lighthouse'], category:'Quality'},
+      {id:'k8s',      title:'Kubernetes',             icon:'account_tree',col:7, row:5, status:'optional', desc:'Orchestration, pods, services, ingress, Helm charts.', topics:['Pods','Services','Ingress','Helm','HPA'], category:'DevOps'},
+    ],
+    edges:[
+      ['root','internet'],['root','html'],['root','js'],['root','git'],
+      ['js','react'],['js','ts'],['js','node'],
+      ['node','rest'],['rest','db-rel'],['db-rel','db-nosql'],
+      ['rest','auth'],['node','docker'],['cloud','ci'],['docker','cloud'],
+      ['react','test'],['node','test'],['react','perf'],['docker','k8s'],
+    ]
+  },
+
+  'Frontend': {
+    color:'#a78bfa',
+    nodes:[
+      {id:'root',   title:'Frontend Dev',         icon:'web',             col:4, row:0, status:'done',     desc:'Build beautiful, performant user interfaces.', topics:['HTML','CSS','JS'], category:'Start'},
+      {id:'html',   title:'HTML Semantics',        icon:'language',        col:2, row:1, status:'done',     desc:'Accessible, semantic HTML5 structure.', topics:['HTML5','ARIA','SEO'], category:'Foundation'},
+      {id:'css',    title:'CSS Mastery',           icon:'brush',           col:6, row:1, status:'done',     desc:'Flexbox, Grid, animations, CSS variables, SASS.', topics:['Flexbox','Grid','SASS','Animations'], category:'Foundation'},
+      {id:'js',     title:'JavaScript ES6+',       icon:'terminal',        col:4, row:2, status:'doing',    desc:'Modern JS — promises, modules, closures, event loop.', topics:['ES6+','Modules','Closures','Fetch'], category:'Core'},
+      {id:'react',  title:'React',                 icon:'hub',             col:2, row:3, status:'doing',    desc:'Hooks, context, suspense, server components.', topics:['Hooks','Context','RSC'], category:'Framework'},
+      {id:'next',   title:'Next.js',               icon:'deployed_code',  col:2, row:4, status:'todo',     desc:'SSR, SSG, ISR, App Router, server actions.', topics:['SSR','SSG','AppRouter','Edge'], category:'Framework'},
+      {id:'ts',     title:'TypeScript',            icon:'data_object',    col:6, row:3, status:'doing',    desc:'Strong typing, interfaces, generics, utility types.', topics:['Types','Generics','Zod'], category:'Core'},
+      {id:'test',   title:'Testing',               icon:'bug_report',     col:4, row:4, status:'todo',     desc:'Jest, React Testing Library, Playwright.', topics:['Jest','RTL','Playwright'], category:'Quality'},
+      {id:'perf',   title:'Web Performance',       icon:'speed',          col:6, row:4, status:'optional', desc:'Vitals, bundling, code splitting, tree shaking.', topics:['LCP','CLS','Parcel','Vite'], category:'Advanced'},
+      {id:'a11y',   title:'Accessibility',         icon:'accessibility',  col:2, row:5, status:'optional', desc:'WCAG, screen readers, focus management, ARIA.', topics:['WCAG','ARIA','Tab focus'], category:'Advanced'},
+      {id:'anim',   title:'Animations & 3D',       icon:'animation',      col:6, row:5, status:'optional', desc:'Framer Motion, GSAP, Three.js, WebGL.', topics:['Framer','GSAP','Three.js','WebGL'], category:'Advanced'},
+    ],
+    edges:[
+      ['root','html'],['root','css'],['root','js'],
+      ['js','react'],['js','ts'],
+      ['react','next'],['react','test'],
+      ['ts','test'],['ts','perf'],
+      ['next','a11y'],['perf','anim'],
+    ]
+  },
+
+  'Backend': {
+    color:'#34d399',
+    nodes:[
+      {id:'root',  title:'Backend Dev',         icon:'dns',            col:4, row:0, status:'done',     desc:'Build scalable, secure server-side systems.', topics:['APIs','Databases','Auth'], category:'Start'},
+      {id:'lang',  title:'Python / Node / Go',  icon:'code',           col:4, row:1, status:'done',     desc:'Pick your primary backend language.', topics:['Python','Node.js','Go','Java'], category:'Language'},
+      {id:'rest',  title:'REST API Design',      icon:'api',            col:2, row:2, status:'done',     desc:'Resource naming, versioning, pagination, status codes.', topics:['REST','OpenAPI','Swagger'], category:'APIs'},
+      {id:'gql',   title:'GraphQL',             icon:'hub',            col:6, row:2, status:'doing',    desc:'Schema, resolvers, mutations, subscriptions.', topics:['Schema','Resolvers','Apollo','Relay'], category:'APIs'},
+      {id:'db',    title:'Databases',           icon:'database',       col:4, row:3, status:'doing',    desc:'SQL vs NoSQL — PostgreSQL, MongoDB, Redis.', topics:['PostgreSQL','MongoDB','Redis'], category:'Data'},
+      {id:'auth',  title:'Auth & Sessions',     icon:'lock',           col:2, row:4, status:'todo',     desc:'JWT, sessions, OAuth2, refresh tokens, MFA.', topics:['JWT','OAuth2','Sessions','MFA'], category:'Security'},
+      {id:'cache', title:'Caching Strategies',  icon:'memory',         col:6, row:4, status:'todo',     desc:'Redis, CDN, cache invalidation, cache-aside pattern.', topics:['Redis','CDN','TTL','Cache-Aside'], category:'Performance'},
+      {id:'msg',   title:'Message Queues',      icon:'queue',          col:4, row:4, status:'optional', desc:'Kafka, RabbitMQ, SQS — event-driven architecture.', topics:['Kafka','RabbitMQ','SQS','Pub/Sub'], category:'Architecture'},
+      {id:'micro', title:'Microservices',       icon:'account_tree',  col:2, row:5, status:'optional', desc:'Service decomposition, gRPC, service mesh, circuit breaker.', topics:['gRPC','Istio','CircuitBreaker'], category:'Architecture'},
+      {id:'test',  title:'Testing Strategies',  icon:'bug_report',    col:6, row:5, status:'todo',     desc:'Unit, integration, contract tests. TDD & BDD.', topics:['Pytest','Jest','Contract Tests','TDD'], category:'Quality'},
+    ],
+    edges:[
+      ['root','lang'],['lang','rest'],['lang','gql'],
+      ['rest','db'],['gql','db'],
+      ['db','auth'],['db','cache'],['db','msg'],
+      ['auth','micro'],['cache','test'],['msg','micro'],
+    ]
+  },
+
+  'DevOps': {
+    color:'#60a5fa',
+    nodes:[
+      {id:'root',    title:'DevOps Engineer',     icon:'settings',       col:4, row:0, status:'done',    desc:'Bridge development and operations for fast, reliable delivery.', topics:['CI/CD','Cloud','IaC'], category:'Start'},
+      {id:'linux',   title:'Linux & Shell',       icon:'terminal',       col:2, row:1, status:'done',    desc:'Bash scripting, file system, process management, SSH.', topics:['Bash','Cron','Systemd','SSH'], category:'Foundation'},
+      {id:'net',     title:'Networking',          icon:'wifi',           col:6, row:1, status:'done',    desc:'TCP/IP, DNS, load balancers, firewalls, VPNs.', topics:['TCP/IP','DNS','NAT','Firewall'], category:'Foundation'},
+      {id:'git',     title:'Git & GitOps',        icon:'history',        col:4, row:2, status:'done',    desc:'Advanced Git, GitFlow, GitHub Actions, ArgoCD.', topics:['GitFlow','ArgoCD','Flux'], category:'VCS'},
+      {id:'docker',  title:'Docker',              icon:'inventory_2',   col:2, row:3, status:'doing',   desc:'Images, containers, networking, volumes, Compose.', topics:['Dockerfile','Compose','Registry'], category:'Containers'},
+      {id:'k8s',     title:'Kubernetes',          icon:'account_tree',  col:5, row:3, status:'doing',   desc:'Pods, deployments, services, ingress, HPA.', topics:['Pods','Services','Helm','HPA','RBAC'], category:'Orchestration'},
+      {id:'cloud',   title:'Cloud (AWS/GCP)',      icon:'cloud',          col:4, row:4, status:'todo',    desc:'Compute, storage, networking, IAM, managed services.', topics:['EC2','S3','VPC','IAM','GKE'], category:'Cloud'},
+      {id:'iac',     title:'IaC — Terraform',     icon:'construction',  col:2, row:4, status:'todo',    desc:'Infrastructure as code, state management, modules.', topics:['Terraform','Pulumi','CDK','Ansible'], category:'IaC'},
+      {id:'ci',      title:'CI/CD Pipelines',     icon:'loop',           col:6, row:4, status:'todo',    desc:'GitHub Actions, Jenkins, Tekton, automated testing.', topics:['GH Actions','Jenkins','Tekton'], category:'CI/CD'},
+      {id:'obs',     title:'Observability',       icon:'monitoring',    col:4, row:5, status:'todo',    desc:'Metrics, logs, traces — Prometheus, Grafana, OpenTelemetry.', topics:['Prometheus','Grafana','Jaeger','OTel'], category:'Operations'},
+      {id:'sec',     title:'DevSecOps',           icon:'security',      col:2, row:5, status:'optional',desc:'SAST, DAST, container scanning, secret management.', topics:['Trivy','Vault','Snyk','OWASP'], category:'Security'},
+    ],
+    edges:[
+      ['root','linux'],['root','net'],
+      ['linux','git'],['net','git'],
+      ['git','docker'],['docker','k8s'],
+      ['k8s','cloud'],['cloud','iac'],['cloud','ci'],
+      ['ci','obs'],['iac','sec'],['obs','sec'],
+    ]
+  },
+
+  'AI / ML': {
+    color:'#f472b6',
+    nodes:[
+      {id:'root',  title:'AI / ML Engineer',    icon:'psychology',     col:4, row:0, status:'done',    desc:'Build intelligent systems that learn from data.', topics:['Math','Python','Statistics'], category:'Start'},
+      {id:'math',  title:'Math Foundations',    icon:'calculate',      col:2, row:1, status:'done',    desc:'Linear algebra, calculus, probability, statistics.', topics:['Linear Algebra','Calculus','Probability'], category:'Math'},
+      {id:'py',    title:'Python + Libraries',  icon:'terminal',       col:6, row:1, status:'done',    desc:'NumPy, Pandas, Matplotlib — data manipulation.', topics:['NumPy','Pandas','Matplotlib','SciPy'], category:'Tools'},
+      {id:'ml',    title:'Machine Learning',    icon:'auto_graph',     col:4, row:2, status:'doing',   desc:'Supervised, unsupervised, reinforcement learning.', topics:['Scikit-learn','XGBoost','SVMs','KNN'], category:'ML'},
+      {id:'dl',    title:'Deep Learning',       icon:'hub',            col:4, row:3, status:'doing',   desc:'Neural networks, CNNs, RNNs, transformers.', topics:['TensorFlow','PyTorch','CNNs','Transformers'], category:'DL'},
+      {id:'nlp',   title:'NLP & LLMs',          icon:'chat',           col:2, row:4, status:'todo',    desc:'Text processing, embeddings, fine-tuning, RAG.', topics:['Hugging Face','LangChain','RAG','RLHF'], category:'NLP'},
+      {id:'cv',    title:'Computer Vision',     icon:'image_search',  col:6, row:4, status:'optional', desc:'Image classification, object detection, segmentation.', topics:['OpenCV','YOLO','ResNet','ViT'], category:'CV'},
+      {id:'mlops', title:'MLOps',               icon:'loop',          col:4, row:4, status:'todo',    desc:'Model deployment, monitoring, drift detection, CI/CD for ML.', topics:['MLflow','Kubeflow','Seldon','DVC'], category:'Ops'},
+      {id:'prod',  title:'Production AI',       icon:'rocket_launch', col:4, row:5, status:'optional', desc:'Latency, quantisation, ONNX, serving, A/B testing.', topics:['ONNX','TensorRT','Triton','vLLM'], category:'Advanced'},
+    ],
+    edges:[
+      ['root','math'],['root','py'],
+      ['math','ml'],['py','ml'],
+      ['ml','dl'],
+      ['dl','nlp'],['dl','cv'],['dl','mlops'],
+      ['nlp','prod'],['mlops','prod'],
+    ]
+  }
+};
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+let activeTrack  = 'Full Stack';
+const rawTrack = new URLSearchParams(window.location.search).get('track');
+if (rawTrack) {
+  const t = rawTrack.toLowerCase();
+  if (t.includes('frontend')) activeTrack = 'Frontend';
+  else if (t.includes('backend') || t.includes('python')) activeTrack = 'Backend';
+  else if (t.includes('devops')) activeTrack = 'DevOps';
+  else if (t.includes('data') || t.includes('ai') || t.includes('ml')) activeTrack = 'AI / ML';
+  else if (t.includes('web') || t.includes('full stack') || t.includes('full-stack')) activeTrack = 'Full Stack';
+}
+let selectedNode = null;
+let statusMap    = JSON.parse(localStorage.getItem('rw_roadmap_status') || '{}');
+let scale        = 1;
+const COL_W = 230, ROW_H = 170;
+const CANVAS_PAD = 60;
+
+// ════════════════════════════════════════════════
+// NAV AUTH
+// ════════════════════════════════════════════════
+(function(){
+  const authContainer = document.getElementById('nav-auth');
+  const mobileAuthContainer = document.getElementById('mobile-nav-auth');
+  
+  const updateAuthUI = (container, isMobile = false) => {
+    if (!container) return;
+    if (ResumeWiseAPI.isAuthenticated()) {
+      const user = ResumeWiseAPI.getUser();
+      if (isMobile) {
+        container.innerHTML = `
+          <span class="text-on-surface-variant text-base py-1">Logged in as: <strong class="text-secondary">${user?.name || 'Strategist'}</strong></span>
+          <a href="dashboard.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">MY ANALYSIS</a>
+          <button onclick="ResumeWiseAPI.logout()" class="bg-white/5 border border-glass-border text-sm px-5 py-3 rounded-full hover:bg-white/10 transition-all w-full font-bold">Logout</button>
+        `;
+      } else {
+        container.innerHTML = `
+          <span class="text-on-surface-variant text-sm">${user?.name || 'Strategist'}</span>
+          <button onclick="ResumeWiseAPI.logout()" class="bg-white/5 border border-glass-border text-sm px-5 py-2 rounded-full hover:bg-white/10 transition-all">Logout</button>
+        `;
+      }
+    }
+  };
+
+  updateAuthUI(authContainer, false);
+  updateAuthUI(mobileAuthContainer, true);
+})();
+
+// Mobile menu toggle logic
+(function() {
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const drawer = document.getElementById('mobile-drawer');
+    const icon = document.getElementById('mobile-menu-icon');
+    if (toggleBtn && drawer && icon) {
+        toggleBtn.addEventListener('click', () => {
+            const isOpen = drawer.classList.contains('opacity-100');
+            if (isOpen) {
+                drawer.classList.remove('opacity-100', 'pointer-events-auto');
+                drawer.classList.add('opacity-0', 'pointer-events-none');
+                icon.textContent = 'menu';
+            } else {
+                drawer.classList.remove('opacity-0', 'pointer-events-none');
+                drawer.classList.add('opacity-100', 'pointer-events-auto');
+                icon.textContent = 'close';
+            }
+        });
+    }
+})();
+
+// ════════════════════════════════════════════════
+// TRACK SIDEBAR
+// ════════════════════════════════════════════════
+function buildTrackList(){
+  const el = document.getElementById('track-list');
+  el.innerHTML = Object.keys(TRACKS).map(k=>`
+    <button class="track-btn ${k===activeTrack?'active':''}" onclick="switchTrack('${k}')">${k}</button>
+  `).join('');
+}
+
+function switchTrack(name){
+  activeTrack = name;
+  buildTrackList();
+  document.getElementById('track-label').textContent = name + ' Developer';
+  closePanel();
+  renderRoadmap();
+}
+
+// ════════════════════════════════════════════════
+// RENDER ROADMAP
+// ════════════════════════════════════════════════
+function renderRoadmap(){
+  const track  = TRACKS[activeTrack];
+  const nodes  = track.nodes;
+  const edges  = track.edges;
+
+  // compute canvas size
+  const maxCol = Math.max(...nodes.map(n=>n.col));
+  const maxRow = Math.max(...nodes.map(n=>n.row));
+  const W      = (maxCol+1)*COL_W + CANVAS_PAD*2;
+  const H      = (maxRow+1)*ROW_H + CANVAS_PAD*2;
+
+  const canvas = document.getElementById('roadmap-canvas');
+  canvas.style.width  = W+'px';
+  canvas.style.height = H+'px';
+
+  // Compute positions
+  const pos = {};
+  nodes.forEach(n=>{
+    pos[n.id] = {
+      x: CANVAS_PAD + n.col * COL_W,
+      y: CANVAS_PAD + n.row * ROW_H
+    };
+  });
+
+  // Draw SVG edges
+  const svg = document.getElementById('roadmap-svg');
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.innerHTML = edges.map(([a,b])=>{
+    const pa = pos[a], pb = pos[b];
+    if(!pa||!pb) return '';
+    const x1=pa.x+105, y1=pa.y+40, x2=pb.x+105, y2=pb.y+4;
+    const cy = (y1+y2)/2;
+    return `<path d="M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}"
+      fill="none" stroke="${track.color}33" stroke-width="2"
+      stroke-dasharray="5 3" class="edge-path"
+    />`;
+  }).join('');
+
+  // Draw nodes
+  const layer = document.getElementById('nodes-layer');
+  layer.innerHTML = '';
+  nodes.forEach(n=>{
+    const p      = pos[n.id];
+    const status = statusMap[activeTrack+'_'+n.id] || n.status;
+    const div    = document.createElement('div');
+    div.className= `rnode status-${status}`;
+    div.style.left= p.x+'px';
+    div.style.top = p.y+'px';
+    div.innerHTML = `
+      <div class="sdot"></div>
+      <span class="material-symbols-outlined rnode-icon" style="color:${track.color}">${n.icon}</span>
+      <div class="rnode-title">${n.title}</div>
+      <div class="rnode-sub">${n.category}</div>`;
+    div.addEventListener('click', ()=>openPanel(n));
+    div.addEventListener('mouseenter', e=>showTooltip(e, n));
+    div.addEventListener('mouseleave', hideTooltip);
+    layer.appendChild(div);
+  });
+
+  updateProgress();
+}
+
+// ════════════════════════════════════════════════
+// PROGRESS
+// ════════════════════════════════════════════════
+function updateProgress(){
+  const nodes = TRACKS[activeTrack].nodes;
+  const total = nodes.length;
+  const done  = nodes.filter(n=>(statusMap[activeTrack+'_'+n.id]||n.status)==='done').length;
+  document.getElementById('progress-bar').style.width = (done/total*100)+'%';
+  document.getElementById('prog-done').textContent  = done+' done';
+  document.getElementById('prog-total').textContent = total+' total';
+}
+
+// ════════════════════════════════════════════════
+// DETAIL PANEL
+// ════════════════════════════════════════════════
+function openPanel(node){
+  selectedNode = node;
+  document.getElementById('dp-title').textContent    = node.title;
+  document.getElementById('dp-category').textContent = node.category || activeTrack;
+  document.getElementById('dp-desc').textContent     = node.desc;
+  document.getElementById('dp-topics').innerHTML     = (node.topics||[]).map(t=>
+    `<span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-label-sm text-secondary uppercase">${t}</span>`
+  ).join('');
+  document.getElementById('dp-resources').innerHTML  = '<div class="text-xs text-on-surface-variant animate-pulse">Fetching YouTube resources…</div>';
+  document.getElementById('detail-panel').classList.add('open');
+
+  // Fetch YouTube videos
+  fetchPanelVideos(node.title);
+}
+
+async function fetchPanelVideos(topic){
+  try{
+    const res = await ResumeWiseAPI.youtubeSearch(topic + ' tutorial', 4);
+    if(res.success && res.data?.videos?.length){
+      renderPanelVideos(res.data.videos);
+    } else {
+      renderPanelVideos([]);
+    }
+  } catch(e){
+    renderPanelVideos([]);
+  }
+}
+
+function renderPanelVideos(videos){
+  const el = document.getElementById('dp-resources');
+  if(!videos.length){
+    el.innerHTML = `<a href="resources.html?q=${encodeURIComponent(selectedNode?.title||'')}" class="text-xs text-secondary">Search in Resource Hub →</a>`;
+    return;
+  }
+  el.innerHTML = videos.map(v=>`
+    <div class="flex gap-3 items-start p-3 rounded-xl bg-white/5 border border-white/8 hover:border-secondary/25 transition-colors cursor-pointer group" onclick="window.open('${escHtml(v.url||'#')}','_blank')">
+      <img src="${escHtml(v.thumbnail||`https://i.ytimg.com/vi/${v.video_id}/default.jpg`)}" alt="" class="w-20 h-14 object-cover rounded-lg flex-shrink-0 group-hover:opacity-90 transition-opacity">
+      <div class="min-w-0">
+        <div class="text-xs font-medium text-on-background line-clamp-2 group-hover:text-secondary transition-colors">${escHtml(v.title)}</div>
+        <div class="text-[10px] text-on-surface-variant mt-1">${escHtml(v.channel||'YouTube')}</div>
+        <div class="text-[10px] text-secondary mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[11px]">open_in_new</span>Watch on YouTube</div>
+      </div>
+    </div>`).join('');
+}
+
+function closePanel(){
+  document.getElementById('detail-panel').classList.remove('open');
+  selectedNode = null;
+}
+
+function setStatus(status){
+  if(!selectedNode) return;
+  statusMap[activeTrack+'_'+selectedNode.id] = status;
+  localStorage.setItem('rw_roadmap_status', JSON.stringify(statusMap));
+  renderRoadmap();
+  // keep panel open, update node status label
+  openPanel(selectedNode);
+}
+
+// ════════════════════════════════════════════════
+// TOOLTIP
+// ════════════════════════════════════════════════
+const tooltip = document.getElementById('tooltip');
+function showTooltip(e, n){
+  tooltip.innerHTML = `<strong>${n.title}</strong><br><span style="color:#c4c7c7;font-size:10px">${(n.desc||'').slice(0,80)}…</span>`;
+  tooltip.style.opacity='1';
+  moveTooltip(e);
+}
+function moveTooltip(e){
+  tooltip.style.left = (e.clientX+14)+'px';
+  tooltip.style.top  = (e.clientY+14)+'px';
+}
+function hideTooltip(){ tooltip.style.opacity='0'; }
+document.addEventListener('mousemove', e=>{
+  if(tooltip.style.opacity==='1') moveTooltip(e);
+});
+
+// ════════════════════════════════════════════════
+// ZOOM
+// ════════════════════════════════════════════════
+const canvasEl = document.getElementById('roadmap-canvas');
+document.getElementById('zoom-in').addEventListener('click', ()=>{ scale=Math.min(scale+.15,2); canvasEl.style.transform=`scale(${scale})`; });
+document.getElementById('zoom-out').addEventListener('click',()=>{ scale=Math.max(scale-.15,.4); canvasEl.style.transform=`scale(${scale})`; });
+document.getElementById('zoom-reset').addEventListener('click',()=>{ scale=1; canvasEl.style.transform=`scale(1)`; });
+
+// Mouse-wheel zoom
+document.getElementById('canvas-wrap').addEventListener('wheel', e=>{
+  if(e.ctrlKey||e.metaKey){
+    e.preventDefault();
+    scale = Math.min(Math.max(scale - e.deltaY*0.001, .4), 2);
+    canvasEl.style.transform=`scale(${scale})`;
+  }
+},{passive:false});
+
+// ════════════════════════════════════════════════
+// UTIL
+// ════════════════════════════════════════════════
+function escHtml(str){ const d=document.createElement('div'); d.textContent=str||''; return d.innerHTML; }
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+buildTrackList();
+if (document.getElementById('track-label')) {
+  document.getElementById('track-label').textContent = activeTrack + ' Developer';
+}
+renderRoadmap();
+</script>
+</body>
+</html>

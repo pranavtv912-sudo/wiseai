@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>ResumeWise AI | Precision Career Engineering</title>
+    <meta name="description" content="AI-Driven Architectural Analysis for the Next-Gen Workforce. Upload your resume for precision career engineering."/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300..900&display=swap" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --bezier-standard: cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+            overflow-x: hidden;
+            perspective: 1500px;
+        }
+        .vanguard-heading {
+            font-family: 'Fraunces', serif;
+            font-variation-settings: 'SOFT' 100, 'WONK' 1;
+            letter-spacing: -0.03em;
+        }
+        .ethereal-blur {
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(60px);
+            transition: transform 0.6s var(--bezier-standard), box-shadow 0.6s var(--bezier-standard);
+        }
+        .vanguard-card {
+            transform-style: preserve-3d;
+            transition: transform 0.5s var(--bezier-standard);
+        }
+        .vanguard-card:hover {
+            transform: scale(1.02) translateZ(20px) rotateX(2deg) rotateY(2deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(16, 185, 129, 0.1);
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px) rotateX(10deg);
+            filter: blur(15px);
+            transition: all 1.2s var(--bezier-standard);
+        }
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0) rotateX(0);
+            filter: blur(0);
+        }
+        #global-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        #hero-matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .island-button:active {
+            transform: scale(0.96);
+        }
+        @keyframes subtle-float {
+            0%, 100% { transform: translateY(0) translateZ(0); }
+            50% { transform: translateY(-15px) translateZ(30px); }
+        }
+        .floating-3d {
+            animation: subtle-float 8s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+        .drop-zone-active {
+            border-color: rgba(78, 222, 163, 0.5) !important;
+            box-shadow: 0 0 40px rgba(78, 222, 163, 0.2);
+        }
+        .upload-progress {
+            transition: width 0.3s ease;
+        }
+        @media (max-width: 767px) {
+            .mobile-hidden { display: none !important; }
+            .mobile-visible { display: flex !important; }
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary": "#4edea3",
+                        "primary": "#c9c6c5",
+                        "on-background": "#e5e2e1",
+                        "background": "#050505",
+                        "surface-card": "#0A0A0A",
+                        "glass-border": "rgba(255, 255, 255, 0.15)",
+                        "glass-highlight": "rgba(255, 255, 255, 0.15)",
+                        "on-surface-variant": "#c4c7c7",
+                        "on-secondary": "#003824",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    spacing: {
+                        "gutter": "24px",
+                        "container-padding": "2rem",
+                        "section-gap": "160px",
+                        "bezel-inner": "6px",
+                        "bezel-outer": "8px"
+                    },
+                    fontFamily: {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Geist"],
+                        "display-xl": ["Geist"]
+                    },
+                    fontSize: {
+                        "body-lg": ["18px", {"lineHeight": "32px", "fontWeight": "300"}],
+                        "label-sm": ["10px", {"lineHeight": "16px", "letterSpacing": "0.2em", "fontWeight": "500"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "28px", "fontWeight": "300"}],
+                        "display-xl": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background">
+<canvas id="global-canvas"></canvas>
+
+<!-- Top Navigation Bar -->
+<nav class="bg-background/40 backdrop-blur-3xl docked full-width top-0 sticky z-50 border-b border-glass-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+    <div class="flex justify-between items-center w-full px-container-padding max-w-7xl mx-auto py-4">
+        <a href="index.html" class="vanguard-heading text-headline-md font-bold tracking-tighter text-on-background">ResumeWise AI</a>
+        <div class="mobile-hidden hidden md:flex items-center space-x-8">
+            <a class="text-secondary font-medium border-b-2 border-secondary pb-1 text-body-md font-body-md" href="index.html">Dashboard</a>
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors text-body-md font-body-md" href="dashboard.html">Analysis</a>
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors text-body-md font-body-md" href="roadmap.html">Roadmap</a>
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors text-body-md font-body-md" href="resources.html">Resources</a>
+        </div>
+        <div class="mobile-hidden hidden md:flex items-center gap-4" id="nav-auth">
+            <a href="signin.html" class="text-on-surface-variant hover:text-on-surface transition-colors font-label-sm text-label-sm">Sign In</a>
+            <a href="signup.html" class="island-button bg-on-background text-background px-6 py-2.5 rounded-full font-label-sm text-label-sm font-bold flex items-center group transition-all duration-300">
+                Get Started
+                <span class="ml-2 w-6 h-6 bg-background/10 rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </span>
+            </a>
+        </div>
+        <!-- Hamburger Button (Mobile only) -->
+        <button id="mobile-menu-toggle" class="mobile-visible flex md:hidden text-on-background hover:text-secondary focus:outline-none transition-colors" aria-label="Toggle Menu">
+            <span class="material-symbols-outlined text-[28px]" id="mobile-menu-icon">menu</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Drawer Overlay -->
+<div id="mobile-drawer" class="fixed inset-x-0 z-40 bg-background/95 backdrop-blur-2xl transition-all duration-300 ease-in-out opacity-0 pointer-events-none md:hidden border-b border-glass-border shadow-2xl" style="top: 72px;">
+    <div class="flex flex-col p-8 space-y-6">
+        <a class="text-secondary font-medium text-lg pb-1" href="index.html">Dashboard</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="dashboard.html">Analysis</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="roadmap.html">Roadmap</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="resources.html">Resources</a>
+        <div class="h-px bg-glass-border my-2"></div>
+        <div class="flex flex-col gap-4" id="mobile-nav-auth">
+            <a href="signin.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">Sign In</a>
+            <a href="signup.html" class="island-button bg-on-background text-background px-6 py-3 rounded-full text-center font-bold">
+                Get Started
+            </a>
+        </div>
+    </div>
+</div>
+
+<main>
+    <!-- Hero Section -->
+    <section class="py-40 px-container-padding max-w-7xl mx-auto text-center relative overflow-visible">
+        <div id="hero-matrix-canvas"></div>
+        <div class="reveal-up active relative z-10">
+            <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.4em] mb-6 block vanguard-heading">The Silent Strategist</span>
+            <h1 class="font-display-xl text-display-xl max-w-4xl mx-auto mb-8 vanguard-heading">Precision Career Engineering</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-16 tracking-widest uppercase opacity-70">
+                AI-Driven Architectural Analysis for the Next-Gen Workforce
+            </p>
+        </div>
+        <!-- Double-Bezel Drop Zone -->
+        <div class="reveal-up active relative z-10" style="transition-delay: 200ms;">
+            <div id="drop-zone" class="max-w-3xl mx-auto p-2 rounded-[2.5rem] bg-white/5 border border-white/15 shadow-2xl relative group vanguard-card">
+                <div class="absolute -inset-1 bg-gradient-to-r from-secondary/30 to-purple-500/30 rounded-[2.6rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                <div class="relative bg-surface-card rounded-[2rem] p-12 md:p-20 border border-white/20 backdrop-blur-[100px] overflow-hidden">
+                    <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
+                    <div class="relative z-10 flex flex-col items-center" id="upload-content">
+                        <div class="w-20 h-20 rounded-2xl bg-secondary/10 flex items-center justify-center mb-6 border border-secondary/20 floating-3d">
+                            <span class="material-symbols-outlined text-secondary text-4xl" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+                        </div>
+                        <h3 class="vanguard-heading text-headline-md mb-2">Ingest Resume Data</h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-4">Drop your PDF or DOCX to begin deep structural analysis.</p>
+                        <!-- Target Role Input -->
+                        <input type="text" id="target-role" placeholder="Target Role (e.g. Software Engineer)" class="mb-6 w-full max-w-sm px-6 py-3 bg-white/5 border border-white/10 rounded-full text-on-background placeholder:text-on-surface-variant/50 focus:border-secondary/50 focus:outline-none focus:ring-1 focus:ring-secondary/30 transition-all text-center">
+                        <input type="file" id="resume-file" accept=".pdf,.docx,.doc" class="hidden">
+                        <button id="upload-btn" class="bg-secondary text-on-secondary px-8 py-4 rounded-full font-label-sm text-label-sm font-bold flex items-center group hover:scale-[1.02] active:scale-95 transition-all">
+                            SELECT ARCHIVE
+                            <span class="ml-3 w-8 h-8 bg-on-secondary/10 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
+                                <span class="material-symbols-outlined text-[20px]">add</span>
+                            </span>
+                        </button>
+                        <!-- Upload Progress -->
+                        <div id="upload-progress" class="hidden w-full max-w-sm mt-6">
+                            <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="h-full bg-secondary rounded-full upload-progress" style="width: 0%"></div>
+                            </div>
+                            <p id="upload-status" class="text-label-sm font-label-sm text-secondary mt-2"></p>
+                        </div>
+                        <!-- Real-time Console Log -->
+                        <div id="debug-log" class="hidden w-full max-w-sm mt-4 p-3 bg-black/50 border border-white/10 rounded-xl font-mono text-[10px] text-left text-on-surface-variant max-h-28 overflow-y-auto space-y-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Features -->
+    <section class="py-40 px-container-padding max-w-7xl mx-auto">
+        <div class="mb-20 text-center reveal-up">
+            <h2 class="font-headline-lg text-headline-lg mb-4 vanguard-heading">Tactical Intelligence</h2>
+            <div class="h-1 w-20 bg-secondary mx-auto rounded-full"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+            <!-- ATS Shadow Simulator -->
+            <div class="md:col-span-8 group reveal-up" style="transition-delay: 100ms;">
+                <div class="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/15 flex flex-col backdrop-blur-3xl">
+                        <div class="flex justify-between items-start mb-12">
+                            <div>
+                                <h4 class="vanguard-heading text-headline-md mb-2">ATS Shadow Simulator</h4>
+                                <p class="font-body-md text-body-md text-on-surface-variant max-w-md">Reverse-engineer the invisible algorithms determining your candidacy.</p>
+                            </div>
+                            <span class="material-symbols-outlined text-secondary text-4xl">visibility</span>
+                        </div>
+                        <div class="mt-auto rounded-xl overflow-hidden border border-white/10 aspect-[16/7] relative bg-gradient-to-br from-secondary/5 to-purple-500/5">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <span class="material-symbols-outlined text-secondary text-6xl mb-4 block opacity-30">insights</span>
+                                    <p class="text-on-surface-variant/50 text-sm">Upload a resume to see ATS analysis</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Skill Gap Intelligence -->
+            <div class="md:col-span-4 group reveal-up" style="transition-delay: 200ms;">
+                <div class="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/15 backdrop-blur-3xl">
+                        <span class="material-symbols-outlined text-secondary text-4xl mb-6">psychology</span>
+                        <h4 class="vanguard-heading text-headline-md mb-2">Skill Gap Intelligence</h4>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-12">Identify precise missing nodes in your professional trajectory.</p>
+                        <div class="space-y-4">
+                            <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-secondary w-3/4 rounded-full"></div></div>
+                            <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-purple-500 w-1/2 rounded-full"></div></div>
+                            <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-secondary/50 w-5/6 rounded-full"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Career Path -->
+            <div class="md:col-span-4 group reveal-up" style="transition-delay: 300ms;">
+                <div class="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/15 backdrop-blur-3xl">
+                        <span class="material-symbols-outlined text-secondary text-4xl mb-6">alt_route</span>
+                        <h4 class="vanguard-heading text-headline-md mb-2">Trajectory Mapper</h4>
+                        <p class="font-body-md text-body-md text-on-surface-variant">Visualizing 10,000+ career evolution paths for your specific profile.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Real-time Roadmap -->
+            <div class="md:col-span-8 group reveal-up" style="transition-delay: 400ms;">
+                <div class="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card">
+                    <div class="bg-surface-card rounded-[1.75rem] p-8 h-full border border-white/15 flex flex-col md:flex-row gap-8 backdrop-blur-3xl">
+                        <div class="flex-1">
+                            <h4 class="vanguard-heading text-headline-md mb-2">Precision Roadmap</h4>
+                            <p class="font-body-md text-body-md text-on-surface-variant">A step-by-step tactical execution plan generated in milliseconds.</p>
+                            <ul class="mt-6 space-y-3">
+                                <li class="flex items-center gap-3 text-body-md text-secondary">
+                                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                    Keyword Optimization
+                                </li>
+                                <li class="flex items-center gap-3 text-body-md text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-[18px]">pending</span>
+                                    Certification Acquisition
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="flex-1 bg-white/5 rounded-2xl p-4 border border-white/10 relative overflow-hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-40 relative overflow-hidden">
+        <div class="absolute inset-0 bg-secondary/10 blur-[120px] rounded-full scale-150 translate-y-1/2"></div>
+        <div class="px-container-padding max-w-5xl mx-auto text-center relative z-10 reveal-up">
+            <h2 class="font-display-xl text-display-xl mb-8 vanguard-heading">Architect Your Future.</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12">
+                Join the top 1% of candidates who leverage precision engineering to bypass the noise and land elite opportunities.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="signup.html" class="island-button bg-secondary text-on-secondary px-10 py-5 rounded-full font-label-sm text-label-sm font-bold flex items-center group transition-all">
+                    COMMENCE ANALYSIS
+                    <span class="ml-4 w-10 h-10 bg-on-secondary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                    </span>
+                </a>
+                <a href="roadmap.html" class="island-button bg-white/5 border border-white/15 text-on-surface px-10 py-5 rounded-full font-label-sm text-label-sm font-bold flex items-center group transition-all hover:bg-white/10">
+                    VIEW METHODOLOGY
+                    <span class="ml-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                        <span class="material-symbols-outlined">auto_graph</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full py-24 border-t border-glass-border relative z-10" style="background:#0e0e0e;">
+    <div class="max-w-7xl mx-auto px-container-padding flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="flex flex-col items-center md:items-start">
+            <div class="vanguard-heading text-headline-md text-primary mb-2">ResumeWise AI</div>
+            <p class="text-on-surface-variant text-label-sm font-label-sm max-w-xs text-center md:text-left">© 2024 ResumeWise AI. Precision Career Engineering.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-8">
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline decoration-secondary underline-offset-4 transition-all" href="#">Privacy Policy</a>
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline decoration-secondary underline-offset-4 transition-all" href="#">Terms of Service</a>
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline decoration-secondary underline-offset-4 transition-all" href="resources.html">Resources</a>
+            <a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary hover:underline decoration-secondary underline-offset-4 transition-all" href="#">Contact</a>
+        </div>
+    </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+    // Auth-aware navigation
+    (function() {
+        const authContainer = document.getElementById('nav-auth');
+        const mobileAuthContainer = document.getElementById('mobile-nav-auth');
+        
+        const updateAuthUI = (container, isMobile = false) => {
+            if (!container) return;
+            if (ResumeWiseAPI.isAuthenticated()) {
+                const user = ResumeWiseAPI.getUser();
+                if (isMobile) {
+                    container.innerHTML = `
+                        <span class="text-on-surface-variant text-base py-1">Logged in as: <strong class="text-secondary">${user?.name || 'Strategist'}</strong></span>
+                        <a href="dashboard.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">MY ANALYSIS</a>
+                        <button onclick="ResumeWiseAPI.logout()" class="island-button bg-white/5 border border-white/15 text-on-surface px-6 py-3 rounded-full font-bold w-full">
+                            LOGOUT
+                        </button>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <a href="dashboard.html" class="text-on-surface-variant hover:text-on-surface transition-colors font-label-sm text-label-sm">MY ANALYSIS</a>
+                        <button onclick="ResumeWiseAPI.logout()" class="island-button bg-white/5 border border-white/15 text-on-surface px-6 py-2.5 rounded-full font-label-sm text-label-sm font-bold flex items-center group transition-all hover:bg-white/10">
+                            LOGOUT
+                        </button>
+                    `;
+                }
+            }
+        };
+
+        updateAuthUI(authContainer, false);
+        updateAuthUI(mobileAuthContainer, true);
+    })();
+
+    // Mobile menu toggle logic
+    (function() {
+        const toggleBtn = document.getElementById('mobile-menu-toggle');
+        const drawer = document.getElementById('mobile-drawer');
+        const icon = document.getElementById('mobile-menu-icon');
+        if (toggleBtn && drawer && icon) {
+            toggleBtn.addEventListener('click', () => {
+                const isOpen = drawer.classList.contains('opacity-100');
+                if (isOpen) {
+                    drawer.classList.remove('opacity-100', 'pointer-events-auto');
+                    drawer.classList.add('opacity-0', 'pointer-events-none');
+                    icon.textContent = 'menu';
+                } else {
+                    drawer.classList.remove('opacity-0', 'pointer-events-none');
+                    drawer.classList.add('opacity-100', 'pointer-events-auto');
+                    icon.textContent = 'close';
+                }
+            });
+        }
+    })();
+
+    // File Upload Logic
+    const uploadBtn = document.getElementById('upload-btn');
+    const fileInput = document.getElementById('resume-file');
+    const dropZone = document.getElementById('drop-zone');
+    const progressContainer = document.getElementById('upload-progress');
+    const progressBar = document.getElementById('progress-bar');
+    const uploadStatus = document.getElementById('upload-status');
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) handleUpload(e.target.files[0]);
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drop-zone-active');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone-active'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drop-zone-active');
+        if (e.dataTransfer.files[0]) handleUpload(e.dataTransfer.files[0]);
+    });
+
+    function appendLog(message, isError = false) {
+        const debugLog = document.getElementById('debug-log');
+        if (!debugLog) return;
+        debugLog.classList.remove('hidden');
+        const line = document.createElement('div');
+        line.className = isError ? 'text-red-400 font-bold' : 'text-secondary';
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        debugLog.appendChild(line);
+        debugLog.scrollTop = debugLog.scrollHeight;
+    }
+
+    async function handleUpload(file) {
+        const debugLog = document.getElementById('debug-log');
+        if (debugLog) {
+            debugLog.innerHTML = '';
+            debugLog.classList.remove('hidden');
+        }
+        
+        appendLog(`Starting upload sequence for: ${file.name}`);
+        if (!ResumeWiseAPI.isAuthenticated()) {
+            appendLog("Error: User is not authenticated. Redirecting to login...", true);
+            setTimeout(() => window.location.href = 'signin.html', 1500);
+            return;
+        }
+        
+        const targetRole = document.getElementById('target-role').value || 'Software Engineer';
+        appendLog(`Target role: "${targetRole}"`);
+        
+        progressContainer.classList.remove('hidden');
+        uploadStatus.textContent = 'UPLOADING ARCHIVE...';
+        progressBar.style.width = '20%';
+
+        try {
+            appendLog("Uploading file to /api/resume/upload...");
+            const result = await ResumeWiseAPI.uploadResume(file, targetRole);
+            appendLog(`Upload response status: success=${result.success}`);
+            progressBar.style.width = '45%';
+            uploadStatus.textContent = 'PARSING RESUME DATA...';
+
+            const resumeId = result.data && result.data.resume ? result.data.resume.id : (result.data && result.data.resume_id);
+            if (resumeId) {
+                appendLog(`Successfully registered Resume ID: ${resumeId}`);
+                localStorage.setItem('rw_last_analyzed_id', resumeId);
+                
+                // Parse the resume
+                appendLog("Sending parse request to /api/resume/<id>/parse...");
+                const parseResult = await ResumeWiseAPI.parseResume(resumeId);
+                appendLog(`Parse complete: success=${parseResult.success}`);
+                progressBar.style.width = '70%';
+                uploadStatus.textContent = 'RUNNING CAREER STRATEGY ANALYSIS...';
+
+                // Run analysis
+                appendLog("Sending analysis request to /api/analyze/...");
+                const analysisResult = await ResumeWiseAPI.analyzeResume(resumeId, targetRole);
+                appendLog(`Analysis complete: success=${analysisResult.success}`);
+                
+                if (analysisResult.success && analysisResult.data && analysisResult.data.analysis) {
+                    const analysis = analysisResult.data.analysis;
+                    const atsScore = analysis.atsScore || 0;
+                    const detectedTrack = analysis.detected_track || analysis.goalRole || analysis.targetRole || targetRole;
+                    localStorage.setItem('rw_last_score', atsScore);
+                    localStorage.setItem('rw_detected_track', detectedTrack);
+                } else {
+                    localStorage.setItem('rw_last_score', 0);
+                    localStorage.setItem('rw_detected_track', targetRole);
+                }
+                
+                progressBar.style.width = '100%';
+                uploadStatus.textContent = 'ANALYSIS COMPLETE. REDIRECTING...';
+                appendLog("Redirecting to Strategist Command...");
+                
+                setTimeout(() => window.location.href = 'dashboard.html', 1200);
+            } else {
+                throw new Error("No resume ID returned from server.");
+            }
+        } catch (err) {
+            console.error('Upload flow error:', err);
+            appendLog(`Error: ${err.message || 'Workflow halted.'}`, true);
+            uploadStatus.textContent = 'ERROR: ' + (err.message || 'Analysis failed.');
+            progressBar.style.width = '0%';
+            progressBar.classList.add('bg-red-500');
+        }
+    }
+
+    // Global Shader Animation
+    const globalCanvas = document.getElementById('global-canvas');
+    const gl = globalCanvas.getContext('webgl');
+
+    const vsSource = `
+        attribute vec2 position;
+        varying vec2 v_texCoord;
+        void main() {
+            v_texCoord = position * 0.5 + 0.5;
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    `;
+
+    const fsSource = `
+        precision highp float;
+        varying vec2 v_texCoord;
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
+
+        float hash(vec2 p) {
+            p = fract(p * vec2(123.34, 456.21));
+            p += dot(p, p + 45.32);
+            return fract(p.x * p.y);
+        }
+
+        float noise(vec2 p) {
+            vec2 i = floor(p);
+            vec2 f = fract(p);
+            float a = hash(i);
+            float b = hash(i + vec2(1.0, 0.0));
+            float c = hash(i + vec2(0.0, 1.0));
+            float d = hash(i + vec2(1.0, 1.0));
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        }
+
+        float fbm(vec2 p) {
+            float v = 0.0;
+            float a = 0.5;
+            vec2 shift = vec2(100.0);
+            mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+            for (int i = 0; i < 5; ++i) {
+                v += a * noise(p);
+                p = rot * p * 2.0 + shift;
+                a *= 0.5;
+            }
+            return v;
+        }
+
+        void main() {
+            vec2 uv = v_texCoord;
+            vec2 p = (v_texCoord - 0.5) * 2.0;
+            p.x *= u_resolution.x / u_resolution.y;
+            float t = u_time * 0.15;
+            vec2 m = (u_mouse / u_resolution) - 0.5;
+            vec2 q = vec2(0.0);
+            q.x = fbm(p + vec2(0.0, 0.0) + t);
+            q.y = fbm(p + vec2(1.0, 1.0) + t);
+            vec2 r = vec2(0.0);
+            r.x = fbm(p + 1.0 * q + vec2(1.7, 9.2) + 0.15 * t);
+            r.y = fbm(p + 1.0 * q + vec2(8.3, 2.8) + 0.126 * t);
+            float f = fbm(p + r);
+            vec3 color = vec3(0.015, 0.015, 0.015);
+            vec3 emerald = vec3(0.0, 0.5, 0.3);
+            vec3 violet = vec3(0.4, 0.1, 0.6);
+            color = mix(color, emerald, clamp(f * f * 4.0, 0.0, 1.0));
+            color = mix(color, violet, clamp(length(q), 0.0, 1.0) * 0.3);
+            color = mix(color, vec3(0.1, 0.2, 0.2), clamp(length(r.x), 0.0, 1.0) * 0.2);
+            float mouseLight = smoothstep(0.8, 0.0, length(p - m * 2.0));
+            color += emerald * mouseLight * 0.1;
+            float grain = (hash(uv + u_time) - 0.5) * 0.02;
+            color += grain;
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `;
+
+    function createShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        return shader;
+    }
+
+    if (gl) {
+        const program = gl.createProgram();
+        gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vsSource));
+        gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fsSource));
+        gl.linkProgram(program);
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+
+        const positionLocation = gl.getAttribLocation(program, 'position');
+        const timeLocation = gl.getUniformLocation(program, 'u_time');
+        const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+        const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+
+        let mouse = { x: 0, y: 0 };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = window.innerHeight - e.clientY;
+        });
+
+        function renderGlobal(time) {
+            globalCanvas.width = window.innerWidth;
+            globalCanvas.height = window.innerHeight;
+            gl.viewport(0, 0, globalCanvas.width, globalCanvas.height);
+            gl.useProgram(program);
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.uniform1f(timeLocation, time * 0.001);
+            gl.uniform2f(resolutionLocation, globalCanvas.width, globalCanvas.height);
+            gl.uniform2f(mouseLocation, mouse.x, mouse.y);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            requestAnimationFrame(renderGlobal);
+        }
+        requestAnimationFrame(renderGlobal);
+    }
+
+    // Hero Section 3D Particle Matrix
+    const heroContainer = document.getElementById('hero-matrix-canvas');
+    (function() {
+        const width = heroContainer.clientWidth || window.innerWidth;
+        const height = heroContainer.clientHeight || 500;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        heroContainer.appendChild(renderer.domElement);
+
+        const particlesCount = 2000;
+        const positions = new Float32Array(particlesCount * 3);
+        const velocities = new Float32Array(particlesCount * 3);
+        for (let i = 0; i < particlesCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 10;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+            velocities[i * 3] = (Math.random() - 0.5) * 0.01;
+            velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
+            velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.PointsMaterial({ color: 0x00ff88, size: 0.035, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+        camera.position.z = 5;
+
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) - 0.5;
+            mouseY = (event.clientY / window.innerHeight) - 0.5;
+        });
+
+        function animateHero() {
+            requestAnimationFrame(animateHero);
+            const positionsAttr = geometry.attributes.position.array;
+            for (let i = 0; i < particlesCount; i++) {
+                positionsAttr[i * 3] += velocities[i * 3];
+                positionsAttr[i * 3 + 1] += velocities[i * 3 + 1];
+                positionsAttr[i * 3 + 2] += velocities[i * 3 + 2];
+                if (Math.abs(positionsAttr[i * 3]) > 5) velocities[i * 3] *= -1;
+                if (Math.abs(positionsAttr[i * 3 + 1]) > 5) velocities[i * 3 + 1] *= -1;
+                if (Math.abs(positionsAttr[i * 3 + 2]) > 5) velocities[i * 3 + 2] *= -1;
+            }
+            geometry.attributes.position.needsUpdate = true;
+            points.rotation.y += 0.001 + (mouseX * 0.01);
+            points.rotation.x += 0.001 + (mouseY * 0.01);
+            renderer.render(scene, camera);
+        }
+        animateHero();
+    })();
+
+    // Intersection Observer for reveal-up animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('active');
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+
+    // Magnetic 3D interaction for cards
+    document.querySelectorAll('.vanguard-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+            card.style.transform = `scale(1.02) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(30px)`;
+            card.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 50px rgba(0,0,0,0.5), 0 0 30px rgba(78, 222, 163, 0.2)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = `scale(1) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
+            card.style.boxShadow = `none`;
+        });
+    });
+</script>
+</body>
+</html>

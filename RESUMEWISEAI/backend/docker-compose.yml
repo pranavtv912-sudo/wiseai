@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: resumewise-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: resumewise_ai
+      MYSQL_USER: resumewise
+      MYSQL_PASSWORD: resumewise123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - resumewise-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Flask Backend
+  backend:
+    build: .
+    container_name: resumewise-backend
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: mysql+pymysql://resumewise:resumewise123@mysql:3306/resumewise_ai
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      ADZUNA_API_ID: ${ADZUNA_API_ID}
+      ADZUNA_API_KEY: ${ADZUNA_API_KEY}
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - resumewise-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mysql_data:
+
+networks:
+  resumewise-network:
+    driver: bridge

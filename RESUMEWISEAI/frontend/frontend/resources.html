@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resource Hub | ResumeWise AI</title>
+<meta name="description" content="Master your career with real YouTube tutorials curated by AI for every skill gap."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300..900&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config={darkMode:"class",theme:{extend:{
+    colors:{"secondary":"#4edea3","primary":"#c9c6c5","on-background":"#e5e2e1","background":"#050505","surface-card":"#0A0A0A","glass-border":"rgba(255,255,255,0.1)","on-surface-variant":"#c4c7c7","on-secondary":"#003824","surface-container-lowest":"#0e0e0e","tertiary":"#d0bcff"},
+    fontFamily:{"body-md":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"headline-md":["Geist"],"headline-lg":["Geist"],"label-sm":["Geist"],"display-xl":["Geist"]},
+    fontSize:{"display-xl":["72px",{"lineHeight":"80px","letterSpacing":"-0.04em","fontWeight":"700"}],"headline-lg":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-md":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"500"}],"body-lg":["18px",{"lineHeight":"32px","fontWeight":"300"}],"body-md":["16px",{"lineHeight":"28px","fontWeight":"300"}],"label-sm":["10px",{"lineHeight":"16px","letterSpacing":"0.2em","fontWeight":"500"}]},
+    spacing:{"container-padding":"2rem"}
+  }}}
+</script>
+<style>
+  :root{--bezier:cubic-bezier(0.32,0.72,0,1);}
+  body{background:#050505;color:#e5e2e1;overflow-x:hidden;}
+  .vanguard-heading{font-family:'Fraunces',serif;font-variation-settings:'SOFT' 100,'WONK' 1;letter-spacing:-0.03em;}
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;}
+  .dbezel{padding:8px;background:rgba(255,255,255,0.04);border-radius:2rem;border:1px solid rgba(255,255,255,0.06);}
+  .dbezel-inner{background:#0A0A0A;border-radius:1.6rem;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 1px 1px rgba(255,255,255,0.08);}
+  .vid-card{transition:transform .4s var(--bezier),box-shadow .4s var(--bezier);}
+  .vid-card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 30px rgba(78,222,163,.12);}
+  @keyframes shimmer{0%{background-position:-400% 0}100%{background-position:400% 0}}
+  .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.04) 75%);background-size:400% 100%;animation:shimmer 1.6s infinite;}
+  .tab-btn{transition:all .25s var(--bezier);}
+  .tab-btn.active{background:rgba(78,222,163,.12);color:#4edea3;border-color:rgba(78,222,163,.35);}
+  #vid-modal{transition:opacity .35s var(--bezier);}
+  #vid-modal.open{opacity:1;pointer-events:all;}
+  #modal-box{transition:transform .4s var(--bezier);}
+  #vid-modal.open #modal-box{transform:translateY(0) scale(1);}
+  #search-input:focus{outline:none;border-color:rgba(78,222,163,.4);box-shadow:0 0 0 2px rgba(78,222,163,.15);}
+  ::-webkit-scrollbar{width:4px;height:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(78,222,163,.25);border-radius:4px;}
+  @media (max-width: 767px) {
+      .mobile-hidden { display: none !important; }
+      .mobile-visible { display: flex !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="bg-background/80 backdrop-blur-2xl border-b border-glass-border sticky top-0 z-50">
+  <div class="flex justify-between items-center w-full px-container-padding max-w-7xl mx-auto py-4">
+    <a href="index.html" class="vanguard-heading text-2xl font-bold tracking-tighter text-on-background">ResumeWise <span class="text-secondary">AI</span></a>
+    <div class="mobile-hidden hidden md:flex items-center gap-8 text-sm">
+      <a class="text-on-surface-variant hover:text-white transition-colors" href="index.html">Dashboard</a>
+      <a class="text-on-surface-variant hover:text-white transition-colors" href="dashboard.html">Analysis</a>
+      <a class="text-on-surface-variant hover:text-white transition-colors" href="roadmap.html">Roadmap</a>
+      <a class="text-secondary font-medium border-b-2 border-secondary pb-1" href="resources.html">Resources</a>
+    </div>
+    <div class="mobile-hidden hidden md:flex items-center gap-3" id="nav-auth">
+      <a href="signin.html" class="text-on-surface-variant hover:text-white transition-colors text-sm">Sign In</a>
+      <a href="signup.html" class="bg-primary text-on-primary px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-95 transition-all">Get Started</a>
+    </div>
+    <!-- Hamburger Button (Mobile only) -->
+    <button id="mobile-menu-toggle" class="mobile-visible flex md:hidden text-on-background hover:text-secondary focus:outline-none transition-colors" aria-label="Toggle Menu">
+        <span class="material-symbols-outlined text-[28px]" id="mobile-menu-icon">menu</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Drawer Overlay -->
+<div id="mobile-drawer" class="fixed inset-x-0 z-40 bg-background/95 backdrop-blur-2xl transition-all duration-300 ease-in-out opacity-0 pointer-events-none md:hidden border-b border-glass-border shadow-2xl" style="top: 65px;">
+    <div class="flex flex-col p-8 space-y-6">
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="index.html">Dashboard</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="dashboard.html">Analysis</a>
+        <a class="text-on-surface-variant hover:text-on-surface transition-colors text-lg" href="roadmap.html">Roadmap</a>
+        <a class="text-secondary font-medium text-lg pb-1" href="resources.html">Resources</a>
+        <div class="h-px bg-glass-border my-2"></div>
+        <div class="flex flex-col gap-4" id="mobile-nav-auth">
+            <a href="signin.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">Sign In</a>
+            <a href="signup.html" class="bg-primary text-on-primary px-6 py-3 rounded-full text-center font-bold text-xs uppercase tracking-widest">
+                Get Started
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<main class="max-w-7xl mx-auto px-container-padding pb-40">
+
+  <!-- Header -->
+  <section class="pt-24 pb-14">
+    <h1 class="vanguard-heading font-display-xl text-display-xl tracking-tight mb-4">
+      Resource <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-tertiary">Hub</span>
+    </h1>
+    <p class="text-on-surface-variant text-body-lg font-body-lg max-w-2xl">Real YouTube tutorials, curated by AI for every skill gap on your career roadmap.</p>
+  </section>
+
+  <!-- Search -->
+  <section class="mb-10">
+    <div class="flex gap-3 max-w-2xl">
+      <div class="relative flex-1">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+        <input id="search-input" type="text" placeholder="Search any skill — Python, Docker, System Design…"
+          class="w-full pl-12 pr-5 py-3.5 bg-white/5 border border-white/10 rounded-full text-sm text-on-background placeholder:text-on-surface-variant/50 transition-all">
+      </div>
+      <button id="search-btn" class="bg-secondary text-on-secondary px-7 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-[18px]">bolt</span>Search
+      </button>
+    </div>
+  </section>
+
+  <!-- Topic tabs -->
+  <section class="mb-10">
+    <div class="flex flex-wrap gap-2" id="topic-tabs"></div>
+  </section>
+
+  <!-- Video section -->
+  <section id="video-section">
+    <div class="mb-10" id="hero-video-wrap"></div>
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="vanguard-heading text-2xl" id="grid-label">Latest Intelligence</h3>
+      <span class="text-on-surface-variant text-xs font-label-sm uppercase tracking-widest" id="result-count"></span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7" id="video-grid"></div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-glass-border py-16" style="background:#0e0e0e;">
+  <div class="max-w-7xl mx-auto px-container-padding flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="vanguard-heading text-xl font-bold text-primary">ResumeWise AI</div>
+    <div class="flex gap-8 text-xs text-on-surface-variant">
+      <a href="#" class="hover:text-primary transition-colors">Privacy</a>
+      <a href="#" class="hover:text-primary transition-colors">Terms</a>
+      <a href="#" class="hover:text-primary transition-colors">Contact</a>
+    </div>
+    <div class="text-xs text-on-surface-variant/50">© 2024 ResumeWise AI</div>
+  </div>
+</footer>
+
+<!-- VIDEO MODAL -->
+<div id="vid-modal" class="fixed inset-0 z-[200] opacity-0 pointer-events-none bg-background/92 backdrop-blur-3xl flex items-center justify-center p-4">
+  <div id="modal-box" class="w-full max-w-5xl transform translate-y-10 scale-95">
+    <div class="flex justify-between items-start mb-5">
+      <div>
+        <div class="text-secondary text-xs font-label-sm uppercase tracking-widest mb-1">Now Playing</div>
+        <h2 class="vanguard-heading text-2xl md:text-3xl text-on-background leading-tight max-w-2xl" id="modal-title"></h2>
+        <div class="text-on-surface-variant text-sm mt-1" id="modal-channel"></div>
+      </div>
+      <button onclick="closeModal()" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors ml-4 flex-shrink-0">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="dbezel">
+      <div class="dbezel-inner aspect-video relative bg-black">
+        <iframe id="yt-iframe" class="w-full h-full" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen></iframe>
+      </div>
+    </div>
+    <div class="mt-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      <p class="text-on-surface-variant text-sm max-w-xl" id="modal-desc"></p>
+      <a id="modal-yt-link" href="#" target="_blank" rel="noopener"
+        class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-xs font-label-sm uppercase tracking-widest hover:bg-white/10 transition-all text-on-background">
+        <span class="material-symbols-outlined text-[16px] text-secondary">open_in_new</span>Open on YouTube
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js?v=3"></script>
+<script>
+// ── CURATED FALLBACK VIDEOS (real YouTube IDs) ───────────
+const FALLBACKS = {
+  default: [
+    {video_id:'rfscVS0vtik',title:'Python for Beginners – Full Course',channel:'freeCodeCamp',description:'Learn Python from scratch.',url:'https://www.youtube.com/watch?v=rfscVS0vtik',thumbnail:'https://i.ytimg.com/vi/rfscVS0vtik/mqdefault.jpg'},
+    {video_id:'PkZNo7MFNFg',title:'JavaScript Tutorial for Beginners',channel:'Programming with Mosh',description:'Complete JS course.',url:'https://www.youtube.com/watch?v=PkZNo7MFNFg',thumbnail:'https://i.ytimg.com/vi/PkZNo7MFNFg/mqdefault.jpg'},
+    {video_id:'SqcY0GlETPk',title:'React JS – Full Course for Beginners',channel:'freeCodeCamp',description:'Learn React.js.',url:'https://www.youtube.com/watch?v=SqcY0GlETPk',thumbnail:'https://i.ytimg.com/vi/SqcY0GlETPk/mqdefault.jpg'},
+    {video_id:'fqMOX6JJhGo',title:'Docker Tutorial for Beginners',channel:'freeCodeCamp',description:'Docker full guide.',url:'https://www.youtube.com/watch?v=fqMOX6JJhGo',thumbnail:'https://i.ytimg.com/vi/fqMOX6JJhGo/mqdefault.jpg'},
+    {video_id:'nu_pCVPKzTk',title:'Git and GitHub for Beginners',channel:'freeCodeCamp',description:'Learn Git & GitHub.',url:'https://www.youtube.com/watch?v=nu_pCVPKzTk',thumbnail:'https://i.ytimg.com/vi/nu_pCVPKzTk/mqdefault.jpg'},
+    {video_id:'i_LwzRVP7bg',title:'Kubernetes Tutorial for Beginners',channel:'TechWorld with Nana',description:'Full Kubernetes course.',url:'https://www.youtube.com/watch?v=i_LwzRVP7bg',thumbnail:'https://i.ytimg.com/vi/i_LwzRVP7bg/mqdefault.jpg'},
+    {video_id:'k1RI5locZE4',title:'AWS Cloud Practitioner Full Course',channel:'freeCodeCamp',description:'AWS certified training.',url:'https://www.youtube.com/watch?v=k1RI5locZE4',thumbnail:'https://i.ytimg.com/vi/k1RI5locZE4/mqdefault.jpg'},
+    {video_id:'HXV3zeQKqGY',title:'SQL Full Course',channel:'freeCodeCamp',description:'Master SQL.',url:'https://www.youtube.com/watch?v=HXV3zeQKqGY',thumbnail:'https://i.ytimg.com/vi/HXV3zeQKqGY/mqdefault.jpg'},
+    {video_id:'2V1UUhBJ62Y',title:'System Design for Beginners',channel:'Exponent',description:'System design fundamentals.',url:'https://www.youtube.com/watch?v=2V1UUhBJ62Y',thumbnail:'https://i.ytimg.com/vi/2V1UUhBJ62Y/mqdefault.jpg'},
+  ],
+  Python: [
+    {video_id:'rfscVS0vtik',title:'Learn Python – Full Course for Beginners',channel:'freeCodeCamp',description:'4-hour Python crash course.',url:'https://www.youtube.com/watch?v=rfscVS0vtik',thumbnail:'https://i.ytimg.com/vi/rfscVS0vtik/mqdefault.jpg'},
+    {video_id:'_uQrJ0TkZlc',title:'Python Tutorial for Beginners',channel:'Programming with Mosh',description:'6-hour Python tutorial.',url:'https://www.youtube.com/watch?v=_uQrJ0TkZlc',thumbnail:'https://i.ytimg.com/vi/_uQrJ0TkZlc/mqdefault.jpg'},
+    {video_id:'kqtD5dpn9C8',title:'Python for Beginners – Learn Fast',channel:'Programming with Mosh',description:'Quick Python intro.',url:'https://www.youtube.com/watch?v=kqtD5dpn9C8',thumbnail:'https://i.ytimg.com/vi/kqtD5dpn9C8/mqdefault.jpg'},
+    {video_id:'YYXdXT2l-Gg',title:'Python Tutorials for Absolute Beginners',channel:'CS Dojo',description:'Beginner-friendly Python.',url:'https://www.youtube.com/watch?v=YYXdXT2l-Gg',thumbnail:'https://i.ytimg.com/vi/YYXdXT2l-Gg/mqdefault.jpg'},
+    {video_id:'8DvywoWv6fI',title:'Python for Everybody – Full University Course',channel:'freeCodeCamp',description:'University-level Python.',url:'https://www.youtube.com/watch?v=8DvywoWv6fI',thumbnail:'https://i.ytimg.com/vi/8DvywoWv6fI/mqdefault.jpg'},
+  ],
+  JavaScript: [
+    {video_id:'PkZNo7MFNFg',title:'JavaScript Tutorial – Beginners to Advanced',channel:'Programming with Mosh',description:'Complete JS fundamentals.',url:'https://www.youtube.com/watch?v=PkZNo7MFNFg',thumbnail:'https://i.ytimg.com/vi/PkZNo7MFNFg/mqdefault.jpg'},
+    {video_id:'hdI2bqOjy3c',title:'JavaScript Crash Course',channel:'Traversy Media',description:'JS crash course.',url:'https://www.youtube.com/watch?v=hdI2bqOjy3c',thumbnail:'https://i.ytimg.com/vi/hdI2bqOjy3c/mqdefault.jpg'},
+    {video_id:'W6NZfCO5SIk',title:'JavaScript Tutorial for Beginners',channel:'Traversy Media',description:'Beginners JS guide.',url:'https://www.youtube.com/watch?v=W6NZfCO5SIk',thumbnail:'https://i.ytimg.com/vi/W6NZfCO5SIk/mqdefault.jpg'},
+    {video_id:'jS4aFq5-91M',title:'JavaScript Full Course',channel:'Bro Code',description:'Full JS course.',url:'https://www.youtube.com/watch?v=jS4aFq5-91M',thumbnail:'https://i.ytimg.com/vi/jS4aFq5-91M/mqdefault.jpg'},
+  ],
+  'System Design': [
+    {video_id:'i7twT3x5yv8',title:'System Design Interview – Step By Step',channel:'Exponent',description:'System design interview prep.',url:'https://www.youtube.com/watch?v=i7twT3x5yv8',thumbnail:'https://i.ytimg.com/vi/i7twT3x5yv8/mqdefault.jpg'},
+    {video_id:'MbjObHmDbZo',title:'10 System Design Concepts You Must Know',channel:'Fireship',description:'Key system design ideas.',url:'https://www.youtube.com/watch?v=MbjObHmDbZo',thumbnail:'https://i.ytimg.com/vi/MbjObHmDbZo/mqdefault.jpg'},
+    {video_id:'2V1UUhBJ62Y',title:'Crack the System Design Interview',channel:'Exponent',description:'System design prep guide.',url:'https://www.youtube.com/watch?v=2V1UUhBJ62Y',thumbnail:'https://i.ytimg.com/vi/2V1UUhBJ62Y/mqdefault.jpg'},
+    {video_id:'UzLMhqg3_Wc',title:'Design a URL Shortener – System Design',channel:'Exponent',description:'URL shortener walkthrough.',url:'https://www.youtube.com/watch?v=UzLMhqg3_Wc',thumbnail:'https://i.ytimg.com/vi/UzLMhqg3_Wc/mqdefault.jpg'},
+  ],
+  React: [
+    {video_id:'SqcY0GlETPk',title:'React Course – Full Tutorial',channel:'freeCodeCamp',description:'Complete React beginners course.',url:'https://www.youtube.com/watch?v=SqcY0GlETPk',thumbnail:'https://i.ytimg.com/vi/SqcY0GlETPk/mqdefault.jpg'},
+    {video_id:'Ke90Tje7VS0',title:'React Tutorial for Beginners',channel:'Programming with Mosh',description:'React fundamentals.',url:'https://www.youtube.com/watch?v=Ke90Tje7VS0',thumbnail:'https://i.ytimg.com/vi/Ke90Tje7VS0/mqdefault.jpg'},
+    {video_id:'w7ejDZ8SWv8',title:'React JS Crash Course',channel:'Traversy Media',description:'React crash course.',url:'https://www.youtube.com/watch?v=w7ejDZ8SWv8',thumbnail:'https://i.ytimg.com/vi/w7ejDZ8SWv8/mqdefault.jpg'},
+  ],
+  'AWS / Cloud': [
+    {video_id:'k1RI5locZE4',title:'AWS Certified Cloud Practitioner Training',channel:'freeCodeCamp',description:'Full AWS CLF course.',url:'https://www.youtube.com/watch?v=k1RI5locZE4',thumbnail:'https://i.ytimg.com/vi/k1RI5locZE4/mqdefault.jpg'},
+    {video_id:'mDo9yQGzUCo',title:'AWS Tutorial For Beginners',channel:'Simplilearn',description:'AWS full tutorial.',url:'https://www.youtube.com/watch?v=mDo9yQGzUCo',thumbnail:'https://i.ytimg.com/vi/mDo9yQGzUCo/mqdefault.jpg'},
+    {video_id:'Ia-UEYYR44s',title:'AWS In 10 Minutes',channel:'Simplilearn',description:'Quick AWS overview.',url:'https://www.youtube.com/watch?v=Ia-UEYYR44s',thumbnail:'https://i.ytimg.com/vi/Ia-UEYYR44s/mqdefault.jpg'},
+  ],
+  'Docker & K8s': [
+    {video_id:'fqMOX6JJhGo',title:'Docker Tutorial for Beginners',channel:'freeCodeCamp',description:'Docker full guide.',url:'https://www.youtube.com/watch?v=fqMOX6JJhGo',thumbnail:'https://i.ytimg.com/vi/fqMOX6JJhGo/mqdefault.jpg'},
+    {video_id:'3c-iBn73dDE',title:'Docker Practical Introduction',channel:'TechWorld with Nana',description:'Practical Docker.',url:'https://www.youtube.com/watch?v=3c-iBn73dDE',thumbnail:'https://i.ytimg.com/vi/3c-iBn73dDE/mqdefault.jpg'},
+    {video_id:'i_LwzRVP7bg',title:'Kubernetes Tutorial [FULL COURSE]',channel:'TechWorld with Nana',description:'Full K8s course.',url:'https://www.youtube.com/watch?v=i_LwzRVP7bg',thumbnail:'https://i.ytimg.com/vi/i_LwzRVP7bg/mqdefault.jpg'},
+  ],
+  'Machine Learning': [
+    {video_id:'GwIo3gDZCVQ',title:'Machine Learning for Beginners',channel:'freeCodeCamp',description:'Full ML course.',url:'https://www.youtube.com/watch?v=GwIo3gDZCVQ',thumbnail:'https://i.ytimg.com/vi/GwIo3gDZCVQ/mqdefault.jpg'},
+    {video_id:'ukzFI9rgwfU',title:'Machine Learning Crash Course',channel:'Google Developers',description:'Google ML crash course.',url:'https://www.youtube.com/watch?v=ukzFI9rgwfU',thumbnail:'https://i.ytimg.com/vi/ukzFI9rgwfU/mqdefault.jpg'},
+    {video_id:'RBSGKlAvoiM',title:'Data Structures Easy to Advanced',channel:'William Fiset',description:'Data structures full.',url:'https://www.youtube.com/watch?v=RBSGKlAvoiM',thumbnail:'https://i.ytimg.com/vi/RBSGKlAvoiM/mqdefault.jpg'},
+  ],
+  'Data Structures': [
+    {video_id:'8hly31xKli0',title:'Data Structures – Full Course',channel:'freeCodeCamp',description:'Complete data structures.',url:'https://www.youtube.com/watch?v=8hly31xKli0',thumbnail:'https://i.ytimg.com/vi/8hly31xKli0/mqdefault.jpg'},
+    {video_id:'pkYVOmU3MgA',title:'Algorithms and Data Structures',channel:'freeCodeCamp',description:'Algorithms full course.',url:'https://www.youtube.com/watch?v=pkYVOmU3MgA',thumbnail:'https://i.ytimg.com/vi/pkYVOmU3MgA/mqdefault.jpg'},
+    {video_id:'RBSGKlAvoiM',title:'Data Structures Easy to Advanced',channel:'William Fiset',description:'Data structures in depth.',url:'https://www.youtube.com/watch?v=RBSGKlAvoiM',thumbnail:'https://i.ytimg.com/vi/RBSGKlAvoiM/mqdefault.jpg'},
+  ],
+  'SQL / Databases': [
+    {video_id:'HXV3zeQKqGY',title:'SQL Full Course',channel:'freeCodeCamp',description:'Master SQL.',url:'https://www.youtube.com/watch?v=HXV3zeQKqGY',thumbnail:'https://i.ytimg.com/vi/HXV3zeQKqGY/mqdefault.jpg'},
+    {video_id:'7S_tz1z_5bA',title:'MySQL Tutorial for Beginners',channel:'Programming with Mosh',description:'Full MySQL tutorial.',url:'https://www.youtube.com/watch?v=7S_tz1z_5bA',thumbnail:'https://i.ytimg.com/vi/7S_tz1z_5bA/mqdefault.jpg'},
+    {video_id:'ztHopE5Wnpc',title:'Database Design Course',channel:'freeCodeCamp',description:'Database design.',url:'https://www.youtube.com/watch?v=ztHopE5Wnpc',thumbnail:'https://i.ytimg.com/vi/ztHopE5Wnpc/mqdefault.jpg'},
+  ],
+  'DevOps / CI-CD': [
+    {video_id:'scEDHsr3APg',title:'DevOps Full Course',channel:'Simplilearn',description:'Full DevOps course.',url:'https://www.youtube.com/watch?v=scEDHsr3APg',thumbnail:'https://i.ytimg.com/vi/scEDHsr3APg/mqdefault.jpg'},
+    {video_id:'R8_veQiYBjI',title:'GitHub Actions Tutorial',channel:'TechWorld with Nana',description:'GitHub Actions CI/CD.',url:'https://www.youtube.com/watch?v=R8_veQiYBjI',thumbnail:'https://i.ytimg.com/vi/R8_veQiYBjI/mqdefault.jpg'},
+    {video_id:'j5Zsa_eOXeY',title:'DevOps CI/CD Explained in 100 Seconds',channel:'Fireship',description:'CI/CD quick overview.',url:'https://www.youtube.com/watch?v=j5Zsa_eOXeY',thumbnail:'https://i.ytimg.com/vi/j5Zsa_eOXeY/mqdefault.jpg'},
+  ],
+  Negotiation: [
+    {video_id:'D9GCJ-8qFXE',title:'How to Negotiate Your Salary',channel:'Self Made Millennial',description:'Salary negotiation tips.',url:'https://www.youtube.com/watch?v=D9GCJ-8qFXE',thumbnail:'https://i.ytimg.com/vi/D9GCJ-8qFXE/mqdefault.jpg'},
+    {video_id:'XY5SeCl_8NE',title:'How to Negotiate a Higher Salary',channel:'Dan Lok',description:'Negotiate salary like a pro.',url:'https://www.youtube.com/watch?v=XY5SeCl_8NE',thumbnail:'https://i.ytimg.com/vi/XY5SeCl_8NE/mqdefault.jpg'},
+    {video_id:'u9BoG7g9fYs',title:'Tech Job Offer Negotiation Tips',channel:'TechLead',description:'Negotiation for tech jobs.',url:'https://www.youtube.com/watch?v=u9BoG7g9fYs',thumbnail:'https://i.ytimg.com/vi/u9BoG7g9fYs/mqdefault.jpg'},
+  ],
+};
+
+// ── TOPICS ──────────────────────────────────────────────
+const TOPICS = [
+  {label:'All',             key:'default'},
+  {label:'Python',          key:'Python'},
+  {label:'JavaScript',      key:'JavaScript'},
+  {label:'System Design',   key:'System Design'},
+  {label:'React',           key:'React'},
+  {label:'AWS / Cloud',     key:'AWS / Cloud'},
+  {label:'Docker & K8s',    key:'Docker & K8s'},
+  {label:'Machine Learning',key:'Machine Learning'},
+  {label:'Data Structures', key:'Data Structures'},
+  {label:'SQL / Databases', key:'SQL / Databases'},
+  {label:'DevOps / CI-CD',  key:'DevOps / CI-CD'},
+  {label:'Negotiation',     key:'Negotiation'},
+];
+
+let currentVideos = [];
+
+// ── NAV AUTH ───────────────────────────────────────────
+(function(){
+  const authContainer = document.getElementById('nav-auth');
+  const mobileAuthContainer = document.getElementById('mobile-nav-auth');
+  
+  const updateAuthUI = (container, isMobile = false) => {
+    if (!container) return;
+    if (typeof ResumeWiseAPI !== 'undefined' && ResumeWiseAPI.isAuthenticated()) {
+      const user = ResumeWiseAPI.getUser();
+      if (isMobile) {
+        container.innerHTML = `
+          <span class="text-on-surface-variant text-base py-1">Logged in as: <strong class="text-secondary">${user?.name || 'Strategist'}</strong></span>
+          <a href="dashboard.html" class="text-on-surface-variant hover:text-on-surface transition-colors text-base py-2">MY ANALYSIS</a>
+          <button onclick="ResumeWiseAPI.logout()" class="bg-white/5 border border-glass-border text-sm px-5 py-3 rounded-full hover:bg-white/10 transition-all w-full font-bold">Logout</button>
+        `;
+      } else {
+        container.innerHTML = `<span class="text-on-surface-variant text-sm">${user?.name || 'Strategist'}</span>`
+          +`<button onclick="ResumeWiseAPI.logout()" class="bg-white/5 border border-glass-border text-sm px-5 py-2 rounded-full hover:bg-white/10 transition-all">Logout</button>`;
+      }
+    }
+  };
+
+  updateAuthUI(authContainer, false);
+  updateAuthUI(mobileAuthContainer, true);
+})();
+
+// Mobile menu toggle logic
+(function() {
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const drawer = document.getElementById('mobile-drawer');
+    const icon = document.getElementById('mobile-menu-icon');
+    if (toggleBtn && drawer && icon) {
+        toggleBtn.addEventListener('click', () => {
+            const isOpen = drawer.classList.contains('opacity-100');
+            if (isOpen) {
+                drawer.classList.remove('opacity-100', 'pointer-events-auto');
+                drawer.classList.add('opacity-0', 'pointer-events-none');
+                icon.textContent = 'menu';
+            } else {
+                drawer.classList.remove('opacity-0', 'pointer-events-none');
+                drawer.classList.add('opacity-100', 'pointer-events-auto');
+                icon.textContent = 'close';
+            }
+        });
+    }
+})();
+
+// ── BUILD TABS ─────────────────────────────────────────
+const tabsEl = document.getElementById('topic-tabs');
+TOPICS.forEach(function(t,i){
+  var btn = document.createElement('button');
+  btn.className = 'tab-btn px-5 py-2 rounded-full border border-white/10 text-xs font-label-sm uppercase tracking-widest text-on-surface-variant' + (i===0?' active':'');
+  btn.textContent = t.label;
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    loadByKey(t.key, t.label);
+  });
+  tabsEl.appendChild(btn);
+});
+
+// ── SKELETONS ──────────────────────────────────────────
+function showSkeletons(){
+  document.getElementById('hero-video-wrap').innerHTML = '<div class="dbezel"><div class="dbezel-inner grid lg:grid-cols-2"><div class="p-10 flex flex-col gap-5"><div class="skeleton h-5 w-32 rounded-full"></div><div class="skeleton h-10 w-full rounded-xl"></div><div class="skeleton h-4 w-3/4 rounded-full"></div><div class="skeleton h-12 w-40 rounded-full mt-4"></div></div><div class="relative min-h-[280px] bg-white/2 flex items-center justify-center"><span class="material-symbols-outlined text-7xl text-white/5">play_circle</span></div></div></div>';
+  var grid = document.getElementById('video-grid');
+  grid.innerHTML = Array.from({length:6}).map(function(){return '<div class="dbezel"><div class="dbezel-inner"><div class="skeleton h-48 w-full"></div><div class="p-6 space-y-3"><div class="skeleton h-3 w-20 rounded-full"></div><div class="skeleton h-5 w-full rounded-lg"></div><div class="skeleton h-4 w-4/5 rounded-lg"></div></div></div></div>';}).join('');
+}
+
+// ── LOAD BY KEY (fallback-first) ───────────────────────
+async function loadByKey(key, label){
+  document.getElementById('grid-label').textContent = label;
+  document.getElementById('result-count').textContent = '';
+  showSkeletons();
+
+  var videos = [];
+
+  // Try backend (if YouTube key configured)
+  try{
+    if(typeof ResumeWiseAPI !== 'undefined' && typeof ResumeWiseAPI.youtubeSearch === 'function'){
+      var q = key === 'default' ? 'programming career development' : key + ' tutorial';
+      var res = await ResumeWiseAPI.youtubeSearch(q, 10);
+      if(res && res.success && res.data && res.data.videos && res.data.videos.length){
+        videos = res.data.videos;
+      }
+    }
+  } catch(e){ /* fallback */ }
+
+  // Use curated fallback
+  if(!videos.length){
+    videos = FALLBACKS[key] || FALLBACKS['default'];
+  }
+
+  currentVideos = videos;
+  document.getElementById('result-count').textContent = videos.length + ' videos';
+  renderHero(videos[0]);
+  renderGrid(videos.slice(1));
+}
+
+// ── LOAD BY SEARCH QUERY ───────────────────────────────
+async function loadBySearch(query){
+  document.getElementById('grid-label').textContent = '"' + query + '"';
+  document.getElementById('result-count').textContent = '';
+  showSkeletons();
+
+  var videos = [];
+
+  try{
+    if(typeof ResumeWiseAPI !== 'undefined' && typeof ResumeWiseAPI.youtubeSearch === 'function'){
+      var res = await ResumeWiseAPI.youtubeSearch(query + ' tutorial', 10);
+      if(res && res.success && res.data && res.data.videos && res.data.videos.length){
+        videos = res.data.videos;
+      }
+    }
+  } catch(e){ /* fallback */ }
+
+  // If backend has no YouTube key, try matching fallback
+  if(!videos.length){
+    var lower = query.toLowerCase();
+    for(var k in FALLBACKS){
+      if(k !== 'default' && k.toLowerCase().includes(lower)){
+        videos = FALLBACKS[k]; break;
+      }
+    }
+    if(!videos.length) videos = FALLBACKS['default'];
+  }
+
+  currentVideos = videos;
+  document.getElementById('result-count').textContent = videos.length + ' videos';
+  renderHero(videos[0]);
+  renderGrid(videos.slice(1));
+}
+
+// ── RENDER HERO ────────────────────────────────────────
+function renderHero(v){
+  if(!v) return;
+  var thumb = v.thumbnail || 'https://i.ytimg.com/vi/' + v.video_id + '/mqdefault.jpg';
+  var heroWrap = document.getElementById('hero-video-wrap');
+  heroWrap.innerHTML = '<div class="dbezel">'
+    + '<div class="dbezel-inner grid lg:grid-cols-2 gap-0 overflow-hidden group">'
+    + '<div class="p-10 md:p-12 flex flex-col justify-center gap-6">'
+    + '<div class="flex items-center gap-3 flex-wrap">'
+    + '<span class="px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-full text-xs font-label-sm uppercase tracking-widest">Featured Tutorial</span>'
+    + '<span class="text-on-surface-variant text-xs">' + esc(v.channel||'YouTube') + '</span>'
+    + '</div>'
+    + '<h2 class="vanguard-heading text-3xl md:text-4xl text-on-background leading-tight">' + esc(v.title) + '</h2>'
+    + '<p class="text-on-surface-variant text-sm">' + esc((v.description||'').slice(0,140)) + '…</p>'
+    + '<div class="flex gap-3 flex-wrap">'
+    + '<button onclick="playVideo(' + JSON.stringify(v).replace(/"/g,"&quot;") + ')" class="flex items-center gap-3 bg-primary text-on-primary px-7 py-3.5 rounded-full text-sm font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-xl"><span class="material-symbols-outlined text-[20px]">play_arrow</span>Watch Now</button>'
+    + '<a href="' + esc(v.url||'https://www.youtube.com/watch?v='+v.video_id) + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/5 border border-white/10 text-sm hover:bg-white/10 transition-all"><span class="material-symbols-outlined text-secondary text-[16px]">open_in_new</span>Open on YouTube</a>'
+    + '</div>'
+    + '</div>'
+    + '<div class="relative min-h-[300px] cursor-pointer group" onclick="playVideo(' + JSON.stringify(v).replace(/"/g,"&quot;") + ')">'
+    + '<img src="' + esc(thumb) + '" alt="' + esc(v.title) + '" class="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity duration-500" style="position:absolute;inset:0;">'
+    + '<div class="absolute inset-0 bg-gradient-to-r from-surface-card to-transparent lg:block hidden"></div>'
+    + '<div class="absolute inset-0 flex items-center justify-center">'
+    + '<div class="w-20 h-20 bg-background/80 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">'
+    + '<span class="material-symbols-outlined text-5xl text-secondary" style="font-variation-settings:\'FILL\' 1;">play_arrow</span>'
+    + '</div></div></div></div></div>';
+}
+
+// ── RENDER GRID ────────────────────────────────────────
+var BADGE = ['bg-secondary/10 text-secondary','bg-purple-500/10 text-purple-400','bg-primary/10 text-primary','bg-amber-400/10 text-amber-400'];
+function renderGrid(videos){
+  var grid = document.getElementById('video-grid');
+  grid.innerHTML = videos.map(function(v,i){
+    var thumb = v.thumbnail || 'https://i.ytimg.com/vi/' + v.video_id + '/mqdefault.jpg';
+    var bc = BADGE[i%BADGE.length].split(' ');
+    var vdata = JSON.stringify(v).replace(/"/g,"&quot;");
+    return '<div class="dbezel vid-card cursor-pointer" onclick="playVideo(' + vdata + ')">'
+      + '<div class="dbezel-inner">'
+      + '<div class="relative h-48 overflow-hidden group">'
+      + '<img src="' + esc(thumb) + '" alt="' + esc(v.title) + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">'
+      + '<div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">'
+      + '<span class="material-symbols-outlined text-5xl text-white drop-shadow-lg" style="font-variation-settings:\'FILL\' 1;">play_circle</span></div>'
+      + '<div class="absolute bottom-2 right-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded text-[9px] font-label-sm uppercase tracking-widest">YouTube</div>'
+      + '</div>'
+      + '<div class="p-5 space-y-3">'
+      + '<div class="flex items-center gap-2"><span class="text-xs ' + bc[1] + '">' + esc(v.channel||'Video') + '</span></div>'
+      + '<h4 class="font-semibold text-sm leading-snug text-on-background line-clamp-2">' + esc(v.title) + '</h4>'
+      + '<p class="text-on-surface-variant text-xs line-clamp-2">' + esc((v.description||'').slice(0,100)) + '</p>'
+      + '<div class="flex items-center justify-between pt-1">'
+      + '<a href="' + esc(v.url||'https://www.youtube.com/watch?v='+v.video_id) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="text-xs text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">open_in_new</span>Open link</a>'
+      + '<span class="text-secondary text-xs flex items-center gap-1">Watch <span class="material-symbols-outlined text-[12px]">arrow_forward</span></span>'
+      + '</div></div></div></div>';
+  }).join('');
+}
+
+// ── EMPTY STATE ────────────────────────────────────────
+function renderEmpty(){
+  document.getElementById('hero-video-wrap').innerHTML = '';
+  document.getElementById('video-grid').innerHTML = '<div class="col-span-full py-20 text-center"><span class="material-symbols-outlined text-6xl text-on-surface-variant/20 mb-4 block">videocam_off</span><p class="text-on-surface-variant">No videos found for this search.</p></div>';
+}
+
+// ── PLAY VIDEO MODAL ───────────────────────────────────
+function playVideo(v){
+  if(typeof v === 'string'){ try{ v=JSON.parse(v); } catch(e){ return; } }
+  if(!v.video_id && v.url){
+    var m = v.url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if(m) v.video_id = m[1];
+  }
+  document.getElementById('modal-title').textContent   = v.title||'';
+  document.getElementById('modal-channel').textContent = v.channel||'';
+  document.getElementById('modal-desc').textContent    = (v.description||'').slice(0,200);
+  document.getElementById('modal-yt-link').href        = v.url||('https://www.youtube.com/watch?v='+v.video_id);
+
+  var iframe = document.getElementById('yt-iframe');
+  iframe.src = v.video_id
+    ? 'https://www.youtube.com/embed/'+v.video_id+'?autoplay=1&rel=0&modestbranding=1'
+    : '';
+
+  document.getElementById('vid-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  document.getElementById('vid-modal').classList.remove('open');
+  document.getElementById('yt-iframe').src = '';
+  document.body.style.overflow = '';
+}
+
+document.getElementById('vid-modal').addEventListener('click', function(e){
+  if(e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+// ── SEARCH ─────────────────────────────────────────────
+document.getElementById('search-btn').addEventListener('click', doSearch);
+document.getElementById('search-input').addEventListener('keydown', function(e){ if(e.key==='Enter') doSearch(); });
+function doSearch(){
+  var val = document.getElementById('search-input').value.trim();
+  if(!val) return;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  loadBySearch(val);
+}
+
+// ── UTIL ───────────────────────────────────────────────
+function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+
+// ── INIT ───────────────────────────────────────────────
+loadByKey('default', 'All Resources');
+</script>
+</body>
+</html>
