@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 
@@ -12,9 +13,12 @@ import DashboardLayout from './layouts/DashboardLayout'
 import Landing from './pages/Landing'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
+import VerifyOtp from './pages/Auth/VerifyOtp'
+import ForgotPassword from './pages/Auth/ForgotPassword'
 import Dashboard from './pages/Dashboard/index'
 import CareerRoadmap from './pages/CareerRoadmap'
 import LearningPlan from './pages/LearningPlan'
+import About from './pages/About'
 
 // Sub/Placeholder Pages
 import UploadResume from './pages/UploadResume/index'
@@ -38,11 +42,14 @@ export default function App() {
           <Route element={<AuthLayout />}>
             <Route path="/signin" element={<Login />} />
             <Route path="/signup" element={<Register />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
           </Route>
 
           {/* Main Dashboard Shell Layout */}
           <Route element={<DashboardLayout />}>
             <Route path="/" element={<Landing />} />
+            <Route path="/about" element={<About />} />
             
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
@@ -69,3 +76,4 @@ export default function App() {
     </AuthProvider>
   )
 }
+

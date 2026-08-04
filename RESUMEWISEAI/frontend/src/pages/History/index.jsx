@@ -74,7 +74,7 @@ export default function History() {
       {/* Header */}
       <section className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#4edea3] block mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6366F1] block mb-2">
             Temporal Ingest Log
           </span>
           <h1 className="vanguard-heading text-4xl md:text-5xl font-bold text-white">
@@ -85,7 +85,7 @@ export default function History() {
           </p>
         </div>
         <div>
-          <Link to="/upload" className="island-button bg-[#4edea3] text-[#003824] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
+          <Link to="/upload" className="island-button bg-[#6366F1] text-[#00173b] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
             <span className="material-symbols-outlined text-[15px]">add</span> Ingest New
           </Link>
         </div>
@@ -113,7 +113,7 @@ export default function History() {
         </Link>
         <Link 
           to="/history"
-          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#4edea3]/12 border border-[#4edea3]/35 text-[#4edea3] transition-all"
+          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#6366F1]/12 border border-[#6366F1]/35 text-[#6366F1] transition-all"
         >
           Ingest History
         </Link>
@@ -128,10 +128,10 @@ export default function History() {
       {/* History Items list */}
       {historyList.length === 0 ? (
         <section className="text-center py-20 bg-[#0A0A0A] border border-white/10 rounded-[2.2rem] p-10 max-w-lg mx-auto shadow-xl">
-          <span className="material-symbols-outlined text-[#4edea3] text-5xl mb-4 block">history</span>
+          <span className="material-symbols-outlined text-[#6366F1] text-5xl mb-4 block">history</span>
           <h3 className="vanguard-heading text-xl font-bold text-white mb-2">Ingestion Log Empty</h3>
           <p className="text-gray-400 text-xs mb-6">You have not uploaded any resume files yet.</p>
-          <Link to="/upload" className="island-button bg-[#4edea3] text-[#003824] px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest">
+          <Link to="/upload" className="island-button bg-[#6366F1] text-[#00173b] px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest">
             Upload File
           </Link>
         </section>
@@ -147,7 +147,7 @@ export default function History() {
                   onClick={() => handleLoadItem(item)}
                   className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer ${
                     isActive 
-                      ? 'bg-[#4edea3]/5 border-[#4edea3]/30 shadow-[0_0_15px_rgba(78,222,163,0.1)]' 
+                      ? 'bg-[#6366F1]/5 border-[#6366F1]/30 shadow-[0_0_15px_rgba(99, 102, 241,0.1)]' 
                       : 'bg-white/[0.01] border-white/5 hover:bg-white/[0.03] hover:border-white/10'
                   }`}
                 >
@@ -155,7 +155,7 @@ export default function History() {
                     <div className="flex items-center gap-3 mb-1.5 flex-wrap">
                       <h4 className="text-base font-bold text-white truncate max-w-[85%]">{item.file_name}</h4>
                       {isActive && (
-                        <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest bg-[#4edea3]/10 text-[#4edea3] border border-[#4edea3]/20">
+                        <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest bg-[#6366F1]/10 text-[#6366F1] border border-[#6366F1]/20">
                           Active Ingest
                         </span>
                       )}
@@ -172,7 +172,7 @@ export default function History() {
                   <div className="flex items-center gap-4 justify-between sm:justify-end">
                     <div className="flex items-center gap-2">
                       <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-mono text-xs font-bold ${
-                        isActive ? 'border-[#4edea3] text-[#4edea3]' : 'border-white/20 text-white'
+                        isActive ? 'border-[#6366F1] text-[#6366F1]' : 'border-white/20 text-white'
                       }`}>
                         {item.score}
                       </div>
@@ -197,3 +197,4 @@ export default function History() {
     </div>
   )
 }
+

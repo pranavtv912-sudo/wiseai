@@ -41,7 +41,7 @@ export default function Register() {
     try {
       const result = await register(fullName, email, password)
       if (result.success) {
-        navigate('/signin')
+        navigate(`/verify-otp?email=${encodeURIComponent(email)}&purpose=register`)
       } else {
         setError(result.message || 'Registration failed')
       }
@@ -70,8 +70,8 @@ export default function Register() {
         <div className="grid grid-cols-2 gap-4">
           {/* First Name */}
           <div className="relative group">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#4edea3] transition-colors duration-200">First Name</label>
-            <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#4edea3]/40 group-focus-within:ring-1 group-focus-within:ring-[#4edea3]/20">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#6366F1] transition-colors duration-200">First Name</label>
+            <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#6366F1]/40 group-focus-within:ring-1 group-focus-within:ring-[#6366F1]/20">
               <input 
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -84,8 +84,8 @@ export default function Register() {
           </div>
           {/* Last Name */}
           <div className="relative group">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#4edea3] transition-colors duration-200">Last Name</label>
-            <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#4edea3]/40 group-focus-within:ring-1 group-focus-within:ring-[#4edea3]/20">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#6366F1] transition-colors duration-200">Last Name</label>
+            <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#6366F1]/40 group-focus-within:ring-1 group-focus-within:ring-[#6366F1]/20">
               <input 
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -100,8 +100,8 @@ export default function Register() {
 
         {/* Email */}
         <div className="relative group">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#4edea3] transition-colors duration-200">Email Address</label>
-          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#4edea3]/40 group-focus-within:ring-1 group-focus-within:ring-[#4edea3]/20">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#6366F1] transition-colors duration-200">Email Address</label>
+          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#6366F1]/40 group-focus-within:ring-1 group-focus-within:ring-[#6366F1]/20">
             <input 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -115,8 +115,8 @@ export default function Register() {
         
         {/* Password */}
         <div className="relative group">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#4edea3] transition-colors duration-200">Password</label>
-          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#4edea3]/40 group-focus-within:ring-1 group-focus-within:ring-[#4edea3]/20">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#6366F1] transition-colors duration-200">Password</label>
+          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#6366F1]/40 group-focus-within:ring-1 group-focus-within:ring-[#6366F1]/20">
             <input 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -143,20 +143,20 @@ export default function Register() {
           <input 
             checked={terms}
             onChange={(e) => setTerms(e.target.checked)}
-            className="w-4 h-4 rounded border-white/20 bg-[#121212] text-[#4edea3] focus:ring-[#4edea3] focus:ring-offset-black cursor-pointer bg-white/[0.02]" 
+            className="w-4 h-4 rounded border-white/20 bg-[#121212] text-[#6366F1] focus:ring-[#6366F1] focus:ring-offset-black cursor-pointer bg-white/[0.02]" 
             id="terms" 
             type="checkbox" 
             required
           />
           <label className="text-xs text-gray-400 cursor-pointer" htmlFor="terms">
-            I accept the <a className="text-white hover:text-[#4edea3] hover:underline transition-colors font-bold" href="#">Strategic Protocol</a>.
+            I accept the <a className="text-white hover:text-[#6366F1] hover:underline transition-colors font-bold" href="#">Strategic Protocol</a>.
           </label>
         </div>
 
         {/* Submit */}
         <button 
           disabled={submitting}
-          className="w-full bg-white hover:bg-[#4edea3] text-black font-bold py-3.5 rounded-lg transition-all duration-300 text-sm mt-6 flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(78,222,163,0.3)] group disabled:opacity-50" 
+          className="w-full bg-white hover:bg-[#6366F1] text-black font-bold py-3.5 rounded-lg transition-all duration-300 text-sm mt-6 flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(99, 102, 241,0.3)] group disabled:opacity-50" 
           type="submit"
         >
           <span className="flex items-center gap-2">
@@ -168,9 +168,10 @@ export default function Register() {
 
       <footer className="mt-8 text-center">
         <p className="text-xs text-gray-400">
-          Already have an account? <Link className="text-white hover:text-[#4edea3] font-bold hover:underline transition-colors ml-1" to="/signin">Log In</Link>
+          Already have an account? <Link className="text-white hover:text-[#6366F1] font-bold hover:underline transition-colors ml-1" to="/signin">Log In</Link>
         </p>
       </footer>
     </>
   )
 }
+

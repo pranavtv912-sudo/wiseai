@@ -48,10 +48,10 @@ export default function Login() {
         
         {/* Email field */}
         <div className="relative group">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#4edea3] transition-colors duration-200">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#6366F1] transition-colors duration-200">
             Email Address
           </label>
-          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#4edea3]/40 group-focus-within:ring-1 group-focus-within:ring-[#4edea3]/20">
+          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#6366F1]/40 group-focus-within:ring-1 group-focus-within:ring-[#6366F1]/20">
             <input 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -66,14 +66,14 @@ export default function Login() {
         {/* Password field */}
         <div className="relative group">
           <div className="flex justify-between items-center">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#4edea3] transition-colors duration-200">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 group-focus-within:text-[#6366F1] transition-colors duration-200">
               Password
             </label>
-            <a className="text-[10px] text-[#4edea3]/80 hover:text-[#4edea3] hover:underline transition-colors font-medium" href="#">
+            <Link className="text-[10px] text-[#6366F1]/80 hover:text-[#6366F1] hover:underline transition-colors font-medium" to="/forgot-password">
               Recover Key
-            </a>
+            </Link>
           </div>
-          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#4edea3]/40 group-focus-within:ring-1 group-focus-within:ring-[#4edea3]/20">
+          <div className="relative mt-1.5 rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 group-focus-within:border-[#6366F1]/40 group-focus-within:ring-1 group-focus-within:ring-[#6366F1]/20">
             <input 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -97,7 +97,7 @@ export default function Login() {
         {/* Submit */}
         <button 
           disabled={submitting}
-          className="w-full bg-white hover:bg-[#4edea3] text-black font-bold py-3.5 rounded-lg transition-all duration-300 text-sm mt-8 flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(78,222,163,0.3)] group disabled:opacity-50" 
+          className="w-full bg-white hover:bg-[#6366F1] text-black font-bold py-3.5 rounded-lg transition-all duration-300 text-sm mt-8 flex items-center justify-center gap-2 transform hover:scale-[1.01] active:scale-[0.99] hover:shadow-[0_0_20px_rgba(99, 102, 241,0.3)] group disabled:opacity-50" 
           type="submit"
         >
           <span className="flex items-center gap-2">
@@ -109,9 +109,10 @@ export default function Login() {
 
       <footer className="mt-8 text-center">
         <p className="text-xs text-gray-400">
-          New operative? <Link className="text-white hover:text-[#4edea3] font-bold hover:underline transition-colors ml-1" to="/signup">Create Account</Link>
+          New operative? <Link className="text-white hover:text-[#6366F1] font-bold hover:underline transition-colors ml-1" to="/signup">Create Account</Link>
         </p>
       </footer>
     </>
   )
 }
+

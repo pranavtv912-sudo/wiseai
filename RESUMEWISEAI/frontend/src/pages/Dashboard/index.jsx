@@ -156,15 +156,15 @@ export default function Dashboard() {
   const offset = 283 - (283 * animatedScore) / 100
   const icons = ['code', 'database', 'cloud', 'security', 'terminal', 'memory', 'hub', 'analytics']
   const statuses = ['Critical Gap', 'Emerging', 'Expert', 'High Proficiency', 'Growing', 'Advanced']
-  const colors = ['bg-[#4edea3]', 'bg-purple-500', 'bg-[#4edea3]/50', 'bg-amber-400']
-  const statusColors = ['text-[#4edea3]', 'text-purple-500', 'text-[#4edea3]/50', 'text-amber-400']
+  const colors = ['bg-[#6366F1]', 'bg-purple-500', 'bg-[#6366F1]/50', 'bg-amber-400']
+  const statusColors = ['text-[#6366F1]', 'text-purple-500', 'text-[#6366F1]/50', 'text-amber-400']
 
   return (
     <div className="flex-1 flex flex-col p-8 max-w-7xl mx-auto w-full relative z-10">
       
       {/* Hero / Analysis Header */}
       <section className="pt-20 pb-16">
-        <span className="font-label-sm text-xs text-[#4edea3] uppercase tracking-[0.4em] mb-4 block">
+        <span className="font-label-sm text-xs text-[#6366F1] uppercase tracking-[0.4em] mb-4 block">
           Precision Analyzed 2026
         </span>
         <h1 className="vanguard-heading text-5xl md:text-7xl leading-tight mb-6">
@@ -180,7 +180,7 @@ export default function Dashboard() {
         <div className="flex flex-wrap gap-2.5 mb-8 border-b border-white/10 pb-6">
           <Link 
             to="/dashboard"
-            className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#4edea3]/12 border border-[#4edea3]/35 text-[#4edea3] transition-all"
+            className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#6366F1]/12 border border-[#6366F1]/35 text-[#6366F1] transition-all"
           >
             Overview
           </Link>
@@ -236,7 +236,7 @@ export default function Dashboard() {
                     cy="50" 
                     r="45" 
                     fill="none" 
-                    stroke="#4edea3" 
+                    stroke="#6366F1" 
                     strokeWidth="8" 
                     strokeLinecap="round" 
                     strokeDasharray="283" 
@@ -272,7 +272,7 @@ export default function Dashboard() {
           >
             <div className="bg-[#0A0A0A] rounded-[1.75rem] p-8 border border-white/10 flex items-center gap-8 h-full">
               <div className="w-24 h-24 flex-shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-4xl text-[#4edea3]">
+                <span className="material-symbols-outlined text-4xl text-[#6366F1]">
                   {status === 'Qualified' ? 'workspace_premium' : 'autorenew'}
                 </span>
               </div>
@@ -281,7 +281,7 @@ export default function Dashboard() {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Profile Target</span>
                   <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${
                     status === 'Active' || status === 'Qualified' 
-                      ? 'bg-[#4edea3]/10 text-[#4edea3] border-[#4edea3]/20' 
+                      ? 'bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20' 
                       : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                   }`}>
                     {loading ? 'Analyzing' : status}
@@ -321,7 +321,7 @@ export default function Dashboard() {
                   </div>
                   <Link 
                     to="/resources" 
-                    className="island-button bg-[#4edea3]/10 text-[#4edea3] px-5 py-2 rounded-full text-xs font-bold flex items-center gap-2 hover:bg-[#4edea3]/20 transition-all border border-[#4edea3]/20"
+                    className="island-button bg-[#6366F1]/10 text-[#6366F1] px-5 py-2 rounded-full text-xs font-bold flex items-center gap-2 hover:bg-[#6366F1]/20 transition-all border border-[#6366F1]/20"
                   >
                     Fill Gaps
                     <span className="material-symbols-outlined text-[16px]">add</span>
@@ -338,8 +338,8 @@ export default function Dashboard() {
                       const skillName = typeof skill === 'string' ? skill : (skill.name || 'Skill')
                       const skillLevel = typeof skill === 'string' ? statuses[i % statuses.length] : (skill.level || 'Advanced')
                       return (
-                        <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-[#4edea3]/30 transition-all cursor-default">
-                          <span className="material-symbols-outlined text-[#4edea3] text-2xl mb-3 block">
+                        <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-[#6366F1]/30 transition-all cursor-default">
+                          <span className="material-symbols-outlined text-[#6366F1] text-2xl mb-3 block">
                             {icons[i % icons.length]}
                           </span>
                           <div className="text-sm font-medium text-white truncate">{skillName}</div>
@@ -372,7 +372,7 @@ export default function Dashboard() {
                   </div>
                   <p className="text-sm text-gray-400 mt-2">Based on your current skill-density and roadmap potential.</p>
                 </div>
-                <div className="mt-8 flex items-center gap-2 text-[#4edea3]">
+                <div className="mt-8 flex items-center gap-2 text-[#6366F1]">
                   <span className="material-symbols-outlined text-[20px]">trending_up</span>
                   <span className="text-[10px] font-bold tracking-widest uppercase">{trendText}</span>
                 </div>
@@ -390,7 +390,7 @@ export default function Dashboard() {
               <div className="bg-[#0A0A0A] rounded-[1.75rem] p-8 h-full border border-white/10">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="vanguard-heading text-2xl font-bold">Gap Intelligence</h3>
-                  <span className="bg-[#4edea3]/10 text-[#4edea3] text-[10px] px-2 py-0.5 rounded border border-[#4edea3]/20 font-bold uppercase tracking-widest">Active Node</span>
+                  <span className="bg-[#6366F1]/10 text-[#6366F1] text-[10px] px-2 py-0.5 rounded border border-[#6366F1]/20 font-bold uppercase tracking-widest">Active Node</span>
                 </div>
                 <p className="text-sm text-gray-400 mb-8">Key areas identified for maximum career velocity.</p>
                 
@@ -435,13 +435,13 @@ export default function Dashboard() {
             >
               <div className="bg-[#0A0A0A] rounded-[1.75rem] p-8 h-full border border-white/10 flex flex-col justify-between">
                 <div>
-                  <span className="material-symbols-outlined text-[#4edea3] text-3xl mb-4">alt_route</span>
+                  <span className="material-symbols-outlined text-[#6366F1] text-3xl mb-4">alt_route</span>
                   <h3 className="vanguard-heading text-2xl font-bold mb-2">Trajectory Mapper</h3>
                   <p className="text-sm text-gray-400 mb-6">Your personalized career evolution paths based on this analysis.</p>
                 </div>
                 <Link 
                   to={`/roadmap?track=${encodeURIComponent(track)}`} 
-                  className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#4edea3] hover:gap-3 transition-all"
+                  className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6366F1] hover:gap-3 transition-all"
                 >
                   <span className="material-symbols-outlined text-[14px]">bolt</span>
                   EXPLORE OPTIMIZED PATHS
@@ -456,3 +456,4 @@ export default function Dashboard() {
     </div>
   )
 }
+

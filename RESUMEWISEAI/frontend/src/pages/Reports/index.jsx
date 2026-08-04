@@ -111,7 +111,7 @@ export default function Reports() {
       {/* Header */}
       <section className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#4edea3] block mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6366F1] block mb-2">
             Archived Intelligence
           </span>
           <h1 className="vanguard-heading text-4xl md:text-5xl font-bold text-white">
@@ -122,7 +122,7 @@ export default function Reports() {
           </p>
         </div>
         <div>
-          <Link to="/upload" className="island-button bg-[#4edea3] text-[#003824] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
+          <Link to="/upload" className="island-button bg-[#6366F1] text-[#00173b] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
             <span className="material-symbols-outlined text-[15px]">upload_file</span> Ingest New
           </Link>
         </div>
@@ -156,7 +156,7 @@ export default function Reports() {
         </Link>
         <Link 
           to="/reports"
-          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#4edea3]/12 border border-[#4edea3]/35 text-[#4edea3] transition-all"
+          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#6366F1]/12 border border-[#6366F1]/35 text-[#6366F1] transition-all"
         >
           Reports Manager
         </Link>
@@ -165,10 +165,10 @@ export default function Reports() {
       {/* Reports Grid */}
       {reports.length === 0 ? (
         <section className="text-center py-20 bg-[#0A0A0A] border border-white/10 rounded-[2.2rem] p-10 max-w-lg mx-auto shadow-xl">
-          <span className="material-symbols-outlined text-[#4edea3] text-5xl mb-4 block">description</span>
+          <span className="material-symbols-outlined text-[#6366F1] text-5xl mb-4 block">description</span>
           <h3 className="vanguard-heading text-xl font-bold text-white mb-2">No Reports Available</h3>
           <p className="text-gray-400 text-xs mb-6">Ingest a resume file to generate your first technical gap report.</p>
-          <Link to="/upload" className="island-button bg-[#4edea3] text-[#003824] px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest">
+          <Link to="/upload" className="island-button bg-[#6366F1] text-[#00173b] px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest">
             Ingest Now
           </Link>
         </section>
@@ -178,7 +178,7 @@ export default function Reports() {
             <div 
               key={report.id}
               onClick={() => handleSelectReport(report)}
-              className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 hover:border-[#4edea3]/30 hover:shadow-[0_0_20px_rgba(78,222,163,0.1)] transition-all cursor-pointer relative group flex flex-col justify-between min-h-[220px]"
+              className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 hover:border-[#6366F1]/30 hover:shadow-[0_0_20px_rgba(99, 102, 241,0.1)] transition-all cursor-pointer relative group flex flex-col justify-between min-h-[220px]"
             >
               <div>
                 {/* Top header row */}
@@ -203,7 +203,7 @@ export default function Reports() {
               {/* Lower Section: Score & Actions */}
               <div className="flex justify-between items-center border-t border-white/5 pt-4 mt-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full border border-[#4edea3]/30 flex items-center justify-center font-mono text-xs text-[#4edea3] font-bold">
+                  <div className="w-8 h-8 rounded-full border border-[#6366F1]/30 flex items-center justify-center font-mono text-xs text-[#6366F1] font-bold">
                     {report.atsScore}
                   </div>
                   <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">ATS Score</span>
@@ -214,7 +214,7 @@ export default function Reports() {
                   </span>
                   <button 
                     onClick={(e) => handleDownload(e, report.id, report.file_name)}
-                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#4edea3]/10 border border-white/10 hover:border-[#4edea3]/30 flex items-center justify-center transition-all z-10 text-white hover:text-[#4edea3]"
+                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#6366F1]/10 border border-white/10 hover:border-[#6366F1]/30 flex items-center justify-center transition-all z-10 text-white hover:text-[#6366F1]"
                     title="Download Report"
                   >
                     <span className="material-symbols-outlined text-[16px]">download</span>
@@ -229,3 +229,4 @@ export default function Reports() {
     </div>
   )
 }
+

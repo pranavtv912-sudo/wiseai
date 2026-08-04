@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { listResumes, getProfile, updateProfile } from '../../services/api'
+import { listResumes, getProfile, updateProfile, requestChangePasswordOtp, changePassword, resendOtp } from '../../services/api'
 
 export default function Profile() {
   const { user, loginUser } = useAuth()
@@ -12,6 +12,35 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false)
   const [resumeCount, setResumeCount] = useState(0)
   const [activeScore, setActiveScore] = useState(localStorage.getItem('rw_last_score') || 0)
+
+  // Security (Change Password) OTP States
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [passwordOtp, setPasswordOtp] = useState('')
+  const [securityStep, setSecurityStep] = useState(1)
+  const [securityTimeLeft, setSecurityTimeLeft] = useState(300)
+  const [securityResendCooldown, setSecurityResendCooldown] = useState(60)
+  const [securitySubmitting, setSecuritySubmitting] = useState(false)
+  const [securityError, setSecurityError] = useState('')
+  const [securitySuccess, setSecuritySuccess] = useState('')
+  const [securityResending, setSecurityResending] = useState(false)
+
+  useEffect(() => {
+    if (securityStep !== 2) return
+
+    const timer = setInterval(() => {
+      setSecurityTimeLeft((prev) => (prev > 0 ? prev - 1 : 0))
+    }, 1000)
+
+    const cooldownTimer = setInterval(() => {
+      setSecurityResendCooldown((prev) => (prev > 0 ? prev - 1 : 0))
+    }, 1000)
+
+    return () => {
+      clearInterval(timer)
+      clearInterval(cooldownTimer)
+    }
+  }, [securityStep])
 
   useEffect(() => {
     async function loadStats() {
@@ -54,6 +83,101 @@ export default function Profile() {
     }
   }
 
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`
+  }
+
+  const handleRequestOtp = async (e) => {
+    e.preventDefault()
+    setSecurityError('')
+    setSecuritySuccess('')
+
+    if (!currentPassword) {
+      setSecurityError('Current password is required to verify identity.')
+      return
+    }
+
+    setSecuritySubmitting(true)
+    try {
+      const res = await requestChangePasswordOtp(currentPassword)
+      if (res.success) {
+        setSecuritySuccess('A secure verification code has been dispatched.')
+        setSecurityStep(2)
+        setSecurityTimeLeft(300)
+        setSecurityResendCooldown(60)
+      } else {
+        setSecurityError(res.message || 'Verification request failed.')
+      }
+    } catch (err) {
+      setSecurityError(err.message || 'Current password check failed or server error.')
+    } finally {
+      setSecuritySubmitting(false)
+    }
+  }
+
+  const handleVerifyAndChange = async (e) => {
+    e.preventDefault()
+    setSecurityError('')
+    setSecuritySuccess('')
+
+    if (!passwordOtp || passwordOtp.length !== 6) {
+      setSecurityError('Please enter a valid 6-digit numeric OTP.')
+      return
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+      setSecurityError('New password must be at least 8 characters long.')
+      return
+    }
+
+    if (securityTimeLeft <= 0) {
+      setSecurityError('Verification code expired. Please request a new one.')
+      return
+    }
+
+    setSecuritySubmitting(true)
+    try {
+      const res = await changePassword(currentPassword, passwordOtp, newPassword)
+      if (res.success) {
+        setSecuritySuccess('Security access key updated successfully!')
+        setCurrentPassword('')
+        setNewPassword('')
+        setPasswordOtp('')
+        setSecurityStep(1)
+      } else {
+        setSecurityError(res.message || 'Password update failed.')
+      }
+    } catch (err) {
+      setSecurityError(err.message || 'OTP verification check failed.')
+    } finally {
+      setSecuritySubmitting(false)
+    }
+  }
+
+  const handleResendSecurityOtp = async () => {
+    if (securityResendCooldown > 0 || securityResending) return
+
+    setSecurityError('')
+    setSecuritySuccess('')
+    setSecurityResending(true)
+    try {
+      const res = await resendOtp(email, 'change_password')
+      if (res.success) {
+        setSecuritySuccess('A new security code has been transmitted.')
+        setSecurityTimeLeft(300)
+        setSecurityResendCooldown(60)
+      } else {
+        setSecurityError(res.message || 'Failed to dispatch verification code.')
+      }
+    } catch (err) {
+      setSecurityError(err.message || 'Resend failed. Please try again.')
+    } finally {
+      setSecurityResending(false)
+    }
+  }
+
   // Count roadmap nodes completed from localStorage
   let completedNodes = 0
   const roadmapStatus = localStorage.getItem('rw_roadmap_status')
@@ -71,7 +195,7 @@ export default function Profile() {
       
       {/* Header */}
       <section className="mb-12">
-        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#4edea3] block mb-2">
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6366F1] block mb-2">
           Operative Dossier Credentials
         </span>
         <h1 className="vanguard-heading text-4xl md:text-5xl font-bold text-white">
@@ -85,7 +209,7 @@ export default function Profile() {
         <div className="md:col-span-1 bg-[#0A0A0A] border border-white/10 rounded-[2rem] p-6 shadow-2xl flex flex-col justify-between min-h-[300px]">
           <div>
             <div className="w-16 h-16 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center mb-6">
-              <span className="material-symbols-outlined text-[#4edea3] text-3xl">person</span>
+              <span className="material-symbols-outlined text-[#6366F1] text-3xl">person</span>
             </div>
             <h3 className="text-lg font-bold text-white mb-1">{user?.name || 'Operative'}</h3>
             <p className="text-xs text-gray-500 truncate mb-6">{user?.email}</p>
@@ -98,7 +222,7 @@ export default function Profile() {
             </div>
             <div className="flex justify-between items-center text-gray-400">
               <span>Current ATS score</span>
-              <span className="text-[#4edea3] font-mono font-bold">{activeScore}%</span>
+              <span className="text-[#6366F1] font-mono font-bold">{activeScore}%</span>
             </div>
             <div className="flex justify-between items-center text-gray-400">
               <span>Roadmap Nodes Finished</span>
@@ -108,97 +232,214 @@ export default function Profile() {
         </div>
 
         {/* Right Side: Account Details Forms */}
-        <div className="md:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Profile Details</h3>
-            {!isEditing && (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="text-xs text-[#4edea3] font-bold hover:underline uppercase tracking-wider"
-              >
-                Edit Dossier
-              </button>
+        <div className="md:col-span-2 space-y-8">
+          
+          {/* Profile Details Card */}
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Profile Details</h3>
+              {!isEditing && (
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="text-xs text-[#6366F1] font-bold hover:underline uppercase tracking-wider"
+                >
+                  Edit Dossier
+                </button>
+              )}
+            </div>
+
+            {isEditing ? (
+              <form onSubmit={handleSave} className="space-y-6">
+                {/* Name */}
+                <div className="relative group">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Full Name</label>
+                  <input 
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white mt-1.5 focus:outline-none focus:border-[#6366F1]/40"
+                    required
+                  />
+                </div>
+
+                {/* Email (Readonly) */}
+                <div className="relative">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Email Address (Locked)</label>
+                  <input 
+                    type="email"
+                    value={email}
+                    disabled
+                    className="w-full bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 text-sm text-gray-500 mt-1.5 focus:outline-none cursor-not-allowed"
+                  />
+                </div>
+
+                {/* Target Track */}
+                <div className="relative">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Target Career Track</label>
+                  <select 
+                    value={targetTrack}
+                    onChange={(e) => setTargetTrack(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white mt-1.5 focus:outline-none focus:border-[#6366F1]/40 cursor-pointer"
+                  >
+                    <option value="Full Stack" className="bg-[#0A0A0A]">Full Stack</option>
+                    <option value="Frontend" className="bg-[#0A0A0A]">Frontend</option>
+                    <option value="Backend" className="bg-[#0A0A0A]">Backend</option>
+                    <option value="DevOps" className="bg-[#0A0A0A]">DevOps</option>
+                    <option value="AI / ML" className="bg-[#0A0A0A]">AI / ML</option>
+                  </select>
+                </div>
+
+                {/* Save/Cancel buttons */}
+                <div className="flex gap-4 pt-4">
+                  <button 
+                    type="submit"
+                    className="bg-[#6366F1] text-[#00173b] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-[1.01] active:scale-[0.99] transition-all"
+                  >
+                    Save Ingest
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setName(user?.name || '')
+                      setTargetTrack(user?.target_role || localStorage.getItem('rw_detected_track') || 'Full Stack')
+                      setIsEditing(false)
+                    }}
+                    className="bg-white/5 border border-white/10 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                <div className="border-b border-white/5 pb-4">
+                  <div className="text-[10px] font-bold uppercase text-gray-500">Full Name</div>
+                  <div className="text-base text-white font-medium mt-1">{user?.name || 'Operative'}</div>
+                </div>
+                <div className="border-b border-white/5 pb-4">
+                  <div className="text-[10px] font-bold uppercase text-gray-500">Email Address</div>
+                  <div className="text-base text-white font-medium mt-1">{user?.email}</div>
+                </div>
+                <div className="pb-4">
+                  <div className="text-[10px] font-bold uppercase text-gray-500">Target Track Focus</div>
+                  <div className="text-base text-[#6366F1] font-medium font-mono mt-1">{targetTrack}</div>
+                </div>
+              </div>
             )}
           </div>
 
-          {isEditing ? (
-            <form onSubmit={handleSave} className="space-y-6">
-              {/* Name */}
-              <div className="relative group">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Full Name</label>
-                <input 
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white mt-1.5 focus:outline-none focus:border-[#4edea3]/40"
-                  required
-                />
-              </div>
+          {/* Security Credentials Card */}
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-[2rem] p-8 shadow-2xl">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-8">Security Credentials</h3>
 
-              {/* Email (Readonly) */}
-              <div className="relative">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Email Address (Locked)</label>
-                <input 
-                  type="email"
-                  value={email}
-                  disabled
-                  className="w-full bg-white/[0.02] border border-white/5 rounded-xl px-4 py-3 text-sm text-gray-500 mt-1.5 focus:outline-none cursor-not-allowed"
-                />
+            {securityError && (
+              <div className="mb-6 p-4 bg-red-950/40 border border-red-500/30 text-red-400 text-xs rounded-lg text-center font-medium">
+                {securityError}
               </div>
+            )}
 
-              {/* Target Track */}
-              <div className="relative">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Target Career Track</label>
-                <select 
-                  value={targetTrack}
-                  onChange={(e) => setTargetTrack(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white mt-1.5 focus:outline-none focus:border-[#4edea3]/40 cursor-pointer"
-                >
-                  <option value="Full Stack" className="bg-[#0A0A0A]">Full Stack</option>
-                  <option value="Frontend" className="bg-[#0A0A0A]">Frontend</option>
-                  <option value="Backend" className="bg-[#0A0A0A]">Backend</option>
-                  <option value="DevOps" className="bg-[#0A0A0A]">DevOps</option>
-                  <option value="AI / ML" className="bg-[#0A0A0A]">AI / ML</option>
-                </select>
+            {securitySuccess && (
+              <div className="mb-6 p-4 bg-[#6366F1]/10 border border-[#6366F1]/30 text-[#6366F1] text-xs rounded-lg text-center font-bold uppercase tracking-wider">
+                {securitySuccess}
               </div>
+            )}
 
-              {/* Save/Cancel buttons */}
-              <div className="flex gap-4 pt-4">
+            {securityStep === 1 ? (
+              <form onSubmit={handleRequestOtp} className="space-y-6">
+                <div className="relative group">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Current Access Key (Password)</label>
+                  <input 
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter current password"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white mt-1.5 focus:outline-none focus:border-[#6366F1]/40"
+                    required
+                  />
+                </div>
+
                 <button 
                   type="submit"
-                  className="bg-[#4edea3] text-[#003824] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-[1.01] active:scale-[0.99] transition-all"
+                  disabled={securitySubmitting}
+                  className="bg-[#6366F1] text-[#00173b] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50"
                 >
-                  Save Ingest
+                  {securitySubmitting ? 'Requesting...' : 'Request Verification Code'}
                 </button>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setName(user?.name || '')
-                    setTargetTrack(user?.target_role || localStorage.getItem('rw_detected_track') || 'Full Stack')
-                    setIsEditing(false)
-                  }}
-                  className="bg-white/5 border border-white/10 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-6">
-              <div className="border-b border-white/5 pb-4">
-                <div className="text-[10px] font-bold uppercase text-gray-500">Full Name</div>
-                <div className="text-base text-white font-medium mt-1">{user?.name || 'Operative'}</div>
-              </div>
-              <div className="border-b border-white/5 pb-4">
-                <div className="text-[10px] font-bold uppercase text-gray-500">Email Address</div>
-                <div className="text-base text-white font-medium mt-1">{user?.email}</div>
-              </div>
-              <div className="pb-4">
-                <div className="text-[10px] font-bold uppercase text-gray-500">Target Track Focus</div>
-                <div className="text-base text-[#4edea3] font-medium font-mono mt-1">{targetTrack}</div>
-              </div>
-            </div>
-          )}
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyAndChange} className="space-y-6">
+                <div className="relative group text-center">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">6-Digit Verification Code</label>
+                  <input 
+                    type="text"
+                    value={passwordOtp}
+                    onChange={(e) => setPasswordOtp(e.target.value.slice(0, 6))}
+                    placeholder="000000"
+                    pattern="\d{6}"
+                    maxLength="6"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-xl font-bold tracking-[0.5em] text-center text-white mt-1.5 focus:outline-none focus:border-[#6366F1]/40"
+                    required
+                  />
+                </div>
+
+                <div className="relative group">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Configure New Access Key</label>
+                  <input 
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white mt-1.5 focus:outline-none focus:border-[#6366F1]/40"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-between items-center text-xs text-gray-400 font-mono">
+                  <div>
+                    Code Expiry: <span className={`font-bold ${securityTimeLeft < 60 ? 'text-red-400' : 'text-[#6366F1]'}`}>{formatTime(securityTimeLeft)}</span>
+                  </div>
+                  <div>
+                    {securityResendCooldown > 0 ? (
+                      <span>Resend in: <span className="text-white font-bold">{securityResendCooldown}s</span></span>
+                    ) : (
+                      <button 
+                        type="button" 
+                        onClick={handleResendSecurityOtp}
+                        disabled={securityResending}
+                        className="text-[#6366F1] hover:underline font-bold transition-all uppercase text-[10px]"
+                      >
+                        {securityResending ? 'Sending...' : 'Resend Code'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button 
+                    type="submit"
+                    disabled={securitySubmitting || securityTimeLeft <= 0}
+                    className="bg-[#6366F1] text-[#00173b] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50"
+                  >
+                    {securitySubmitting ? 'Updating...' : 'Update Credentials'}
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setSecurityStep(1)
+                      setPasswordOtp('')
+                      setNewPassword('')
+                      setSecurityError('')
+                      setSecuritySuccess('')
+                    }}
+                    className="bg-white/5 border border-white/10 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+
         </div>
 
       </div>
@@ -206,3 +447,4 @@ export default function Profile() {
     </div>
   )
 }
+

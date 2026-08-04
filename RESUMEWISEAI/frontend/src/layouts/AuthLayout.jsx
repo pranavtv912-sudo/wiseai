@@ -19,7 +19,7 @@ export default function AuthLayout() {
           {/* Top Branding */}
           <div className="relative z-10">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md w-fit">
-              <span className="w-2 h-2 rounded-full bg-[#4edea3] animate-pulse shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-pulse shadow-[0_0_8px_rgba(99, 102, 241,0.8)]"></span>
               <span className="text-[10px] font-bold tracking-widest uppercase text-gray-300">VANGUARD SHIELD</span>
             </div>
           </div>
@@ -27,7 +27,7 @@ export default function AuthLayout() {
           {/* Mid Content */}
           <div className="mt-8 md:mt-12 relative z-10">
             <h1 className="text-4xl md:text-5xl font-semibold mb-4 leading-tight vanguard-heading text-white">
-              Welcome to the<br /><span className="text-[#4edea3] italic font-bold">Elite.</span>
+              Welcome to the<br /><span className="text-[#6366F1] italic font-bold">Elite.</span>
             </h1>
             <p className="text-gray-300 text-sm max-w-xs leading-relaxed">
               Initialize your credentials to access your career neural network and tactical dossier.
@@ -39,17 +39,17 @@ export default function AuthLayout() {
             <div className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 rounded-xl p-4 transition-all duration-300 group hover:-translate-y-0.5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] font-bold leading-tight text-white/40 uppercase tracking-wider">ATS Fidelity</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1] shadow-[0_0_8px_rgba(99, 102, 241,0.8)]"></span>
               </div>
-              <div className="text-2xl font-bold text-[#4edea3] vanguard-heading">99.8%</div>
+              <div className="text-2xl font-bold text-[#6366F1] vanguard-heading">99.8%</div>
               <div className="text-[9px] text-gray-500 mt-1">Real-time feedback loop</div>
             </div>
             <div className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 rounded-xl p-4 transition-all duration-300 group hover:-translate-y-0.5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] font-bold leading-tight text-white/40 uppercase tracking-wider">Nodes Scanned</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1] shadow-[0_0_8px_rgba(99, 102, 241,0.8)]"></span>
               </div>
-              <div className="text-2xl font-bold text-[#4edea3] vanguard-heading">14.2k</div>
+              <div className="text-2xl font-bold text-[#6366F1] vanguard-heading">14.2k</div>
               <div className="text-[9px] text-gray-500 mt-1">Global framework sync</div>
             </div>
           </div>
@@ -66,3 +66,4 @@ export default function AuthLayout() {
     </div>
   )
 }
+

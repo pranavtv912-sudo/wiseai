@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext'
 
 const TRACKS = {
   'Full Stack': {
-    color: '#4edea3',
+    color: '#6366F1',
     nodes: [
       { id: 'root', title: 'Full Stack Dev', icon: 'code', col: 4, row: 0, status: 'done', desc: 'The complete path from zero to a production-ready full-stack engineer.', topics: ['HTML', 'CSS', 'JavaScript', 'Git'], category: 'Start Here' },
       { id: 'internet', title: 'How the Internet Works', icon: 'wifi', col: 1, row: 1, status: 'done', desc: 'TCP/IP, DNS, HTTP, HTTPS, SSL/TLS and how browsers render pages.', topics: ['HTTP/HTTPS', 'DNS', 'TCP/IP'], category: 'Fundamentals' },
@@ -292,7 +292,7 @@ export default function CareerRoadmap() {
                 }}
                 className={`w-full text-left padding px-3 py-2 rounded-lg text-xs font-semibold tracking-wider font-mono transition-all border ${
                   k === activeTrack
-                    ? 'bg-[#4edea3]/10 border-[#4edea3]/30 text-[#4edea3]'
+                    ? 'bg-[#6366F1]/10 border-[#6366F1]/30 text-[#6366F1]'
                     : 'bg-transparent border-transparent text-gray-400 hover:bg-white/5 hover:text-white'
                 }`}
               >
@@ -306,7 +306,7 @@ export default function CareerRoadmap() {
         <div className="p-4 border-b border-white/10 space-y-2 text-xs">
           <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Legend</div>
           <div className="flex items-center gap-2 text-gray-300">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#4edea3]" /> Completed
+            <div className="w-2.5 h-2.5 rounded-full bg-[#6366F1]" /> Completed
           </div>
           <div className="flex items-center gap-2 text-gray-300">
             <div className="w-2.5 h-2.5 rounded-full bg-amber-400" /> In Progress
@@ -325,7 +325,7 @@ export default function CareerRoadmap() {
             <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Progress</div>
             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-[#4edea3] rounded-full transition-all duration-700" 
+                className="h-full bg-[#6366F1] rounded-full transition-all duration-700" 
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -380,7 +380,7 @@ export default function CareerRoadmap() {
             </button>
             <Link 
               to="/resources"
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/20 text-[#4edea3] text-[10px] font-bold uppercase tracking-widest hover:bg-[#4edea3]/20 transition-all"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#6366F1]/10 border border-[#6366F1]/20 text-[#6366F1] text-[10px] font-bold uppercase tracking-widest hover:bg-[#6366F1]/20 transition-all"
             >
               <span className="material-symbols-outlined text-[14px]">play_circle</span>Resources
             </Link>
@@ -416,13 +416,13 @@ export default function CareerRoadmap() {
                     
                     return (
                       <div key={monthKey} className="relative group">
-                        <div className="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#050505] border border-[#4edea3] flex items-center justify-center text-[10px] text-[#4edea3] font-bold font-mono">
+                        <div className="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#050505] border border-[#6366F1] flex items-center justify-center text-[10px] text-[#6366F1] font-bold font-mono">
                           {idx + 1}
                         </div>
                         
-                        <div className="p-1.5 rounded-[2rem] bg-white/5 border border-white/5 hover:border-[#4edea3]/20 transition-all">
+                        <div className="p-1.5 rounded-[2rem] bg-white/5 border border-white/5 hover:border-[#6366F1]/20 transition-all">
                           <div className="bg-[#0A0A0A] rounded-[calc(2rem-0.375rem)] p-6 border border-white/10">
-                            <span className="text-[10px] text-[#4edea3] font-bold uppercase tracking-widest font-mono block mb-1">
+                            <span className="text-[10px] text-[#6366F1] font-bold uppercase tracking-widest font-mono block mb-1">
                               {monthKey.replace('_', ' ')}
                             </span>
                             <h3 className="text-xl font-bold text-white mb-3">{focus}</h3>
@@ -460,7 +460,7 @@ export default function CareerRoadmap() {
                                           setLoadingVideos(false);
                                         }
                                       }}
-                                      className="px-3 py-1 rounded-full bg-white/5 hover:bg-[#4edea3]/10 hover:text-[#4edea3] border border-white/10 text-[10px] text-gray-300 font-semibold uppercase tracking-wider transition-all"
+                                      className="px-3 py-1 rounded-full bg-white/5 hover:bg-[#6366F1]/10 hover:text-[#6366F1] border border-white/10 text-[10px] text-gray-300 font-semibold uppercase tracking-wider transition-all"
                                     >
                                       📽 {r}
                                     </button>
@@ -549,7 +549,7 @@ export default function CareerRoadmap() {
                     onMouseLeave={() => setTooltip(prev => ({ ...prev, show: false }))}
                     className={`rnode absolute pointer-events-auto bg-[#0a0a0a]/95 border rounded-[14px] px-[18px] py-[14px] cursor-pointer transition-all duration-300 text-center min-w-[190px] max-w-[220px] select-none ${
                       status === 'done' 
-                        ? 'border-[#4edea3]/50 shadow-[0_0_20px_rgba(78,222,163,0.15)]' 
+                        ? 'border-[#6366F1]/50 shadow-[0_0_20px_rgba(99, 102, 241,0.15)]' 
                         : status === 'doing' 
                           ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.12)]' 
                           : status === 'optional'
@@ -561,7 +561,7 @@ export default function CareerRoadmap() {
                     {/* Status dot */}
                     <div className={`w-2 h-2 rounded-full absolute top-2 right-2.5 ${
                       status === 'done' 
-                        ? 'bg-[#4edea3]' 
+                        ? 'bg-[#6366F1]' 
                         : status === 'doing' 
                           ? 'bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.8)]' 
                           : status === 'optional'
@@ -597,7 +597,7 @@ export default function CareerRoadmap() {
           <>
             <div className="flex justify-between items-start mb-8">
               <div>
-                <div className="text-[#4edea3] text-[10px] font-bold uppercase tracking-widest mb-1">
+                <div className="text-[#6366F1] text-[10px] font-bold uppercase tracking-widest mb-1">
                   {selectedNode.category || activeTrack}
                 </div>
                 <h2 className="vanguard-heading text-2xl text-white font-bold">{selectedNode.title}</h2>
@@ -616,7 +616,7 @@ export default function CareerRoadmap() {
                 onClick={() => setNodeStatus(selectedNode.id, 'done')}
                 className={`flex-1 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${
                   (statusMap[`${activeTrack}_${selectedNode.id}`] || selectedNode.status) === 'done'
-                    ? 'border-[#4edea3]/50 text-[#4edea3] bg-[#4edea3]/10'
+                    ? 'border-[#6366F1]/50 text-[#6366F1] bg-[#6366F1]/10'
                     : 'border-white/10 text-gray-400 bg-white/5 hover:bg-white/10'
                 }`}
               >
@@ -653,7 +653,7 @@ export default function CareerRoadmap() {
                 {(selectedNode.topics || []).map((t, idx) => (
                   <span 
                     key={idx}
-                    className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-[#4edea3] uppercase tracking-wider"
+                    className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-[#6366F1] uppercase tracking-wider"
                   >
                     {t}
                   </span>
@@ -670,7 +670,7 @@ export default function CareerRoadmap() {
               ) : videos.length === 0 ? (
                 <Link 
                   to={`/resources?q=${encodeURIComponent(selectedNode.title)}`}
-                  className="text-xs text-[#4edea3] hover:underline"
+                  className="text-xs text-[#6366F1] hover:underline"
                 >
                   Search in Resource Hub →
                 </Link>
@@ -680,7 +680,7 @@ export default function CareerRoadmap() {
                     <div
                       key={i}
                       onClick={() => setActiveVideo(v)}
-                      className="flex gap-3 items-start p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#4edea3]/25 transition-colors group cursor-pointer"
+                      className="flex gap-3 items-start p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#6366F1]/25 transition-colors group cursor-pointer"
                     >
                       <img 
                         src={v.thumbnail || `https://i.ytimg.com/vi/${v.video_id}/mqdefault.jpg`} 
@@ -688,11 +688,11 @@ export default function CareerRoadmap() {
                         className="w-20 h-14 object-cover rounded-lg flex-shrink-0 group-hover:opacity-90 transition-opacity"
                       />
                       <div className="min-w-0">
-                        <div className="text-xs font-medium text-white line-clamp-2 group-hover:text-[#4edea3] transition-colors">
+                        <div className="text-xs font-medium text-white line-clamp-2 group-hover:text-[#6366F1] transition-colors">
                           {v.title}
                         </div>
                         <div className="text-[10px] text-gray-500 mt-1">{v.channel || 'YouTube'}</div>
-                        <div className="text-[10px] text-[#4edea3] mt-1 flex items-center gap-1">
+                        <div className="text-[10px] text-[#6366F1] mt-1 flex items-center gap-1">
                           <span className="material-symbols-outlined text-[11px]">play_circle</span>
                           Watch In-App
                         </div>
@@ -709,13 +709,14 @@ export default function CareerRoadmap() {
       {/* Premium Video Modal Player */}
       <PremiumVideoModal 
         activeVideo={activeVideo} 
-        setActiveVideo={setActiveVideo} 
+        setActiveVideo={setActiveVideo}
+        videosList={videos}
       />
 
       {/* Hover Node Tooltip */}
       {tooltip.show && (
         <div 
-          className="fixed pointer-events-none z-[100] bg-[#111] border border-[#4edea3]/30 rounded-lg p-3 text-xs text-white max-w-[240px] shadow-[0_8px_30px_rgba(0,0,0,.5)] transition-opacity duration-200"
+          className="fixed pointer-events-none z-[100] bg-[#111] border border-[#6366F1]/30 rounded-lg p-3 text-xs text-white max-w-[240px] shadow-[0_8px_30px_rgba(0,0,0,.5)] transition-opacity duration-200"
           style={{ left: `${tooltip.x}px`, top: `${tooltip.y}px` }}
         >
           <strong className="block mb-1 text-white">{tooltip.title}</strong>
@@ -726,4 +727,5 @@ export default function CareerRoadmap() {
     </div>
   )
 }
+
 

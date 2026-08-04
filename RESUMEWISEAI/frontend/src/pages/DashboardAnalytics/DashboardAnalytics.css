@@ -15,7 +15,7 @@
 .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  border-color: rgba(78, 222, 163, 0.5);
+  border-color: rgba(99, 102, 241, 0.5);
 }
 
 .chart-card {

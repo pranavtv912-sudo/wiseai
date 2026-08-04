@@ -1,121 +1,28 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import * as THREE from 'three'
 import { useAuth } from '../../context/AuthContext'
-import { uploadResume, parseResume, analyzeResume } from '../../services/api'
+import { motion } from 'framer-motion'
+import Aurora from '../../components/Aurora'
 
 export default function Landing() {
   const { authenticated } = useAuth()
   const navigate = useNavigate()
-  
-  const heroContainerRef = useRef(null)
-  const fileInputRef = useRef(null)
-  
-  const [targetRole, setTargetRole] = useState('')
-  const [isDragOver, setIsDragOver] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [statusText, setStatusText] = useState('')
-  const [logs, setLogs] = useState([])
 
-  const addLog = (message, isError = false) => {
-    setLogs(prev => [...prev, {
-      time: new Date().toLocaleTimeString(),
-      text: message,
-      isError
-    }])
-  }
-
-  // Three.js Particle Matrix
+  // Scroll Entry Animations
   useEffect(() => {
-    const container = heroContainerRef.current
-    if (!container) return
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active')
+        }
+      })
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
 
-    const width = container.clientWidth || window.innerWidth
-    const height = container.clientHeight || 500
-    
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
-    
-    renderer.setSize(width, height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    container.appendChild(renderer.domElement)
-
-    const particlesCount = 1500
-    const positions = new Float32Array(particlesCount * 3)
-    const velocities = new Float32Array(particlesCount * 3)
-    
-    for (let i = 0; i < particlesCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 10
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 10
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 10
-      velocities[i * 3] = (Math.random() - 0.5) * 0.005
-      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.005
-      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.005
-    }
-
-    const geometry = new THREE.BufferGeometry()
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    
-    const material = new THREE.PointsMaterial({
-      color: 0x00ff88,
-      size: 0.035,
-      transparent: true,
-      opacity: 0.4,
-      blending: THREE.AdditiveBlending,
-      sizeAttenuation: true
-    })
-    
-    const points = new THREE.Points(geometry, material)
-    scene.add(points)
-    camera.position.z = 5
-
-    let mouseX = 0, mouseY = 0
-    const onMouseMove = (e) => {
-      mouseX = (e.clientX / window.innerWidth) - 0.5
-      mouseY = (e.clientY / window.innerHeight) - 0.5
-    }
-    window.addEventListener('mousemove', onMouseMove)
-
-    let rafId
-    const animate = () => {
-      rafId = requestAnimationFrame(animate)
-      const positionsAttr = geometry.attributes.position.array
-      for (let i = 0; i < particlesCount; i++) {
-        positionsAttr[i * 3] += velocities[i * 3]
-        positionsAttr[i * 3 + 1] += velocities[i * 3 + 1]
-        positionsAttr[i * 3 + 2] += velocities[i * 3 + 2]
-        
-        if (Math.abs(positionsAttr[i * 3]) > 5) velocities[i * 3] *= -1
-        if (Math.abs(positionsAttr[i * 3 + 1]) > 5) velocities[i * 3 + 1] *= -1
-        if (Math.abs(positionsAttr[i * 3 + 2]) > 5) velocities[i * 3 + 2] *= -1
-      }
-      geometry.attributes.position.needsUpdate = true
-      points.rotation.y += 0.0008 + (mouseX * 0.005)
-      points.rotation.x += 0.0008 + (mouseY * 0.005)
-      renderer.render(scene, camera)
-    }
-    animate()
-
-    const onResize = () => {
-      const w = container.clientWidth
-      const h = container.clientHeight
-      camera.aspect = w / h
-      camera.updateProjectionMatrix()
-      renderer.setSize(w, h)
-    }
-    window.addEventListener('resize', onResize)
+    const elements = document.querySelectorAll('.reveal-up')
+    elements.forEach(el => observer.observe(el))
 
     return () => {
-      cancelAnimationFrame(rafId)
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('resize', onResize)
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement)
-      }
-      geometry.dispose()
-      material.dispose()
+      elements.forEach(el => observer.unobserve(el))
     }
   }, [])
 
@@ -126,10 +33,10 @@ export default function Landing() {
     const y = e.clientY - rect.top
     const centerX = rect.width / 2
     const centerY = rect.height / 2
-    const rotateX = (y - centerY) / 20
-    const rotateY = (centerX - x) / 20
-    card.style.transform = `scale(1.02) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(30px)`
-    card.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2}px 50px rgba(0,0,0,0.5), 0 0 30px rgba(78, 222, 163, 0.2)`
+    const rotateX = (y - centerY) / 25
+    const rotateY = (centerX - x) / 25
+    card.style.transform = `scale(1.015) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`
+    card.style.boxShadow = `${-rotateY * 1.5}px ${rotateX * 1.5}px 40px rgba(0,0,0,0.6), 0 0 30px rgba(59, 130, 246, 0.12)`
   }
 
   const handleCardMouseLeave = (card) => {
@@ -137,204 +44,137 @@ export default function Landing() {
     card.style.boxShadow = `none`
   }
 
-  const handleUpload = async (file) => {
-    setLogs([])
-    addLog(`Starting upload sequence for: ${file.name}`)
-    
-    if (!authenticated) {
-      addLog("Error: User is not authenticated. Redirecting to login...", true)
-      setTimeout(() => navigate('/signin'), 1500)
-      return
-    }
-
-    const selectedRole = targetRole || 'Software Engineer'
-    addLog(`Target role: "${selectedRole}"`)
-    
-    setUploading(true)
-    setStatusText('UPLOADING ARCHIVE...')
-    setProgress(20)
-
-    try {
-      addLog("Uploading file to /api/resume/upload...")
-      const result = await uploadResume(file, selectedRole)
-      addLog(`Upload response status: success=${result.success}`)
-      setProgress(45)
-      setStatusText('PARSING RESUME DATA...')
-
-      const resumeId = result.data?.resume?.id || result.data?.resume_id
-      if (resumeId) {
-        addLog(`Successfully registered Resume ID: ${resumeId}`)
-        localStorage.setItem('rw_last_analyzed_id', resumeId)
-        
-        // Parse the resume
-        addLog("Sending parse request to /api/resume/<id>/parse...")
-        const parseResult = await parseResume(resumeId)
-        addLog(`Parse complete: success=${parseResult.success}`)
-        setProgress(70)
-        setStatusText('RUNNING CAREER STRATEGY ANALYSIS...')
-
-        // Run analysis
-        addLog("Sending analysis request to /api/analyze/...")
-        const analysisResult = await analyzeResume(resumeId, selectedRole)
-        addLog(`Analysis complete: success=${analysisResult.success}`)
-        
-        if (analysisResult.success && analysisResult.data?.analysis) {
-          const analysis = analysisResult.data.analysis
-          const atsScore = analysis.atsScore || 0
-          const detectedTrack = analysis.detected_track || analysis.goalRole || analysis.targetRole || selectedRole
-          localStorage.setItem('rw_last_score', atsScore)
-          localStorage.setItem('rw_detected_track', detectedTrack)
-        } else {
-          localStorage.setItem('rw_last_score', 0)
-          localStorage.setItem('rw_detected_track', selectedRole)
-        }
-        
-        setProgress(100)
-        setStatusText('ANALYSIS COMPLETE. REDIRECTING...')
-        addLog("Redirecting to Strategist Command...")
-        
-        setTimeout(() => navigate('/dashboard'), 1200)
-      } else {
-        throw new Error("No resume ID returned from server.")
-      }
-    } catch (err) {
-      console.error('Upload flow error:', err)
-      addLog(`Error: ${err.message || 'Workflow halted.'}`, true)
-      setStatusText('ERROR: ' + (err.message || 'Analysis failed.'))
-      setProgress(0)
-    }
-  }
-
   return (
-    <div className="flex-1 flex flex-col relative">
-      {/* Hero Section */}
-      <section className="py-40 px-8 max-w-7xl mx-auto text-center relative overflow-visible w-full">
-        {/* ThreeJS container */}
-        <div ref={heroContainerRef} className="absolute inset-0 w-full h-full z-0 opacity-60 pointer-events-none" />
-        
-        <div className="relative z-10">
-          <span className="font-label-sm text-[10px] tracking-[0.4em] text-[#4edea3] uppercase mb-6 block vanguard-heading">
-            The Silent Strategist
-          </span>
-          <h1 className="text-6xl md:text-[72px] font-bold leading-none max-w-4xl mx-auto mb-8 vanguard-heading tracking-tight">
-            Precision Career Engineering
-          </h1>
-          <p className="font-body-lg text-lg text-gray-400 max-w-2xl mx-auto mb-16 tracking-widest uppercase opacity-70">
-            AI-Driven Architectural Analysis for the Next-Gen Workforce
-          </p>
+    <div className="flex-1 flex flex-col relative bg-[#030303] text-[#e5e2e1] overflow-x-hidden select-none">
+      {/* Aurora Hero Section */}
+      <section className="relative w-full min-h-[85vh] lg:min-h-screen flex flex-col justify-center items-center overflow-hidden px-6 text-center z-10 pt-20 pb-16">
+        {/* WebGL Aurora Background covering full width behind content */}
+        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+          <Aurora
+            colorStops={["#3B82F6", "#60A5FA", "#064E3B"]}
+            blend={0.5}
+            amplitude={1.0}
+            speed={0.8}
+          />
+          {/* Blend overlay to merge with dark background */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#030303]/40 to-[#030303]"></div>
         </div>
 
-        {/* Double-Bezel Drop Zone */}
-        <div className="relative z-10">
-          <div 
-            onDragOver={(e) => { e.preventDefault(); setIsDragOver(true) }}
-            onDragLeave={() => setIsDragOver(false)}
-            onDrop={(e) => {
-              e.preventDefault()
-              setIsDragOver(false)
-              if (e.dataTransfer.files[0]) handleUpload(e.dataTransfer.files[0])
-            }}
-            className={`max-w-3xl mx-auto p-2 rounded-[2.5rem] bg-white/5 border transition-all duration-300 relative group vanguard-card ${
-              isDragOver ? 'border-[#4edea3] shadow-[0_0_40px_rgba(78,222,163,0.2)]' : 'border-white/15 shadow-2xl'
-            }`}
-            onMouseMove={(e) => handleCardMouseMove(e, e.currentTarget)}
-            onMouseLeave={(e) => handleCardMouseLeave(e.currentTarget)}
-          >
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#4edea3]/30 to-purple-500/30 rounded-[2.6rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-            <div className="relative bg-[#0A0A0A] rounded-[2rem] p-12 md:p-20 border border-white/20 backdrop-blur-[100px] overflow-hidden">
-              
-              <div className="relative z-10 flex flex-col items-center">
-                <div className="w-20 h-20 rounded-2xl bg-[#4edea3]/10 flex items-center justify-center mb-6 border border-[#4edea3]/20 floating-3d">
-                  <span className="material-symbols-outlined text-[#4edea3] text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    upload_file
-                  </span>
-                </div>
-                <h3 className="vanguard-heading text-2xl font-bold mb-2">Ingest Resume Data</h3>
-                <p className="font-body-md text-gray-400 mb-4">Drop your PDF or DOCX to begin deep structural analysis.</p>
-                
-                {/* Target Role Input */}
-                <input 
-                  type="text" 
-                  value={targetRole}
-                  onChange={(e) => setTargetRole(e.target.value)}
-                  placeholder="Target Role (e.g. Software Engineer)" 
-                  className="mb-6 w-full max-w-sm px-6 py-3 bg-white/5 border border-white/10 rounded-full text-white placeholder:text-gray-600 focus:border-[#4edea3]/50 focus:outline-none focus:ring-1 focus:ring-[#4edea3]/30 transition-all text-center"
-                />
-                
-                <input 
-                  type="file" 
-                  ref={fileInputRef}
-                  accept=".pdf,.docx,.doc" 
-                  className="hidden" 
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) handleUpload(e.target.files[0])
-                  }}
-                />
-                
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-[#4edea3] text-[#003824] px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest flex items-center group hover:scale-[1.02] active:scale-95 transition-all"
-                >
-                  SELECT ARCHIVE
-                  <span className="ml-3 w-8 h-8 bg-[#003824]/10 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
-                    <span className="material-symbols-outlined text-[20px]">add</span>
-                  </span>
-                </button>
-
-                {/* Upload Progress */}
-                {uploading && (
-                  <div className="w-full max-w-sm mt-6">
-                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#4edea3] rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
-                    </div>
-                    <p className="text-[10px] font-bold tracking-widest uppercase text-[#4edea3] mt-2">{statusText}</p>
-                  </div>
-                )}
-
-                {/* Real-time Console Log */}
-                {logs.length > 0 && (
-                  <div className="w-full max-w-sm mt-4 p-3 bg-black/50 border border-white/10 rounded-xl font-mono text-[10px] text-left text-gray-400 max-h-28 overflow-y-auto space-y-1">
-                    {logs.map((log, idx) => (
-                      <div key={idx} className={log.isError ? 'text-red-400 font-bold' : 'text-[#4edea3]'}>
-                        [{log.time}] {log.text}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+        {/* Hero Content Panel */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 max-w-4xl mx-auto flex flex-col items-center mt-6"
+        >
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[10px] uppercase tracking-[0.25em] font-medium bg-white/[0.03] border border-white/10 text-[#3B82F6] mb-8 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] animate-ping" />
+            🚀 AI-Powered Career Development Platform
           </div>
+
+          {/* Heading */}
+          <h1 className="text-4xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-white max-w-3xl mb-6 font-sans">
+            Your AI Career Coach for{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-blue-300">
+              Resume, Skills & Interviews
+            </span>
+          </h1>
+
+          {/* Description */}
+          <p className="font-sans text-sm md:text-lg text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed opacity-90">
+            Analyze resumes, improve ATS scores, identify skill gaps, prepare for interviews, and accelerate your career growth through AI-powered insights and personalized learning roadmaps.
+          </p>
+
+          {/* Call to Actions */}
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+            <button
+              onClick={() => {
+                if (authenticated) {
+                  navigate('/dashboard')
+                } else {
+                  navigate('/signup')
+                }
+              }}
+              className="group relative bg-[#3B82F6] hover:bg-[#60A5FA] active:scale-[0.97] text-[#00173b] px-9 py-4 rounded-full font-bold text-[11px] uppercase tracking-[0.18em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_0_30px_rgba(59,130,246,0.2)] hover:shadow-[0_0_40px_rgba(96,165,250,0.4)]"
+            >
+              Get Started
+              <span className="ml-4 w-7 h-7 bg-[#002b1c]/10 rounded-full flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 transition-all duration-500">
+                <span className="material-symbols-outlined text-[16px] font-bold">arrow_forward</span>
+              </span>
+            </button>
+            
+            <button
+              onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })}
+              className="group bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-white/20 active:scale-[0.97] text-white px-9 py-4 rounded-full font-bold text-[11px] uppercase tracking-[0.18em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            >
+              Learn More
+              <span className="ml-4 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 transition-all duration-500">
+                <span className="material-symbols-outlined text-[16px]">expand_more</span>
+              </span>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* 4 Feature Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl mt-20 relative z-10 px-4">
+          {[
+            { title: 'AI Resume Analysis', icon: 'analytics', desc: 'Instant deep structural analysis' },
+            { title: 'ATS Score Optimization', icon: 'speed', desc: 'Reverse-engineer applicant tracking systems' },
+            { title: 'Personalized Learning Roadmaps', icon: 'alt_route', desc: 'Custom pathways to bridge your skill gaps' },
+            { title: 'AI Mock Interviews', icon: 'forum', desc: 'Interactive prep with real-time feedback' }
+          ].map((card, i) => (
+            <motion.div
+              key={card.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.1, duration: 0.6 }}
+              onMouseMove={(e) => handleCardMouseMove(e, e.currentTarget)}
+              onMouseLeave={(e) => handleCardMouseLeave(e.currentTarget)}
+              className="p-6 rounded-2xl border border-white/5 bg-[#0a0a0a]/40 backdrop-blur-md flex flex-col items-center text-center hover:border-[#3B82F6]/25 transition-all duration-300 group hover:shadow-[0_0_25px_rgba(59,130,246,0.06)]"
+            >
+              <span className="material-symbols-outlined text-[#3B82F6] text-3xl mb-4 p-2 bg-[#3B82F6]/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                {card.icon}
+              </span>
+              <h3 className="text-white font-bold text-sm mb-2">{card.title}</h3>
+              <p className="text-gray-400 text-xs font-sans leading-relaxed">{card.desc}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
+
       {/* Bento Grid Features */}
-      <section className="py-40 px-8 max-w-7xl mx-auto w-full">
-        <div className="mb-20 text-center">
-          <h2 className="text-4xl font-semibold mb-4 vanguard-heading">Tactical Intelligence</h2>
-          <div className="h-1 w-20 bg-[#4edea3] mx-auto rounded-full"></div>
+      <section id="features-section" className="py-24 md:py-36 px-6 max-w-7xl mx-auto w-full z-10 scroll-mt-24">
+        <div className="mb-20 text-center reveal-up">
+          <div className="inline-block rounded-full px-3 py-1 text-[9px] uppercase tracking-[0.2em] font-medium bg-[#6366F1]/10 text-[#6366F1] mb-4">
+            Features
+          </div>
+          <h2 className="text-4xl md:text-5xl font-semibold vanguard-heading text-white">Tactical Intelligence</h2>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
-          {/* ATS Shadow Simulator */}
-          <div className="md:col-span-8 group">
+        {/* Asymmetrical Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10">
+          {/* Card 1: ATS Shadow Simulator (8 Cols) */}
+          <div className="md:col-span-8 group reveal-up">
             <div 
-              className="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card border border-white/5"
+              className="p-2 rounded-[2rem] bg-white/[0.02] h-full border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
               onMouseMove={(e) => handleCardMouseMove(e, e.currentTarget)}
               onMouseLeave={(e) => handleCardMouseLeave(e.currentTarget)}
             >
-              <div className="bg-[#0A0A0A] rounded-[1.75rem] p-8 h-full border border-white/15 flex flex-col backdrop-blur-3xl">
+              <div className="bg-[#080808]/90 rounded-[calc(2rem-0.5rem)] p-8 md:p-12 h-full border border-white/5 flex flex-col justify-between backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]">
                 <div className="flex justify-between items-start mb-12">
                   <div>
-                    <h4 className="vanguard-heading text-2xl font-bold mb-2">ATS Shadow Simulator</h4>
-                    <p className="text-gray-400 text-sm max-w-md">Reverse-engineer the invisible algorithms determining your candidacy.</p>
+                    <h4 className="vanguard-heading text-2xl font-bold text-white mb-2">ATS Shadow Simulator</h4>
+                    <p className="text-gray-400 text-sm max-w-md font-sans leading-relaxed">Reverse-engineer the invisible algorithms determining your candidacy.</p>
                   </div>
-                  <span className="material-symbols-outlined text-[#4edea3] text-4xl">visibility</span>
+                  <span className="material-symbols-outlined text-[#6366F1] text-3xl">visibility</span>
                 </div>
-                <div className="mt-auto rounded-xl overflow-hidden border border-white/10 aspect-[16/7] relative bg-gradient-to-br from-[#4edea3]/5 to-purple-500/5">
+                <div className="mt-8 rounded-2xl overflow-hidden border border-white/5 aspect-[16/6] relative bg-gradient-to-br from-[#6366F1]/5 via-purple-500/[0.02] to-transparent">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <span className="material-symbols-outlined text-[#4edea3] text-6xl mb-4 block opacity-30">insights</span>
-                      <p className="text-gray-500 text-sm">Upload a resume to see ATS analysis</p>
+                    <div className="text-center p-6">
+                      <span className="material-symbols-outlined text-[#6366F1] text-4xl mb-3 opacity-40">insights</span>
+                      <p className="text-gray-500 text-xs font-sans tracking-wide">Upload a resume to initialize real-time simulation matrix</p>
                     </div>
                   </div>
                 </div>
@@ -342,65 +182,96 @@ export default function Landing() {
             </div>
           </div>
           
-          {/* Skill Gap Intelligence */}
-          <div className="md:col-span-4 group">
+          {/* Card 2: Skill Gap Intelligence (4 Cols) */}
+          <div className="md:col-span-4 group reveal-up delay-100">
             <div 
-              className="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card border border-white/5"
+              className="p-2 rounded-[2rem] bg-white/[0.02] h-full border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
               onMouseMove={(e) => handleCardMouseMove(e, e.currentTarget)}
               onMouseLeave={(e) => handleCardMouseLeave(e.currentTarget)}
             >
-              <div className="bg-[#0A0A0A] rounded-[1.75rem] p-8 h-full border border-white/15 backdrop-blur-3xl">
-                <span className="material-symbols-outlined text-[#4edea3] text-4xl mb-6">psychology</span>
-                <h4 className="vanguard-heading text-2xl font-bold mb-2">Skill Gap Intelligence</h4>
-                <p className="text-gray-400 text-sm mb-12">Identify precise missing nodes in your professional trajectory.</p>
-                <div className="space-y-4">
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-[#4edea3] w-3/4 rounded-full"></div></div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-purple-500 w-1/2 rounded-full"></div></div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-[#4edea3]/50 w-5/6 rounded-full"></div></div>
+              <div className="bg-[#080808]/90 rounded-[calc(2rem-0.5rem)] p-8 md:p-12 h-full border border-white/5 flex flex-col justify-between backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]">
+                <div>
+                  <div className="flex justify-between items-start mb-8">
+                    <span className="material-symbols-outlined text-[#6366F1] text-3xl">psychology</span>
+                  </div>
+                  <h4 className="vanguard-heading text-2xl font-bold text-white mb-2">Skill Gap Intelligence</h4>
+                  <p className="text-gray-400 text-sm font-sans leading-relaxed">Identify precise missing nodes in your professional trajectory.</p>
+                </div>
+                <div className="space-y-4 mt-12">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px] text-gray-500 uppercase tracking-widest">
+                      <span>System Architecture</span>
+                      <span>85%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-[#6366F1] w-[85%] rounded-full"></div></div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px] text-gray-500 uppercase tracking-widest">
+                      <span>Distributed Ledger</span>
+                      <span>50%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-purple-500 w-[50%] rounded-full"></div></div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px] text-gray-500 uppercase tracking-widest">
+                      <span>Cognitive Modeling</span>
+                      <span>92%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-[#6366F1]/60 w-[92%] rounded-full"></div></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Career Path */}
-          <div className="md:col-span-4 group">
+          {/* Card 3: Trajectory Mapper (5 Cols) */}
+          <div className="md:col-span-5 group reveal-up">
             <div 
-              className="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card border border-white/5"
+              className="p-2 rounded-[2rem] bg-white/[0.02] h-full border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
               onMouseMove={(e) => handleCardMouseMove(e, e.currentTarget)}
               onMouseLeave={(e) => handleCardMouseLeave(e.currentTarget)}
             >
-              <div className="bg-[#0A0A0A] rounded-[1.75rem] p-8 h-full border border-white/15 backdrop-blur-3xl">
-                <span className="material-symbols-outlined text-[#4edea3] text-4xl mb-6">alt_route</span>
-                <h4 className="vanguard-heading text-2xl font-bold mb-2">Trajectory Mapper</h4>
-                <p className="text-gray-400 text-sm">Visualizing 10,000+ career evolution paths for your specific profile.</p>
+              <div className="bg-[#080808]/90 rounded-[calc(2rem-0.5rem)] p-8 md:p-12 h-full border border-white/5 flex flex-col justify-between backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]">
+                <div>
+                  <div className="flex justify-between items-start mb-8">
+                    <span className="material-symbols-outlined text-[#6366F1] text-3xl">alt_route</span>
+                  </div>
+                  <h4 className="vanguard-heading text-2xl font-bold text-white mb-2">Trajectory Mapper</h4>
+                  <p className="text-gray-400 text-sm font-sans leading-relaxed mb-6">Visualizing 10,000+ career evolution paths for your specific profile.</p>
+                </div>
+                <div className="mt-6 p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center text-xs font-mono text-gray-500">
+                  ⚡ VECTOR PATHWAY ACTIVE
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Real-time Roadmap */}
-          <div className="md:col-span-8 group">
+          {/* Card 4: Precision Roadmap (7 Cols) */}
+          <div className="md:col-span-7 group reveal-up delay-100">
             <div 
-              className="p-2 rounded-[2rem] bg-white/5 h-full vanguard-card border border-white/5"
+              className="p-2 rounded-[2rem] bg-white/[0.02] h-full border border-white/10 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
               onMouseMove={(e) => handleCardMouseMove(e, e.currentTarget)}
               onMouseLeave={(e) => handleCardMouseLeave(e.currentTarget)}
             >
-              <div className="bg-[#0A0A0A] rounded-[1.75rem] p-8 h-full border border-white/15 flex flex-col md:flex-row gap-8 backdrop-blur-3xl">
-                <div className="flex-1">
-                  <h4 className="vanguard-heading text-2xl font-bold mb-2">Precision Roadmap</h4>
-                  <p className="text-gray-400 text-sm">A step-by-step tactical execution plan generated in milliseconds.</p>
-                  <ul className="mt-6 space-y-3">
-                    <li className="flex items-center gap-3 text-sm text-[#4edea3]">
-                      <span className="material-symbols-outlined text-[18px]">check_circle</span>
+              <div className="bg-[#080808]/90 rounded-[calc(2rem-0.5rem)] p-8 md:p-12 h-full border border-white/5 flex flex-col md:flex-row gap-8 backdrop-blur-3xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]">
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <h4 className="vanguard-heading text-2xl font-bold text-white mb-2">Precision Roadmap</h4>
+                    <p className="text-gray-400 text-sm font-sans leading-relaxed">A step-by-step tactical execution plan generated in milliseconds.</p>
+                  </div>
+                  <ul className="mt-8 space-y-3.5">
+                    <li className="flex items-center gap-3 text-xs tracking-wide text-[#6366F1] font-sans font-medium">
+                      <span className="material-symbols-outlined text-[16px]">check_circle</span>
                       Keyword Optimization
                     </li>
-                    <li className="flex items-center gap-3 text-sm text-gray-400">
-                      <span className="material-symbols-outlined text-[18px]">pending</span>
+                    <li className="flex items-center gap-3 text-xs tracking-wide text-gray-400 font-sans">
+                      <span className="material-symbols-outlined text-[16px]">pending</span>
                       Certification Acquisition
                     </li>
                   </ul>
                 </div>
-                <div className="flex-1 bg-white/5 rounded-2xl p-4 border border-white/10 relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-500 font-mono">
+                <div className="flex-1 min-h-[150px] bg-white/[0.02] rounded-2xl p-6 border border-white/5 relative overflow-hidden flex items-center justify-center">
+                  <div className="text-center text-[10px] text-gray-500 font-mono tracking-widest">
                     [ROADMAP CANVAS MINIMIZED]
                   </div>
                 </div>
@@ -411,14 +282,14 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-40 relative overflow-hidden w-full">
-        <div className="absolute inset-0 bg-[#4edea3]/10 blur-[120px] rounded-full scale-150 translate-y-1/2"></div>
-        <div className="px-8 max-w-5xl mx-auto text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-bold mb-8 vanguard-heading">Architect Your Future.</h2>
-          <p className="font-body-lg text-lg text-gray-400 max-w-2xl mx-auto mb-12">
+      <section className="py-32 md:py-44 relative overflow-hidden w-full z-10 reveal-up">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#6366F1]/5 via-purple-500/[0.02] to-transparent blur-[120px] rounded-full scale-125 translate-y-1/3 pointer-events-none"></div>
+        <div className="px-6 max-w-5xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl md:text-6xl font-bold mb-8 vanguard-heading text-white">Architect Your Future.</h2>
+          <p className="font-sans text-base md:text-lg text-gray-400 max-w-2xl mx-auto mb-14 leading-relaxed">
             Join the top 1% of candidates who leverage precision engineering to bypass the noise and land elite opportunities.
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <button 
               onClick={() => {
                 if (authenticated) {
@@ -427,17 +298,17 @@ export default function Landing() {
                   navigate('/signup')
                 }
               }}
-              className="island-button bg-[#4edea3] text-[#003824] px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest flex items-center justify-center group transition-all"
+              className="group bg-[#6366F1] hover:bg-[#5affb8] active:scale-[0.97] text-[#00173b] px-9 py-4 rounded-full font-bold text-[11px] uppercase tracking-[0.18em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
             >
               COMMENCE ANALYSIS
-              <span className="ml-4 w-10 h-10 bg-[#003824]/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined">rocket_launch</span>
+              <span className="ml-4 w-7 h-7 bg-[#002b1c]/10 rounded-full flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 transition-all duration-500">
+                <span className="material-symbols-outlined text-[16px]">rocket_launch</span>
               </span>
             </button>
-            <Link to="/roadmap" className="island-button bg-white/5 border border-white/15 text-white px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest flex items-center justify-center group transition-all hover:bg-white/10">
+            <Link to="/roadmap" className="group bg-white/[0.02] border border-white/10 hover:bg-white/[0.06] hover:border-white/20 active:scale-[0.97] text-white px-9 py-4 rounded-full font-bold text-[11px] uppercase tracking-[0.18em] flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
               VIEW METHODOLOGY
-              <span className="ml-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                <span className="material-symbols-outlined">auto_graph</span>
+              <span className="ml-4 w-7 h-7 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-105 group-hover:translate-x-0.5 transition-all duration-500">
+                <span className="material-symbols-outlined text-[16px]">auto_graph</span>
               </span>
             </Link>
           </div>
@@ -445,20 +316,22 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-24 border-t border-white/10 relative z-10 bg-[#0e0e0e]">
-        <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="w-full py-20 border-t border-white/5 relative z-10 bg-[#070707] reveal-up">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex flex-col items-center md:items-start">
             <div className="vanguard-heading text-2xl font-bold text-white mb-2">ResumeWise AI</div>
-            <p className="text-gray-400 text-xs text-center md:text-left">© 2024 ResumeWise AI. Precision Career Engineering.</p>
+            <p className="text-gray-500 text-[11px] font-sans tracking-wide">© 2024 ResumeWise AI. Precision Career Engineering.</p>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
-            <a className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all" href="#">Privacy Policy</a>
-            <a className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all" href="#">Terms of Service</a>
-            <Link className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all" to="/resources">Resources</Link>
-            <a className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all" href="#">Contact</a>
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+            <a className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 hover:text-white transition-colors duration-300" href="#">Privacy Policy</a>
+            <a className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 hover:text-white transition-colors duration-300" href="#">Terms of Service</a>
+            <Link className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 hover:text-white transition-colors duration-300" to="/about">About Us</Link>
+            <Link className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 hover:text-white transition-colors duration-300" to="/resources">Resources</Link>
+            <a className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 hover:text-white transition-colors duration-300" href="#">Contact</a>
           </div>
         </div>
       </footer>
     </div>
   )
 }
+

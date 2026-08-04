@@ -114,3 +114,4 @@ export const ResumePreview = ({ data, template }) => {
     </div>
   );
 };
+

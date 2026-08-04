@@ -46,8 +46,8 @@ export default function CubeCanvas({ className = '' }) {
         return [(p[0]*size)/(z*0.25)+w/2, (p[1]*size)/(z*0.25)+h/2]
       })
 
-      ctx.shadowBlur = 15; ctx.shadowColor = '#4edea3'
-      ctx.strokeStyle = 'rgba(78,222,163,0.35)'; ctx.lineWidth = 1.5
+      ctx.shadowBlur = 15; ctx.shadowColor = '#6366F1'
+      ctx.strokeStyle = 'rgba(99, 102, 241,0.35)'; ctx.lineWidth = 1.5
       edges.forEach(([a,b]) => {
         ctx.beginPath()
         ctx.moveTo(projected[a][0], projected[a][1])
@@ -76,3 +76,4 @@ export default function CubeCanvas({ className = '' }) {
     />
   )
 }
+

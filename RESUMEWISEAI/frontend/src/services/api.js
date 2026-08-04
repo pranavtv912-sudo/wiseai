@@ -7,13 +7,15 @@ const axiosClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Request Interceptor: Attach JWT to headers
+// Request Interceptor: Attach JWT and L402 Payment Headers
 axiosClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('rw_access_token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+
+
     // Content-Type handling
     if (config.data instanceof FormData) {
       config.headers['Content-Type'] = 'multipart/form-data';
@@ -25,16 +27,19 @@ axiosClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle auth failure (401) and format errors
+// Response Interceptor: Handle auth failure (401), L402 Payment Required (402), and format errors
 axiosClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
     if (error.response) {
-      const { status, data } = error.response;
+      const { status, data, config } = error.response;
+      
       if (status === 401 && localStorage.getItem('rw_access_token')) {
         clearSession();
         window.location.href = '/signin';
       }
+      
+
       
       // Extract error details if present (e.g. 422 validation errors)
       const message = data?.message || 'API request failed';
@@ -73,11 +78,39 @@ export const getUser = () => {
 // ----------------------------------------------------
 
 export const register = async (name, email, password) => {
-  const result = await axiosClient.post('/auth/register', { name, email, password });
+  return axiosClient.post('/auth/register', { name, email, password });
+};
+
+export const verifySignupOtp = async (email, otp) => {
+  const result = await axiosClient.post('/auth/verify-signup-otp', { email, otp });
   if (result.success && result.data?.tokens) {
     setSession(result.data.tokens.access_token, result.data.user);
   }
   return result;
+};
+
+export const forgotPassword = async (email) => {
+  return axiosClient.post('/auth/forgot-password', { email });
+};
+
+export const resetPassword = async (email, otp, newPassword) => {
+  return axiosClient.post('/auth/reset-password', { email, otp, new_password: newPassword });
+};
+
+export const requestChangePasswordOtp = async (currentPassword) => {
+  return axiosClient.post('/auth/change-password-otp', { current_password: currentPassword });
+};
+
+export const changePassword = async (currentPassword, otp, newPassword) => {
+  return axiosClient.post('/auth/change-password', { 
+    old_password: currentPassword, 
+    otp: otp,
+    new_password: newPassword 
+  });
+};
+
+export const resendOtp = async (email, purpose) => {
+  return axiosClient.post('/auth/resend-otp', { email, purpose });
 };
 
 export const login = async (email, password) => {
@@ -94,13 +127,6 @@ export const getProfile = async () => {
 
 export const updateProfile = async (profileData) => {
   return axiosClient.put('/auth/profile', profileData);
-};
-
-export const changePassword = async (oldPassword, newPassword) => {
-  return axiosClient.post('/auth/change-password', { 
-    old_password: oldPassword, 
-    new_password: newPassword 
-  });
 };
 
 export const uploadResume = async (file, targetRole = '') => {
@@ -128,8 +154,8 @@ export const deleteResume = async (resumeId) => {
   return axiosClient.delete(`/resume/${resumeId}`);
 };
 
-export const analyzeResume = async (resumeId, targetRole) => {
-  return axiosClient.post('/analyze/', { resumeId, targetRole });
+export const analyzeResume = async (resumeId, targetRole, jobDescription = '') => {
+  return axiosClient.post('/analyze/', { resumeId, targetRole, jobDescription });
 };
 
 export const getAnalysis = async (resumeId) => {
@@ -344,6 +370,7 @@ const ResumeWiseAPI = {
   getRoles, evaluateInterviewAnswer, analyzeJDMatch, chatWithAssistant,
   generateOrPrefillResume, getResumeTemplates, downloadBuiltResume,
   getDashboardOverview, getDashboardCharts,
+  verifySignupOtp, forgotPassword, resetPassword, requestChangePasswordOtp, resendOtp,
   logout: () => { clearSession(); window.location.href = '/'; },
 };
 

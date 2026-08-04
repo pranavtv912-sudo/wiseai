@@ -80,7 +80,7 @@ export default function JobDescriptionAnalyzer() {
       datasets: [
         {
           data: [result.matchScore, 100 - result.matchScore],
-          backgroundColor: ['#4edea3', '#111'],
+          backgroundColor: ['#6366F1', '#111'],
           borderWidth: 0,
           cutout: '80%'
         }
@@ -120,7 +120,7 @@ export default function JobDescriptionAnalyzer() {
       {/* Header */}
       <div className="mb-10">
         <h1 className="text-3xl md:text-5xl text-white font-bold tracking-tight mb-4 flex items-center gap-4 vanguard-heading">
-          <span className="material-symbols-outlined text-[40px] text-[#4edea3]">radar</span>
+          <span className="material-symbols-outlined text-[40px] text-[#6366F1]">radar</span>
           Job Match Analyzer
         </h1>
         <p className="text-gray-400 max-w-2xl text-sm md:text-base leading-relaxed">
@@ -143,7 +143,7 @@ export default function JobDescriptionAnalyzer() {
                   <select 
                     value={selectedResume}
                     onChange={(e) => setSelectedResume(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-[#4edea3] transition-colors"
+                    className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-[#6366F1] transition-colors"
                   >
                     {resumes.map(r => (
                       <option key={r.id} value={r.id} className="bg-[#111]">
@@ -169,7 +169,7 @@ export default function JobDescriptionAnalyzer() {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 placeholder="Paste the complete job description here..."
-                className="w-full bg-white/5 border border-white/10 text-gray-300 text-sm rounded-xl px-4 py-4 h-64 focus:outline-none focus:border-[#4edea3] transition-colors resize-none custom-scrollbar"
+                className="w-full bg-white/5 border border-white/10 text-gray-300 text-sm rounded-xl px-4 py-4 h-64 focus:outline-none focus:border-[#6366F1] transition-colors resize-none custom-scrollbar"
               />
             </div>
 
@@ -182,7 +182,7 @@ export default function JobDescriptionAnalyzer() {
             <button
               onClick={handleAnalyze}
               disabled={loading || !selectedResume}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4edea3] to-[#3baf81] text-[#003824] hover:shadow-[0_0_30px_rgba(78,222,163,0.3)] text-sm font-bold uppercase tracking-widest transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#3baf81] text-[#00173b] hover:shadow-[0_0_30px_rgba(99, 102, 241,0.3)] text-sm font-bold uppercase tracking-widest transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -204,10 +204,10 @@ export default function JobDescriptionAnalyzer() {
           {loading && (
             <div className="h-full min-h-[500px] flex flex-col items-center justify-center bg-[#0A0A0A] border border-white/10 rounded-[20px]">
               <div className="relative w-24 h-24 mb-6">
-                <div className="absolute inset-0 border-4 border-[#4edea3]/20 rounded-full"></div>
-                <div className="absolute inset-0 border-4 border-[#4edea3] rounded-full border-t-transparent animate-spin"></div>
+                <div className="absolute inset-0 border-4 border-[#6366F1]/20 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-[#6366F1] rounded-full border-t-transparent animate-spin"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[#4edea3] text-3xl animate-pulse">radar</span>
+                  <span className="material-symbols-outlined text-[#6366F1] text-3xl animate-pulse">radar</span>
                 </div>
               </div>
               <h3 className="text-xl text-white font-bold tracking-widest uppercase mb-2">Analyzing JD</h3>
@@ -235,7 +235,7 @@ export default function JobDescriptionAnalyzer() {
                     <p className="text-gray-400 text-sm max-w-[200px]">Probability of passing ATS screening based on current alignment.</p>
                     
                     <div className="mt-6 flex gap-2">
-                      <span className="px-2.5 py-1 rounded-md bg-[#4edea3]/10 text-[#4edea3] text-[10px] font-bold uppercase tracking-widest border border-[#4edea3]/20">
+                      <span className="px-2.5 py-1 rounded-md bg-[#6366F1]/10 text-[#6366F1] text-[10px] font-bold uppercase tracking-widest border border-[#6366F1]/20">
                         {result.matchScore >= 80 ? 'Excellent' : result.matchScore >= 60 ? 'Good' : 'Needs Work'}
                       </span>
                     </div>
@@ -263,13 +263,13 @@ export default function JobDescriptionAnalyzer() {
                 
                 {/* Matching Skills */}
                 <div className="bg-white/5 border border-white/10 rounded-[20px] p-6">
-                  <h4 className="text-[#4edea3] text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <h4 className="text-[#6366F1] text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
                     <span className="material-symbols-outlined text-[16px]">check_circle</span> Matching Skills
                   </h4>
                   {result.matchingSkills && result.matchingSkills.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {result.matchingSkills.map((s, i) => (
-                        <span key={i} className="px-3 py-1.5 bg-[#4edea3]/10 text-[#4edea3] text-[11px] font-semibold rounded-full border border-[#4edea3]/20">
+                        <span key={i} className="px-3 py-1.5 bg-[#6366F1]/10 text-[#6366F1] text-[11px] font-semibold rounded-full border border-[#6366F1]/20">
                           {s}
                         </span>
                       ))}
@@ -312,7 +312,7 @@ export default function JobDescriptionAnalyzer() {
                       <ul className="space-y-2">
                         {result.strengths && result.strengths.map((s, i) => (
                           <li key={i} className="flex items-start gap-2 text-gray-400 text-xs leading-relaxed">
-                            <span className="text-[#4edea3] mt-0.5">•</span> {s}
+                            <span className="text-[#6366F1] mt-0.5">•</span> {s}
                           </li>
                         ))}
                       </ul>
@@ -358,3 +358,4 @@ export default function JobDescriptionAnalyzer() {
     </div>
   )
 }
+

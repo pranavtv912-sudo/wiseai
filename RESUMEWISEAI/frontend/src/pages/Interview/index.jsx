@@ -247,7 +247,7 @@ export default function Interview() {
       {/* Header */}
       <section className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#4edea3] block mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6366F1] block mb-2">
             AI Interlocutor System
           </span>
           <h1 className="vanguard-heading text-4xl md:text-5xl font-bold text-white">
@@ -267,8 +267,8 @@ export default function Interview() {
       {/* Main Panel */}
       {!interviewStarted ? (
         <section className="bg-[#0A0A0A] border border-white/15 rounded-[2.2rem] p-10 max-w-2xl mx-auto shadow-2xl relative overflow-hidden">
-          <div className="w-16 h-16 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/20 flex items-center justify-center mx-auto mb-6">
-            <span className="material-symbols-outlined text-[#4edea3] text-3xl">forum</span>
+          <div className="w-16 h-16 rounded-full bg-[#6366F1]/10 border border-[#6366F1]/20 flex items-center justify-center mx-auto mb-6">
+            <span className="material-symbols-outlined text-[#6366F1] text-3xl">forum</span>
           </div>
           <h3 className="vanguard-heading text-2xl font-bold text-white mb-4 text-center">Initialize Interview Protocol</h3>
           <p className="text-gray-400 text-sm mb-8 leading-relaxed text-center">
@@ -292,7 +292,7 @@ export default function Interview() {
                     onClick={() => setInterviewType(type.value)}
                     className={`p-3.5 rounded-xl border text-left transition-all ${
                       interviewType === type.value
-                        ? 'bg-[#4edea3]/10 border-[#4edea3] text-white'
+                        ? 'bg-[#6366F1]/10 border-[#6366F1] text-white'
                         : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
                     }`}
                   >
@@ -312,7 +312,7 @@ export default function Interview() {
                   <select 
                     value={targetRole}
                     onChange={(e) => setTargetRole(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-[#4edea3]/50 focus:outline-none transition-all cursor-pointer animate-fade-in"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-[#6366F1]/50 focus:outline-none transition-all cursor-pointer animate-fade-in"
                   >
                     {roles.length > 0 ? (
                       roles.map(r => (
@@ -337,7 +337,7 @@ export default function Interview() {
                   <select 
                     value={skillFocus}
                     onChange={(e) => setSkillFocus(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-[#4edea3]/50 focus:outline-none transition-all cursor-pointer animate-fade-in"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-[#6366F1]/50 focus:outline-none transition-all cursor-pointer animate-fade-in"
                   >
                     <option value="React" className="bg-[#0A0A0A]">React / Frontend</option>
                     <option value="Python" className="bg-[#0A0A0A]">Python / Scripting</option>
@@ -358,7 +358,7 @@ export default function Interview() {
                       onClick={() => setExperienceLevel(lvl)}
                       className={`flex-1 py-2 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all ${
                         experienceLevel === lvl
-                          ? 'bg-[#4edea3]/10 border-[#4edea3] text-[#4edea3]'
+                          ? 'bg-[#6366F1]/10 border-[#6366F1] text-[#6366F1]'
                           : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
                       }`}
                     >
@@ -379,7 +379,7 @@ export default function Interview() {
                       onClick={() => setQuestionCount(count)}
                       className={`flex-1 py-2 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all ${
                         questionCount === count
-                          ? 'bg-[#4edea3]/10 border-[#4edea3] text-[#4edea3]'
+                          ? 'bg-[#6366F1]/10 border-[#6366F1] text-[#6366F1]'
                           : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
                       }`}
                     >
@@ -405,7 +405,7 @@ export default function Interview() {
           <button 
             onClick={startInterview}
             disabled={interviewType === 'resume' && !resumeId}
-            className="bg-[#4edea3] text-[#003824] px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#6366F1] text-[#00173b] px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all w-full disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Commence Interview
           </button>
@@ -416,7 +416,7 @@ export default function Interview() {
           {/* Chat Interface Column */}
           <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-[2rem] flex flex-col h-[520px] shadow-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 bg-white/[0.01] flex items-center justify-between">
-              <span className="text-xs text-[#4edea3] font-bold tracking-widest uppercase">Live Session</span>
+              <span className="text-xs text-[#6366F1] font-bold tracking-widest uppercase">Live Session</span>
               <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider font-mono">
                 {interviewFinished ? 'Session Done' : `Question ${currentQuestionIndex + 1} of ${questions.length}`}
               </span>
@@ -429,7 +429,7 @@ export default function Interview() {
                   <div 
                     className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed border whitespace-pre-line ${
                       log.type === 'user' 
-                        ? 'bg-[#4edea3]/10 border-[#4edea3]/20 text-white rounded-tr-none' 
+                        ? 'bg-[#6366F1]/10 border-[#6366F1]/20 text-white rounded-tr-none' 
                         : 'bg-white/5 border-white/10 text-gray-300 rounded-tl-none'
                     }`}
                   >
@@ -440,7 +440,7 @@ export default function Interview() {
               
               {evaluating && (
                 <div className="flex justify-start">
-                  <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-none p-4 text-xs font-mono text-[#4edea3] animate-pulse">
+                  <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-none p-4 text-xs font-mono text-[#6366F1] animate-pulse">
                     Evaluating response fidelity...
                   </div>
                 </div>
@@ -452,7 +452,7 @@ export default function Interview() {
               {interviewFinished ? (
                 <button 
                   onClick={() => setInterviewStarted(false)}
-                  className="w-full bg-[#4edea3]/15 border border-[#4edea3]/20 text-[#4edea3] py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#4edea3]/25 transition-all"
+                  className="w-full bg-[#6366F1]/15 border border-[#6366F1]/20 text-[#6366F1] py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#6366F1]/25 transition-all"
                 >
                   Restart Session
                 </button>
@@ -464,12 +464,12 @@ export default function Interview() {
                     onChange={(e) => setUserAnswer(e.target.value)}
                     disabled={evaluating}
                     placeholder="Type your technical explanation here..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#4edea3]/50 focus:ring-1 focus:ring-[#4edea3]/30 transition-all"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/30 transition-all"
                   />
                   <button 
                     type="submit"
                     disabled={evaluating || !userAnswer.trim()}
-                    className="bg-[#4edea3] text-[#003824] px-5 rounded-xl hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center"
+                    className="bg-[#6366F1] text-[#00173b] px-5 rounded-xl hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center"
                   >
                     <span className="material-symbols-outlined text-[20px]">send</span>
                   </button>
@@ -492,7 +492,7 @@ export default function Interview() {
                 <div className="space-y-6">
                   {/* Overall Score Dial */}
                   <div className="text-center bg-white/[0.02] border border-white/5 rounded-2xl p-5">
-                    <div className="text-3xl font-black font-mono text-[#4edea3] mb-1">{scores.overall}%</div>
+                    <div className="text-3xl font-black font-mono text-[#6366F1] mb-1">{scores.overall}%</div>
                     <div className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Overall Score</div>
                   </div>
 
@@ -513,7 +513,7 @@ export default function Interview() {
                         <span>{scores.technical}%</span>
                       </div>
                       <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#4edea3]" style={{ width: `${scores.technical}%` }} />
+                        <div className="h-full bg-[#6366F1]" style={{ width: `${scores.technical}%` }} />
                       </div>
                     </div>
                     <div>
@@ -533,7 +533,7 @@ export default function Interview() {
                     <div className="text-xs text-gray-400 leading-normal space-y-4 font-mono max-h-60 overflow-y-auto scrollbar-thin pr-1">
                       {feedbacks.map((f, i) => (
                         <div key={i} className="border-b border-white/5 pb-3 last:border-0 last:pb-0 space-y-2">
-                          <div className="flex justify-between items-center text-[10px] font-bold text-[#4edea3]">
+                          <div className="flex justify-between items-center text-[10px] font-bold text-[#6366F1]">
                             <span>Question {i+1}</span>
                             <span>Score: {f.finalScore}/100</span>
                           </div>
@@ -573,3 +573,4 @@ export default function Interview() {
     </div>
   )
 }
+

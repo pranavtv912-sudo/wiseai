@@ -8,7 +8,7 @@ import {
 import { motion } from 'framer-motion';
 import './DashboardAnalytics.css';
 
-const COLORS = ['#4edea3', '#f59e0b', '#ef4444', '#3b82f6'];
+const COLORS = ['#6366F1', '#f59e0b', '#ef4444', '#3b82f6'];
 
 const StatCard = ({ title, value, icon, delay }) => (
   <motion.div 
@@ -21,7 +21,7 @@ const StatCard = ({ title, value, icon, delay }) => (
       <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">{title}</p>
       <h3 className="text-3xl font-black text-white">{value}</h3>
     </div>
-    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[#4edea3]">
+    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[#6366F1]">
       <span className="material-symbols-outlined text-[24px]">{icon}</span>
     </div>
   </motion.div>
@@ -94,7 +94,7 @@ export default function DashboardAnalytics() {
         <div className="flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-black text-white tracking-tight mb-2">Analytics Overview</h1>
-            <p className="text-gray-400 text-sm">Welcome back, <span className="text-[#4edea3] font-bold">{user?.name}</span>. Here is your career progress.</p>
+            <p className="text-gray-400 text-sm">Welcome back, <span className="text-[#6366F1] font-bold">{user?.name}</span>. Here is your career progress.</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Target Role</p>
@@ -118,7 +118,7 @@ export default function DashboardAnalytics() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="chart-card p-6">
             <h3 className="text-white font-bold mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#4edea3]">trending_up</span> ATS Score History
+              <span className="material-symbols-outlined text-[#6366F1]">trending_up</span> ATS Score History
             </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -127,7 +127,7 @@ export default function DashboardAnalytics() {
                   <XAxis dataKey="month" stroke="#888" tick={{fill: '#888', fontSize: 12}} />
                   <YAxis stroke="#888" tick={{fill: '#888', fontSize: 12}} domain={[0, 100]} />
                   <Tooltip contentStyle={{backgroundColor: '#111', borderColor: '#333', color: '#fff'}} />
-                  <Line type="monotone" dataKey="score" stroke="#4edea3" strokeWidth={3} dot={{r: 4, fill: '#4edea3', strokeWidth: 2}} activeDot={{r: 8}} />
+                  <Line type="monotone" dataKey="score" stroke="#6366F1" strokeWidth={3} dot={{r: 4, fill: '#6366F1', strokeWidth: 2}} activeDot={{r: 8}} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -202,9 +202,9 @@ export default function DashboardAnalytics() {
           {/* Progress Bars */}
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.9 }} className="chart-card p-6 col-span-1">
             <h3 className="text-white font-bold mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#4edea3]">military_tech</span> Progress Tracker
+              <span className="material-symbols-outlined text-[#6366F1]">military_tech</span> Progress Tracker
             </h3>
-            <ProgressBar label="Avg ATS Score" value={overview?.ats_score || 0} color="#4edea3" />
+            <ProgressBar label="Avg ATS Score" value={overview?.ats_score || 0} color="#6366F1" />
             <ProgressBar label="Roadmap Mastery" value={overview?.roadmap_progress || 0} color="#f59e0b" />
             <ProgressBar label="Interview Readiness" value={overview?.interview_score || 0} color="#ef4444" />
             <ProgressBar label="Resume Match (Avg)" value={overview?.resume_match || 0} color="#3b82f6" />
@@ -216,11 +216,11 @@ export default function DashboardAnalytics() {
               
               <div>
                 <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#4edea3]">lightbulb</span> AI Insights
+                  <span className="material-symbols-outlined text-[#6366F1]">lightbulb</span> AI Insights
                 </h3>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
-                    <span className="material-symbols-outlined text-[#4edea3] text-[20px] mt-0.5">check_circle</span>
+                    <span className="material-symbols-outlined text-[#6366F1] text-[20px] mt-0.5">check_circle</span>
                     <p className="text-sm text-gray-300">Your average ATS score is <strong className="text-white">{overview?.ats_score}%</strong>. Keep iterating your summary for better keyword matching.</p>
                   </li>
                   <li className="flex items-start gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
@@ -248,7 +248,7 @@ export default function DashboardAnalytics() {
                   )}
                   {overview?.analysis_count > 0 && (
                     <div className="pl-6 relative">
-                      <div className="absolute w-3 h-3 bg-[#4edea3] rounded-full -left-[6.5px] top-1"></div>
+                      <div className="absolute w-3 h-3 bg-[#6366F1] rounded-full -left-[6.5px] top-1"></div>
                       <p className="text-sm text-white font-bold">ATS Analysis Completed</p>
                       <p className="text-xs text-gray-500">Detailed scorecard generated</p>
                     </div>
@@ -269,3 +269,4 @@ export default function DashboardAnalytics() {
     </div>
   );
 }
+

@@ -109,10 +109,10 @@ export default function SkillGap() {
   if (!localStorage.getItem('rw_last_analyzed_id')) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 max-w-4xl mx-auto text-center pt-24 pb-32 relative z-10">
-        <span className="material-symbols-outlined text-[#4edea3] text-6xl mb-6">insights</span>
+        <span className="material-symbols-outlined text-[#6366F1] text-6xl mb-6">insights</span>
         <h1 className="vanguard-heading text-4xl font-bold mb-4">No Active Resume</h1>
         <p className="text-gray-400 mb-8 max-w-md">Please upload a resume dossier to analyze skill gaps.</p>
-        <Link to="/upload" className="island-button bg-[#4edea3] text-[#003824] px-7 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest">
+        <Link to="/upload" className="island-button bg-[#6366F1] text-[#00173b] px-7 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest">
           Ingest Resume Now
         </Link>
       </div>
@@ -123,14 +123,14 @@ export default function SkillGap() {
     'Critical Gap': 'text-red-400 border-red-500/25 bg-red-950/20',
     'Node Missing': 'text-amber-400 border-amber-500/25 bg-amber-950/20',
     'Partial Match': 'text-purple-400 border-purple-500/25 bg-purple-950/20',
-    'Emerging': 'text-[#4edea3] border-[#4edea3]/25 bg-[#4edea3]/5'
+    'Emerging': 'text-[#6366F1] border-[#6366F1]/25 bg-[#6366F1]/5'
   }
 
   const progressColors = {
     'Critical Gap': 'bg-red-500',
     'Node Missing': 'bg-amber-400',
     'Partial Match': 'bg-purple-500',
-    'Emerging': 'bg-[#4edea3]'
+    'Emerging': 'bg-[#6366F1]'
   }
 
   return (
@@ -139,7 +139,7 @@ export default function SkillGap() {
       {/* Header */}
       <section className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#4edea3] block mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6366F1] block mb-2">
             Competency Gap Audit
           </span>
           <h1 className="vanguard-heading text-4xl md:text-5xl font-bold text-white">
@@ -153,7 +153,7 @@ export default function SkillGap() {
           <Link to="/roadmap" className="island-button bg-white/5 border border-white/10 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
             Open Roadmap
           </Link>
-          <Link to="/resources" className="island-button bg-[#4edea3] text-[#003824] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
+          <Link to="/resources" className="island-button bg-[#6366F1] text-[#00173b] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
             <span className="material-symbols-outlined text-[14px]">play_circle</span> Learning Resources
           </Link>
         </div>
@@ -181,7 +181,7 @@ export default function SkillGap() {
         </Link>
         <Link 
           to="/skill-gap"
-          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#4edea3]/12 border border-[#4edea3]/35 text-[#4edea3] transition-all"
+          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#6366F1]/12 border border-[#6366F1]/35 text-[#6366F1] transition-all"
         >
           Skill Gap
         </Link>
@@ -206,12 +206,12 @@ export default function SkillGap() {
           <p className="text-xs text-gray-500">Analyze competency alignment against specific job profiles.</p>
         </div>
         <div className="flex items-center gap-3">
-          {updating && <span className="text-[10px] text-[#4edea3] font-mono animate-pulse uppercase">Syncing Role...</span>}
+          {updating && <span className="text-[10px] text-[#6366F1] font-mono animate-pulse uppercase">Syncing Role...</span>}
           <select 
             disabled={updating}
             value={selectedRole}
             onChange={(e) => handleRoleChange(e.target.value)}
-            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:border-[#4edea3]/50 focus:outline-none transition-all cursor-pointer font-sans min-w-[200px]"
+            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-xs focus:border-[#6366F1]/50 focus:outline-none transition-all cursor-pointer font-sans min-w-[200px]"
           >
             <option value="" disabled className="bg-[#0A0A0A]">Select Role Profile</option>
             {roles.map((r, i) => (
@@ -235,7 +235,7 @@ export default function SkillGap() {
         </div>
         <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
           <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Coverage Index</div>
-          <div className="text-3xl font-bold text-[#4edea3] font-mono">{coverage}%</div>
+          <div className="text-3xl font-bold text-[#6366F1] font-mono">{coverage}%</div>
         </div>
       </section>
 
@@ -252,7 +252,7 @@ export default function SkillGap() {
               const status = typeof gap === 'string' ? 'Critical Gap' : gap.status
               const level = typeof gap === 'string' ? 50 : gap.level
               const col = priorityColors[status] || 'text-white border-white/10 bg-white/5'
-              const pcol = progressColors[status] || 'bg-[#4edea3]'
+              const pcol = progressColors[status] || 'bg-[#6366F1]'
 
               return (
                 <div 
@@ -279,7 +279,7 @@ export default function SkillGap() {
                   <div className="flex items-center gap-3">
                     <button 
                       onClick={() => navigate(`/resources?q=${encodeURIComponent(name)}`)}
-                      className="island-button bg-[#4edea3]/10 text-[#4edea3] border border-[#4edea3]/20 hover:bg-[#4edea3]/20 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all"
+                      className="island-button bg-[#6366F1]/10 text-[#6366F1] border border-[#6366F1]/20 hover:bg-[#6366F1]/20 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all"
                     >
                       <span className="material-symbols-outlined text-[14px]">search</span>
                       Find Courses
@@ -302,3 +302,4 @@ export default function SkillGap() {
     </div>
   )
 }
+

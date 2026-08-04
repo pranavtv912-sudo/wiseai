@@ -57,10 +57,10 @@ export default function ResumeAnalysis() {
   if (!analysisData) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 max-w-4xl mx-auto text-center pt-24 pb-32 relative z-10">
-        <span className="material-symbols-outlined text-[#4edea3] text-6xl mb-6">analytics</span>
+        <span className="material-symbols-outlined text-[#6366F1] text-6xl mb-6">analytics</span>
         <h1 className="vanguard-heading text-4xl font-bold mb-4">No Analysis File Selected</h1>
         <p className="text-gray-400 mb-8 max-w-md">You have not ingested any resume dossiers for keyword analysis yet.</p>
-        <Link to="/upload" className="island-button bg-[#4edea3] text-[#003824] px-7 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest">
+        <Link to="/upload" className="island-button bg-[#6366F1] text-[#00173b] px-7 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest">
           Ingest Resume Now
         </Link>
       </div>
@@ -84,7 +84,7 @@ export default function ResumeAnalysis() {
       {/* Header */}
       <section className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#4edea3] block mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6366F1] block mb-2">
             Tactical Dossier Analysis
           </span>
           <h1 className="vanguard-heading text-4xl md:text-5xl font-bold text-white">
@@ -98,7 +98,7 @@ export default function ResumeAnalysis() {
           <Link to="/upload" className="island-button bg-white/5 border border-white/10 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
             Ingest Another
           </Link>
-          <Link to="/roadmap" className="island-button bg-[#4edea3] text-[#003824] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
+          <Link to="/roadmap" className="island-button bg-[#6366F1] text-[#00173b] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
             <span className="material-symbols-outlined text-[14px]">alt_route</span> Explore Roadmap
           </Link>
         </div>
@@ -120,7 +120,7 @@ export default function ResumeAnalysis() {
         </Link>
         <Link 
           to="/analysis"
-          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#4edea3]/12 border border-[#4edea3]/35 text-[#4edea3] transition-all"
+          className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#6366F1]/12 border border-[#6366F1]/35 text-[#6366F1] transition-all"
         >
           Detailed Report
         </Link>
@@ -149,7 +149,7 @@ export default function ResumeAnalysis() {
         
         {/* Left Side: Score Summary Card */}
         <div className="lg:col-span-4 bg-[#0A0A0A] border border-white/15 rounded-[2rem] p-8 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-[#4edea3]/5 rounded-bl-full pointer-events-none" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-[#6366F1]/5 rounded-bl-full pointer-events-none" />
           
           <div className="w-full">
             <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-6 text-left">Overall Score</h3>
@@ -162,7 +162,7 @@ export default function ResumeAnalysis() {
                   cy="50" 
                   r="44" 
                   fill="none" 
-                  stroke="#4edea3" 
+                  stroke="#6366F1" 
                   strokeWidth="6" 
                   strokeLinecap="round" 
                   strokeDasharray="276" 
@@ -178,7 +178,7 @@ export default function ResumeAnalysis() {
             
             <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border ${
               score >= 90 
-                ? 'bg-[#4edea3]/10 text-[#4edea3] border-[#4edea3]/20' 
+                ? 'bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20' 
                 : score >= 75
                   ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                   : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
@@ -212,10 +212,10 @@ export default function ResumeAnalysis() {
             <div>
               <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">
                 <span>Keyword Density & Relevance</span>
-                <span className="text-[#4edea3]">{scoreBreakdown.keywords}%</span>
+                <span className="text-[#6366F1]">{scoreBreakdown.keywords}%</span>
               </div>
               <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-[#4edea3] rounded-full" style={{ width: `${scoreBreakdown.keywords}%` }} />
+                <div className="h-full bg-[#6366F1] rounded-full" style={{ width: `${scoreBreakdown.keywords}%` }} />
               </div>
             </div>
 
@@ -223,7 +223,7 @@ export default function ResumeAnalysis() {
             <div>
               <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">
                 <span>Dossier Section Structure</span>
-                <span className="text-[#4edea3]">{scoreBreakdown.structure}%</span>
+                <span className="text-[#6366F1]">{scoreBreakdown.structure}%</span>
               </div>
               <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div className="h-full bg-purple-500 rounded-full" style={{ width: `${scoreBreakdown.structure}%` }} />
@@ -234,7 +234,7 @@ export default function ResumeAnalysis() {
             <div>
               <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">
                 <span>Layout & Parsing Readiness</span>
-                <span className="text-[#4edea3]">{scoreBreakdown.formatting}%</span>
+                <span className="text-[#6366F1]">{scoreBreakdown.formatting}%</span>
               </div>
               <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div className="h-full bg-amber-400 rounded-full" style={{ width: `${scoreBreakdown.formatting}%` }} />
@@ -245,7 +245,7 @@ export default function ResumeAnalysis() {
             <div>
               <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">
                 <span>Styling & Action Verb Index</span>
-                <span className="text-[#4edea3]">{scoreBreakdown.style}%</span>
+                <span className="text-[#6366F1]">{scoreBreakdown.style}%</span>
               </div>
               <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${scoreBreakdown.style}%` }} />
@@ -262,12 +262,12 @@ export default function ResumeAnalysis() {
         {/* Matched Keywords */}
         <div className="bg-[#0A0A0A] border border-white/10 rounded-[2rem] p-8 shadow-xl">
           <div className="flex items-center gap-2 mb-6">
-            <span className="material-symbols-outlined text-[#4edea3] text-2xl">check_circle</span>
+            <span className="material-symbols-outlined text-[#6366F1] text-2xl">check_circle</span>
             <h3 className="vanguard-heading text-xl font-bold text-white">Matched Keywords</h3>
           </div>
           <div className="flex flex-wrap gap-2.5">
             {matchingSkills.map((s, i) => (
-              <span key={i} className="px-3.5 py-1.5 rounded-xl bg-[#4edea3]/5 border border-[#4edea3]/20 text-xs font-mono text-[#4edea3] tracking-wide">
+              <span key={i} className="px-3.5 py-1.5 rounded-xl bg-[#6366F1]/5 border border-[#6366F1]/20 text-xs font-mono text-[#6366F1] tracking-wide">
                 {typeof s === 'string' ? s : s.name}
               </span>
             ))}
@@ -303,19 +303,19 @@ export default function ResumeAnalysis() {
         </div>
         <ul className="space-y-4 text-sm text-gray-400">
           <li className="flex gap-3 items-start">
-            <span className="w-1.5 h-1.5 bg-[#4edea3] rounded-full mt-2 flex-shrink-0" />
+            <span className="w-1.5 h-1.5 bg-[#6366F1] rounded-full mt-2 flex-shrink-0" />
             <div>
               <strong className="text-white">Enhance Keyword Density</strong>: Incorporate {missingSkills.slice(0, 3).map(s => typeof s === 'string' ? s : s.name).join(', ')} into your experience bullets, tying them to metrics.
             </div>
           </li>
           <li className="flex gap-3 items-start">
-            <span className="w-1.5 h-1.5 bg-[#4edea3] rounded-full mt-2 flex-shrink-0" />
+            <span className="w-1.5 h-1.5 bg-[#6366F1] rounded-full mt-2 flex-shrink-0" />
             <div>
               <strong className="text-white">Leverage Strong Action Verbs</strong>: Replace passive phrases like "assisted with" or "responsible for" with strong metrics-based descriptors (e.g. "Architected", "Optimized", "Engineered").
             </div>
           </li>
           <li className="flex gap-3 items-start">
-            <span className="w-1.5 h-1.5 bg-[#4edea3] rounded-full mt-2 flex-shrink-0" />
+            <span className="w-1.5 h-1.5 bg-[#6366F1] rounded-full mt-2 flex-shrink-0" />
             <div>
               <strong className="text-white">Review Dossier Formatting</strong>: Ensure layout parser integrity by removing dual-column grids or custom graphics, keeping section names strict (e.g., "Work Experience", "Education").
             </div>
@@ -326,3 +326,4 @@ export default function ResumeAnalysis() {
     </div>
   )
 }
+

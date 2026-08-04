@@ -45,6 +45,7 @@ export default function LearningPlan() {
   const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(false)
   const [activeVideo, setActiveVideo] = useState(null)
+  const [activeVideosList, setActiveVideosList] = useState([])
   
   const [tab, setTab] = useState('plan')
   const [planData, setPlanData] = useState(null)
@@ -113,12 +114,18 @@ export default function LearningPlan() {
     }
   }
 
-  const handlePlayVideo = async (video, skillName = 'General') => {
+  const handlePlayVideo = async (video, playlist = [], skillName = 'General') => {
+    // Directly open the modal — the modal handles embed failure & auto-fallback
     setActiveVideo(video)
-    try {
-      await addHistory(video.video_id, video.title, skillName)
-    } catch (err) {
-      console.error('Failed to add watch history:', err)
+    setActiveVideosList(Array.isArray(playlist) && playlist.length ? playlist : [video])
+    
+    const videoId = video.video_id || video.videoId || ''
+    if (videoId && videoId.length === 11) {
+      try {
+        await addHistory(videoId, video.title, skillName)
+      } catch (e) {
+        console.warn('history add failed:', e)
+      }
     }
   }
 
@@ -179,7 +186,7 @@ export default function LearningPlan() {
       <section className="pt-24 pb-14 flex flex-col items-center text-center gap-6 w-full">
         <div>
           <h1 className="vanguard-heading text-5xl md:text-7xl font-bold tracking-tight mb-4 text-white">
-            Resource <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4edea3] to-[#d0bcff]">Hub</span>
+            Resource <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#d0bcff]">Hub</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Real YouTube tutorials and structured plans curated for your skill gaps.
@@ -191,7 +198,7 @@ export default function LearningPlan() {
           <button
             onClick={() => setTab('plan')}
             className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
-              tab === 'plan' ? 'bg-[#4edea3] text-black' : 'text-gray-400 hover:text-white'
+              tab === 'plan' ? 'bg-[#6366F1] text-black' : 'text-gray-400 hover:text-white'
             }`}
           >
             Learning Plan
@@ -199,7 +206,7 @@ export default function LearningPlan() {
           <button
             onClick={() => setTab('search')}
             className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
-              tab === 'search' ? 'bg-[#4edea3] text-black' : 'text-gray-400 hover:text-white'
+              tab === 'search' ? 'bg-[#6366F1] text-black' : 'text-gray-400 hover:text-white'
             }`}
           >
             Search Library
@@ -215,7 +222,7 @@ export default function LearningPlan() {
             </div>
           ) : !planData || !planData.skills || planData.skills.length === 0 ? (
             <div className="text-center py-20 bg-[#0A0A0A] border border-white/10 rounded-[2.2rem] p-10 max-w-lg mx-auto shadow-xl">
-              <span className="material-symbols-outlined text-[#4edea3] text-5xl mb-4 block">school</span>
+              <span className="material-symbols-outlined text-[#6366F1] text-5xl mb-4 block">school</span>
               <h3 className="vanguard-heading text-xl font-bold text-white mb-2">No active Learning Plan</h3>
               <p className="text-gray-400 text-xs mb-6">Upload a resume with identified competency gaps to initialize your learning roadmap.</p>
             </div>
@@ -224,7 +231,7 @@ export default function LearningPlan() {
               {planData.skills.map((s, idx) => {
                 const isDone = !!progressMap[s.skill]
                 return (
-                  <div key={idx} className="p-1.5 rounded-[2rem] bg-white/5 border border-white/5 hover:border-[#4edea3]/10 transition-all">
+                  <div key={idx} className="p-1.5 rounded-[2rem] bg-white/5 border border-white/5 hover:border-[#6366F1]/10 transition-all">
                     <div className="bg-[#0A0A0A] rounded-[calc(2rem-0.375rem)] p-8 border border-white/10 flex flex-col md:flex-row gap-8 justify-between">
                       
                       <div className="flex-1 space-y-4">
@@ -233,7 +240,7 @@ export default function LearningPlan() {
                             Week {s.startWeek} - {s.endWeek}
                           </span>
                           <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${
-                            isDone ? 'bg-[#4edea3]/10 text-[#4edea3] border-[#4edea3]/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                            isDone ? 'bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                           }`}>
                             {isDone ? 'Completed' : 'Active Gap'}
                           </span>
@@ -259,8 +266,8 @@ export default function LearningPlan() {
                               {s.resources.map((v, i) => (
                                 <button
                                   key={i}
-                                  onClick={() => handlePlayVideo(v, s.skill)}
-                                  className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-[#4edea3]/10 hover:text-[#4edea3] border border-white/10 text-[10px] text-gray-300 font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5"
+                                  onClick={() => handlePlayVideo(v, s.resources, s.skill)}
+                                  className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-[#6366F1]/10 hover:text-[#6366F1] border border-white/10 text-[10px] text-gray-300 font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5"
                                 >
                                   <span className="material-symbols-outlined text-[13px]">play_circle</span>
                                   {v.title.slice(0, 45)}...
@@ -277,7 +284,7 @@ export default function LearningPlan() {
                           onClick={() => handleToggleComplete(s.skill)}
                           className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all ${
                             isDone 
-                              ? 'bg-[#4edea3]/10 border-[#4edea3] text-[#4edea3] shadow-[0_0_20px_rgba(78,222,163,0.15)]' 
+                              ? 'bg-[#6366F1]/10 border-[#6366F1] text-[#6366F1] shadow-[0_0_20px_rgba(99, 102, 241,0.15)]' 
                               : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/20'
                           }`}
                         >
@@ -308,12 +315,12 @@ export default function LearningPlan() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search any skill — Python, Docker, System Design…"
-                  className="w-full pl-12 pr-5 py-3.5 bg-white/5 border border-white/10 rounded-full text-sm text-white placeholder:text-gray-600 transition-all focus:outline-none focus:border-[#4edea3]/40 focus:ring-1 focus:ring-[#4edea3]/20"
+                  className="w-full pl-12 pr-5 py-3.5 bg-white/5 border border-white/10 rounded-full text-sm text-white placeholder:text-gray-600 transition-all focus:outline-none focus:border-[#6366F1]/40 focus:ring-1 focus:ring-[#6366F1]/20"
                 />
               </div>
               <button 
                 type="submit"
-                className="bg-[#4edea3] text-[#003824] px-7 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all"
+                className="bg-[#6366F1] text-[#00173b] px-7 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-[18px]">bolt</span>Search
               </button>
@@ -333,7 +340,7 @@ export default function LearningPlan() {
                   }}
                   className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
                     activeTopic === topic
-                      ? 'bg-[#4edea3]/12 border-[#4edea3]/35 text-[#4edea3]'
+                      ? 'bg-[#6366F1]/12 border-[#6366F1]/35 text-[#6366F1]'
                       : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
                   }`}
                 >
@@ -365,8 +372,8 @@ export default function LearningPlan() {
                 {videos.map((v, i) => (
                   <div 
                     key={i}
-                    onClick={() => handlePlayVideo(v)}
-                    className="vid-card bg-[#0A0A0A] rounded-[1.6rem] border border-white/10 overflow-hidden cursor-pointer transition-all duration-300 hover:translate-y-[-6px] hover:border-[#4edea3]/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.5),0_0_30px_rgba(78,222,163,0.12)]"
+                    onClick={() => handlePlayVideo(v, videos, activeTopic || 'General')}
+                    className="vid-card bg-[#0A0A0A] rounded-[1.6rem] border border-white/10 overflow-hidden cursor-pointer transition-all duration-300 hover:translate-y-[-6px] hover:border-[#6366F1]/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.5),0_0_30px_rgba(99, 102, 241,0.12)]"
                   >
                     <div className="aspect-video relative overflow-hidden bg-black flex items-center justify-center group">
                       <img 
@@ -379,10 +386,10 @@ export default function LearningPlan() {
                       </div>
                     </div>
                     <div className="p-6">
-                      <div className="text-xs font-bold uppercase tracking-widest text-[#4edea3] mb-2">
+                      <div className="text-xs font-bold uppercase tracking-widest text-[#6366F1] mb-2">
                         {v.channel || 'YouTube'}
                       </div>
-                      <h4 className="text-sm font-semibold text-white line-clamp-2 mb-2 group-hover:text-[#4edea3] transition-colors">
+                      <h4 className="text-sm font-semibold text-white line-clamp-2 mb-2 group-hover:text-[#6366F1] transition-colors">
                         {v.title}
                       </h4>
                       <p className="text-xs text-gray-500 line-clamp-2">{v.description}</p>
@@ -398,9 +405,11 @@ export default function LearningPlan() {
       {/* Premium Video Modal Player */}
       <PremiumVideoModal 
         activeVideo={activeVideo} 
-        setActiveVideo={setActiveVideo} 
+        setActiveVideo={setActiveVideo}
+        videosList={activeVideosList}
       />
 
     </div>
   )
 }
+

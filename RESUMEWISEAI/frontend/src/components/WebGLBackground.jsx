@@ -49,14 +49,14 @@ const FS = `
     vec2 q = vec2(fbm(p + t), fbm(p + vec2(1.0,1.0) + t));
     vec2 r = vec2(fbm(p + 1.0*q + vec2(1.7,9.2) + 0.15*t), fbm(p + 1.0*q + vec2(8.3,2.8) + 0.126*t));
     float f = fbm(p + r);
-    vec3 color = vec3(0.015, 0.015, 0.015);
-    vec3 emerald = vec3(0.0, 0.5, 0.3);
-    vec3 violet = vec3(0.4, 0.1, 0.6);
-    color = mix(color, emerald, clamp(f*f*4.0,0.0,1.0));
+    vec3 color = vec3(0.015, 0.015, 0.02);
+    vec3 indigo = vec3(0.31, 0.27, 0.90);
+    vec3 violet = vec3(0.54, 0.36, 0.96);
+    color = mix(color, indigo, clamp(f*f*4.0,0.0,1.0));
     color = mix(color, violet, clamp(length(q),0.0,1.0)*0.3);
-    color = mix(color, vec3(0.1,0.2,0.2), clamp(length(r.x),0.0,1.0)*0.2);
+    color = mix(color, vec3(0.1,0.15,0.3), clamp(length(r.x),0.0,1.0)*0.2);
     float mouseLight = smoothstep(0.8, 0.0, length(p - m*2.0));
-    color += emerald * mouseLight * 0.1;
+    color += indigo * mouseLight * 0.1;
     color += (hash(uv + u_time) - 0.5) * 0.02;
     gl_FragColor = vec4(color, 1.0);
   }
@@ -131,3 +131,4 @@ export default function WebGLBackground() {
     />
   )
 }
+

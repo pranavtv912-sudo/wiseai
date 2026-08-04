@@ -101,7 +101,7 @@ export default function AIChatAssistant() {
           className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
             isOpen 
               ? 'bg-red-500 hover:bg-red-600 rotate-90 scale-90' 
-              : 'bg-gradient-to-tr from-[#4edea3] to-[#3baf81] hover:shadow-[0_0_20px_rgba(78,222,163,0.5)] hover:-translate-y-1'
+              : 'bg-gradient-to-tr from-[#6366F1] to-[#3baf81] hover:shadow-[0_0_20px_rgba(99, 102, 241,0.5)] hover:-translate-y-1'
           }`}
         >
           <span className="material-symbols-outlined text-white text-[28px]">
@@ -117,13 +117,13 @@ export default function AIChatAssistant() {
           {/* Header */}
           <div className="bg-[#111] p-4 flex items-center justify-between border-b border-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#4edea3]/20 flex items-center justify-center border border-[#4edea3]/30">
-                <span className="material-symbols-outlined text-[#4edea3] text-[18px]">psychology</span>
+              <div className="w-8 h-8 rounded-full bg-[#6366F1]/20 flex items-center justify-center border border-[#6366F1]/30">
+                <span className="material-symbols-outlined text-[#6366F1] text-[18px]">psychology</span>
               </div>
               <div>
                 <h3 className="text-white text-sm font-bold tracking-widest uppercase">ResumeWise AI</h3>
-                <p className="text-[#4edea3] text-[10px] font-semibold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] animate-pulse"></span> Online
+                <p className="text-[#6366F1] text-[10px] font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1] animate-pulse"></span> Online
                 </p>
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function AIChatAssistant() {
                 <div 
                   className={`max-w-[85%] rounded-2xl p-4 relative group ${
                     msg.role === 'user' 
-                      ? 'bg-[#4edea3] text-[#003824] rounded-tr-sm' 
+                      ? 'bg-[#6366F1] text-[#00173b] rounded-tr-sm' 
                       : 'bg-white/5 text-gray-200 border border-white/10 rounded-tl-sm'
                   }`}
                 >
@@ -159,7 +159,7 @@ export default function AIChatAssistant() {
                       <span className="material-symbols-outlined text-[14px]">content_copy</span>
                     </button>
                   )}
-                  <div className={`prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-p:text-[#003824] prose-strong:text-[#002417]' : 'prose-invert prose-p:text-gray-300 prose-headings:text-white prose-a:text-[#4edea3] prose-strong:text-white prose-code:text-[#4edea3] prose-pre:bg-[#000]'}`}>
+                  <div className={`prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-p:text-[#00173b] prose-strong:text-[#00173b]' : 'prose-invert prose-p:text-gray-300 prose-headings:text-white prose-a:text-[#6366F1] prose-strong:text-white prose-code:text-[#6366F1] prose-pre:bg-[#000]'}`}>
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                   </div>
                 </div>
@@ -170,9 +170,9 @@ export default function AIChatAssistant() {
               <div className="flex w-full justify-start">
                 <div className="max-w-[85%] bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm p-4 flex items-center gap-2">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 rounded-full bg-[#4edea3] animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-2 h-2 rounded-full bg-[#4edea3] animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-2 h-2 rounded-full bg-[#4edea3] animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-2 h-2 rounded-full bg-[#6366F1] animate-bounce" style={{ animationDelay: '300ms' }}></span>
                   </div>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function AIChatAssistant() {
                 <button
                   key={i}
                   onClick={() => handleSend(q)}
-                  className="whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-[11px] font-medium hover:bg-[#4edea3]/10 hover:text-[#4edea3] hover:border-[#4edea3]/30 transition-all flex-shrink-0"
+                  className="whitespace-nowrap px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-[11px] font-medium hover:bg-[#6366F1]/10 hover:text-[#6366F1] hover:border-[#6366F1]/30 transition-all flex-shrink-0"
                 >
                   {q}
                 </button>
@@ -197,7 +197,7 @@ export default function AIChatAssistant() {
 
           {/* Input Area */}
           <div className="p-4 bg-[#111] border-t border-white/5">
-            <div className="relative flex items-end gap-2 bg-[#050505] border border-white/10 rounded-xl focus-within:border-[#4edea3]/50 transition-colors">
+            <div className="relative flex items-end gap-2 bg-[#050505] border border-white/10 rounded-xl focus-within:border-[#6366F1]/50 transition-colors">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -209,7 +209,7 @@ export default function AIChatAssistant() {
               <button
                 onClick={() => handleSend()}
                 disabled={!input.trim() || isLoading}
-                className="p-3 text-[#4edea3] hover:text-white disabled:opacity-50 disabled:hover:text-[#4edea3] transition-colors flex-shrink-0"
+                className="p-3 text-[#6366F1] hover:text-white disabled:opacity-50 disabled:hover:text-[#6366F1] transition-colors flex-shrink-0"
               >
                 <span className="material-symbols-outlined text-[20px]">send</span>
               </button>
@@ -224,3 +224,4 @@ export default function AIChatAssistant() {
     </>
   );
 }
+
