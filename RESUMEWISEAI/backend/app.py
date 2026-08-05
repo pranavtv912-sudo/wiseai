@@ -39,7 +39,7 @@ from routes import (
 def verify_db_connection(app):
     """
     Verify that the database is reachable before proceeding.
-    Exits with a descriptive error message if the connection cannot be established.
+    Raises an Exception if the connection cannot be established.
     """
     db_url = app.config.get('SQLALCHEMY_DATABASE_URI', '')
     masked_url = db_url
@@ -64,9 +64,7 @@ def verify_db_connection(app):
         print('\n[ERROR] Failed to connect to database!')
         print(f'  Connection URL: {masked_url}')
         print(f'  Reason: {error_msg}')
-        print('\n[HINT] Ensure MySQL is running locally or set LOCAL_DATABASE_URL in .env')
-        import sys
-        sys.exit(1)
+        raise RuntimeError(f"Database connection failed: {error_msg}")
 
 
 def create_app(config_name=None):
@@ -94,14 +92,24 @@ def create_app(config_name=None):
     db.init_app(app)
     
     # Configure CORS
+    cors_origins = app.config.get('CORS_ORIGINS', [])
+    if isinstance(cors_origins, str):
+        cors_origins = [o.strip() for o in cors_origins.split(',') if o.strip()]
+
+    default_allowed_origins = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+        "https://resumewiseai.vercel.app"
+    ]
+    for origin in default_allowed_origins:
+        if origin not in cors_origins:
+            cors_origins.append(origin)
+
     CORS(app, resources={
         r"/api/*": {
-            "origins": [
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://127.0.0.1:5173",
-                "http://127.0.0.1:3000"
-            ],
+            "origins": cors_origins,
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
@@ -162,12 +170,14 @@ def create_app(config_name=None):
     
     # Verify database connection and create tables
     with app.app_context():
-        verify_db_connection(app)
         try:
+            verify_db_connection(app)
             db.create_all()
-            print('[OK] Database tables created/verified successfully')
+            print("[OK] Database tables created/verified successfully")
         except Exception as e:
-            print(f'[ERROR] Error creating database tables: {str(e)}')
+            app.logger.error(f"Database initialization failed: {e}")
+            print(f"[WARNING] Database initialization skipped: {e}")
+            print("[INFO] Application will continue to start.")
     
     # Setup logging
     setup_logging(app)
