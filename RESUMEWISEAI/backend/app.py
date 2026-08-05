@@ -42,16 +42,29 @@ def verify_db_connection(app):
     Exits with a descriptive error message if the connection cannot be established.
     """
     db_url = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    masked_url = db_url
+    if "@" in db_url:
+        try:
+            proto_user, host_db = db_url.split("@", 1)
+            if ":" in proto_user:
+                proto, user = proto_user.rsplit(":", 1)
+                masked_url = f"{proto}:*****@{host_db}"
+            else:
+                masked_url = f"*****@{host_db}"
+        except Exception:
+            masked_url = db_url
+
     try:
         with db.engine.connect() as connection:
             connection.execute(text('SELECT 1'))
         print('[OK] Connected to database successfully')
-        print(f'  Database: {db_url.split("@")[-1] if "@" in db_url else db_url}')
+        print(f'  Database target: {host_db if "@" in db_url else db_url}')
     except Exception as e:
         error_msg = str(e)
         print('\n[ERROR] Failed to connect to database!')
-        print(f'  Connection URL: {db_url.split("@")[-1] if "@" in db_url else db_url}')
+        print(f'  Connection URL: {masked_url}')
         print(f'  Reason: {error_msg}')
+        print('\n[HINT] Ensure MySQL is running locally or set LOCAL_DATABASE_URL in .env')
         import sys
         sys.exit(1)
 
