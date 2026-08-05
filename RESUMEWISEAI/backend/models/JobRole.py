@@ -18,13 +18,6 @@ class JobRole(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, title=None, category=None, is_active=True, **kwargs):
-        self.title = title
-        self.category = category
-        self.is_active = is_active
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
     def __repr__(self):
         return f'<JobRole {self.title}>'
 
