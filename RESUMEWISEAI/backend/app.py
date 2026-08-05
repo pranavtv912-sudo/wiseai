@@ -18,7 +18,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
 from config import get_config
-from models import db
+from extensions import db
 from routes import (
     auth_routes,
     resume_routes,

@@ -3,12 +3,10 @@ User Model
 Represents user account information and authentication details
 """
 
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
-
-db = SQLAlchemy()
+from extensions import db
 
 
 class User(db.Model):

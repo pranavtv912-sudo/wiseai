@@ -4,8 +4,8 @@ Represents generated reports containing analysis results and recommendations
 """
 
 from datetime import datetime
-from models.User import db
 import uuid
+from extensions import db
 
 
 class Report(db.Model):

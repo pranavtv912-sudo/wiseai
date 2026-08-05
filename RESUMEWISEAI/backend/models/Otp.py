@@ -3,10 +3,10 @@ OTP Model
 Represents one-time passwords for email verification, password reset, and password changes.
 """
 
-from models.User import db
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
+from extensions import db
 
 class Otp(db.Model):
     """OTP model for verification and security rate-limiting"""

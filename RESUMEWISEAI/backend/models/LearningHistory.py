@@ -1,6 +1,6 @@
 from datetime import datetime
-from models.User import db
 import uuid
+from extensions import db
 
 
 class LearningHistory(db.Model):

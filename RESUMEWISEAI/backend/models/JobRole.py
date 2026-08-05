@@ -4,7 +4,7 @@ Stores all available target job roles for resume analysis
 """
 
 from datetime import datetime
-from models.User import db
+from extensions import db
 
 
 class JobRole(db.Model):
