@@ -7,101 +7,201 @@ import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 
 class Config:
-    """Base configuration class"""
-    
+    """Base configuration"""
+
+    # =====================================================
     # Flask Configuration
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
+    # =====================================================
+
+    SECRET_KEY = os.getenv(
+        "SECRET_KEY",
+        "change-this-secret-key"
+    )
+
     DEBUG = False
     TESTING = False
-    
-    # Database Configuration - SQLite by default
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URL',
-        'sqlite:///resumewise.db'
+
+    # =====================================================
+    # Database Configuration (Railway + MySQL + PyMySQL)
+    # =====================================================
+
+    DATABASE_URL = os.getenv(
+        "DATABASE_URL",
+        "sqlite:///resumewise.db"
     )
+
+    # Railway usually provides mysql://
+    if DATABASE_URL.startswith("mysql://"):
+        DATABASE_URL = DATABASE_URL.replace(
+            "mysql://",
+            "mysql+pymysql://",
+            1
+        )
+
+    # Fix if mysqldb is used
+    if DATABASE_URL.startswith("mysql+mysqldb://"):
+        DATABASE_URL = DATABASE_URL.replace(
+            "mysql+mysqldb://",
+            "mysql+pymysql://",
+            1
+        )
+
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # Engine options are MySQL-specific and incompatible with SQLite
-    # SQLALCHEMY_ENGINE_OPTIONS = {
-    #     'pool_recycle': 3600,
-    #     'pool_pre_ping': True,
-    #     'pool_size': 10,
-    #     'max_overflow': 20,
-    #     'connect_args': {
-    #         'charset': 'utf8mb4',
-    #     }
-    # }
-    
-    # JWT Configuration
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key')
+
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+        "pool_size": 10,
+        "max_overflow": 20,
+    }
+
+    # =====================================================
+    # JWT
+    # =====================================================
+
+    JWT_SECRET_KEY = os.getenv(
+        "JWT_SECRET_KEY",
+        "jwt-secret-key"
+    )
+
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=90)
-    
-    # File Upload Configuration
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
-    ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc'}
-    
-    # External API Keys
-    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
-    OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
-    OPENROUTER_MODEL = os.getenv('OPENROUTER_MODEL', 'google/gemini-2.5-flash')
-    YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY', '')
-    ADZUNA_API_KEY = os.getenv('ADZUNA_API_KEY', '')
-    ADZUNA_API_ID = os.getenv('ADZUNA_API_ID', '')
-    # SMTP Configurations for Gmail
-    SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.gmail.com')
-    SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
-    SMTP_USER = os.getenv('SMTP_USER', '')
-    SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
-    
-    # CORS Configuration
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5000').split(',')
-    
-    # Spacy Model
-    SPACY_MODEL = 'en_core_web_sm'
-    
+
+    # =====================================================
+    # Uploads
+    # =====================================================
+
+    UPLOAD_FOLDER = os.path.join(
+        os.path.dirname(__file__),
+        "uploads"
+    )
+
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+    ALLOWED_EXTENSIONS = {
+        "pdf",
+        "doc",
+        "docx",
+    }
+
+    # =====================================================
+    # AI APIs
+    # =====================================================
+
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+    OPENROUTER_API_KEY = os.getenv(
+        "OPENROUTER_API_KEY",
+        ""
+    )
+
+    OPENROUTER_MODEL = os.getenv(
+        "OPENROUTER_MODEL",
+        "google/gemini-2.5-flash"
+    )
+
+    # =====================================================
+    # External APIs
+    # =====================================================
+
+    YOUTUBE_API_KEY = os.getenv(
+        "YOUTUBE_API_KEY",
+        ""
+    )
+
+    ADZUNA_API_ID = os.getenv(
+        "ADZUNA_API_ID",
+        ""
+    )
+
+    ADZUNA_API_KEY = os.getenv(
+        "ADZUNA_API_KEY",
+        ""
+    )
+
+    # =====================================================
+    # SMTP
+    # =====================================================
+
+    SMTP_HOST = os.getenv(
+        "SMTP_HOST",
+        "smtp.gmail.com"
+    )
+
+    SMTP_PORT = int(
+        os.getenv("SMTP_PORT", "587")
+    )
+
+    SMTP_USER = os.getenv(
+        "SMTP_USER",
+        ""
+    )
+
+    SMTP_PASSWORD = os.getenv(
+        "SMTP_PASSWORD",
+        ""
+    )
+
+    # =====================================================
+    # CORS
+    # =====================================================
+
+    CORS_ORIGINS = os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:3000"
+    ).split(",")
+
+    # =====================================================
+    # SpaCy
+    # =====================================================
+
+    SPACY_MODEL = "en_core_web_sm"
+
+    # =====================================================
     # Pagination
+    # =====================================================
+
     ITEMS_PER_PAGE = 20
 
 
 class DevelopmentConfig(Config):
-    """Development environment configuration"""
     DEBUG = True
     SQLALCHEMY_ECHO = True
 
 
 class TestingConfig(Config):
-    """Testing environment configuration"""
     TESTING = True
-    # Use a dedicated SQLite test database
+
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        'TEST_DATABASE_URL',
-        'sqlite:///resumewise_test.db'
+        "TEST_DATABASE_URL",
+        "sqlite:///resumewise_test.db"
     )
+
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
 
 
 class ProductionConfig(Config):
-    """Production environment configuration"""
     DEBUG = False
-    # In production, ensure all environment variables are properly set
 
 
-# Configuration dictionary
 config = {
-    'development': DevelopmentConfig,
-    'testing': TestingConfig,
-    'production': ProductionConfig,
-    'default': DevelopmentConfig
+    "development": DevelopmentConfig,
+    "testing": TestingConfig,
+    "production": ProductionConfig,
+    "default": DevelopmentConfig,
 }
 
 
 def get_config():
-    """Get the appropriate configuration based on environment"""
-    env = os.getenv('FLASK_ENV', 'development')
-    return config.get(env, config['default'])
+    env = os.getenv(
+        "FLASK_ENV",
+        "development"
+    )
+    return config.get(env, config["default"])
