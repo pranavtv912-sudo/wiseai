@@ -48,11 +48,16 @@ class Config:
     
     # External API Keys
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+    OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
+    OPENROUTER_MODEL = os.getenv('OPENROUTER_MODEL', 'google/gemini-2.5-flash')
     YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY', '')
     ADZUNA_API_KEY = os.getenv('ADZUNA_API_KEY', '')
     ADZUNA_API_ID = os.getenv('ADZUNA_API_ID', '')
-    EMAILJS_API_KEY = os.getenv('EMAILJS_API_KEY', '')
-    EMAILJS_PRIVATE_KEY = os.getenv('EMAILJS_PRIVATE_KEY', '')
+    # SMTP Configurations for Gmail
+    SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.gmail.com')
+    SMTP_PORT = int(os.getenv('SMTP_PORT', '587'))
+    SMTP_USER = os.getenv('SMTP_USER', '')
+    SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
     
     # CORS Configuration
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5000').split(',')

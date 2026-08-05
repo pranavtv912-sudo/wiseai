@@ -314,3 +314,32 @@ def _get_interview_tips(role: str, experience: str) -> list:
             tips.extend(role_tips)
     
     return tips
+
+
+@interview_routes.route('/evaluate', methods=['POST'])
+@token_required
+def evaluate_answer(user, payload):
+    """
+    Evaluate candidate's answer to a question
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return error_response('Request body is required', status_code=400)
+            
+        question = data.get('question')
+        answer = data.get('answer')
+        mode = data.get('mode', 'Technical')
+        
+        if not question or not answer:
+            return error_response('question and answer are required', status_code=400)
+            
+        gemini = GeminiAIService()
+        evaluation = gemini.evaluate_interview_answer(question, answer, mode)
+        
+        return success_response('Evaluation completed', {
+            'evaluation': evaluation
+        })
+    except Exception as e:
+        return error_response(f'Error evaluating answer: {str(e)}', status_code=500)
+

@@ -163,6 +163,35 @@ def generate_learning_plan(user, payload):
         return error_response(f'Error generating learning plan: {str(e)}', status_code=500)
 
 
+@roadmap_routes.route('/youtube-search', methods=['GET'])
+@token_required
+def youtube_search(user, payload):
+    """
+    Search YouTube tutorials
+    """
+    try:
+        query = request.args.get('q', '')
+        max_results = int(request.args.get('max', 9))
+        
+        if not query:
+            return error_response('Query parameter q is required', status_code=400)
+            
+        youtube = YouTubeService()
+        videos = youtube.search_skill_tutorials(query, max_results=max_results)
+        
+        # Check if we got fallbacks containing search results (suggesting quota/limit issue or fallback)
+        is_fallback = False
+        if videos and any(v.get('video_id') == '' or 'results?search_query' in v.get('url', '') for v in videos):
+            is_fallback = True
+            
+        return success_response('YouTube search completed', {
+            'videos': videos,
+            'isFallback': is_fallback
+        })
+    except Exception as e:
+        return error_response(f'Error searching YouTube: {str(e)}', status_code=500)
+
+
 def _get_practice_projects(skill: str) -> List[str]:
     """Get practice project ideas for skill"""
     projects = {

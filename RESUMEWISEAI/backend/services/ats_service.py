@@ -24,13 +24,14 @@ class ATSScoreCalculator:
             'formatting': 0.10
         }
     
-    def calculate_ats_score(self, resume_data: Dict, target_role: str = None) -> Dict:
+    def calculate_ats_score(self, resume_data: Dict, target_role: str = None, jd_skills: Dict = None) -> Dict:
         """
         Calculate comprehensive ATS score
         
         Args:
             resume_data: Extracted resume data
             target_role: Target job role for skill matching
+            jd_skills: Optional custom required/preferred skills from job description
             
         Returns:
             Dictionary with ATS score and breakdown
@@ -40,7 +41,8 @@ class ATSScoreCalculator:
         # Calculate individual component scores
         scores['skills_match'] = self._calculate_skills_match(
             resume_data.get('skills', []),
-            target_role
+            target_role,
+            jd_skills
         )
         scores['projects'] = self._calculate_projects_score(resume_data.get('projects', []))
         scores['certifications'] = self._calculate_certifications_score(
@@ -73,7 +75,7 @@ class ATSScoreCalculator:
             }
         }
     
-    def _calculate_skills_match(self, extracted_skills: List[str], target_role: str) -> float:
+    def _calculate_skills_match(self, extracted_skills: List[str], target_role: str, jd_skills: Dict = None) -> float:
         """
         Calculate skills match score
         
@@ -84,13 +86,19 @@ class ATSScoreCalculator:
         if not extracted_skills:
             return 0.0
         
-        if not target_role or target_role not in self.SKILL_DATABASE:
+        required_skills = []
+        preferred_skills = []
+        
+        if jd_skills and ('required' in jd_skills or 'preferred' in jd_skills):
+            required_skills = jd_skills.get('required', [])
+            preferred_skills = jd_skills.get('preferred', [])
+        elif target_role and target_role in self.SKILL_DATABASE:
+            role_skills = self.SKILL_DATABASE[target_role]
+            required_skills = role_skills['required']
+            preferred_skills = role_skills['preferred']
+        else:
             # Generic scoring if no target role
             return min(len(extracted_skills) / 10 * 100, 100)
-        
-        role_skills = self.SKILL_DATABASE[target_role]
-        required_skills = role_skills['required']
-        preferred_skills = role_skills['preferred']
         
         matched_required = sum(
             1 for skill in extracted_skills
@@ -213,26 +221,34 @@ class ATSScoreCalculator:
         
         return max(formatting_score, 0)
     
-    def get_skill_gap_analysis(self, extracted_skills: List[str], target_role: str) -> Dict:
+    def get_skill_gap_analysis(self, extracted_skills: List[str], target_role: str, jd_skills: Dict = None) -> Dict:
         """
-        Analyze skill gaps for target role
+        Analyze skill gaps for target role or custom job description skills
         
         Args:
             extracted_skills: Skills extracted from resume
             target_role: Target job role
+            jd_skills: Optional custom required/preferred skills from job description
             
         Returns:
             Dictionary with skill gap analysis
         """
-        if target_role not in self.SKILL_DATABASE:
+        required_skills = set()
+        preferred_skills = set()
+        
+        if jd_skills and ('required' in jd_skills or 'preferred' in jd_skills):
+            required_skills = set(jd_skills.get('required', []))
+            preferred_skills = set(jd_skills.get('preferred', []))
+        elif target_role in self.SKILL_DATABASE:
+            role_skills = self.SKILL_DATABASE[target_role]
+            required_skills = set(role_skills['required'])
+            preferred_skills = set(role_skills['preferred'])
+        else:
             return {
                 'error': f'Target role "{target_role}" not found in database',
                 'available_roles': list(self.SKILL_DATABASE.keys())
             }
         
-        role_skills = self.SKILL_DATABASE[target_role]
-        required_skills = set(role_skills['required'])
-        preferred_skills = set(role_skills['preferred'])
         extracted_set = set(s.lower() for s in extracted_skills)
         
         # Find matching and missing skills
@@ -259,5 +275,5 @@ class ATSScoreCalculator:
             'missing_preferred_skills': missing_preferred,
             'total_required_skills': len(required_skills),
             'total_preferred_skills': len(preferred_skills),
-            'coverage_percentage': round((len(matching_skills) / len(required_skills)) * 100, 2)
+            'coverage_percentage': round((len(matching_skills) / len(required_skills)) * 100, 2) if required_skills else 100.0
         }

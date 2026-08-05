@@ -10,6 +10,7 @@ from services.youtube_service import YouTubeService
 from services.adzuna_service import AdzunaService
 from services.report_service import ReportGenerator
 from services.email_service import EmailService
+from services.payment_service import PaymentService
 
 __all__ = [
     'ResumeParser',
@@ -18,5 +19,7 @@ __all__ = [
     'YouTubeService',
     'AdzunaService',
     'ReportGenerator',
-    'EmailService'
+    'EmailService',
+    'PaymentService'
 ]
+

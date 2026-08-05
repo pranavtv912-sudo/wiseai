@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Identity - ResumeWise AI</title>
+    <!--[if mso]>
+    <xml>
+    <o:OfficeDocumentSettings>
+    <o:AllowPNG/>
+    <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    <![endif]-->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #05070C;
+            color: #E2E8F0;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        a {
+            color: #6366F1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .btn-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+            background: linear-gradient(135deg, #4F46E5 0%, #8B5CF6 100%) !important;
+        }
+    </style>
+</head>
+<body style="margin:0; padding:0; background-color:#05070C; font-family:'Plus Jakarta Sans', 'Inter', sans-serif;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#05070C; width:100%; min-height:100%;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- Top Decorative Accent -->
+                <table width="100%" max-width="600" border="0" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
+                    <tr>
+                        <td height="6" style="background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%); border-top-left-radius: 24px; border-top-right-radius: 24px;"></td>
+                    </tr>
+                </table>
+                
+                <!-- Main Shell Container -->
+                <table width="100%" max-width="600" border="0" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:#0B0F19; border: 1px solid #1E293B; border-bottom-left-radius:24px; border-bottom-right-radius:24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); overflow:hidden;">
+                    <tr>
+                        <td style="padding: 48px 40px;">
+                            
+                            <!-- Header Section -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="text-align: center;">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 32px;">
+                                        <span style="font-size: 20px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.5px;">
+                                            ResumeWise <span style="color:#818CF8;">AI</span>
+                                        </span>
+                                        <div style="font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 3px; margin-top: 4px;">
+                                            Your AI Career Copilot
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 8px;">
+                                        <h1 style="margin: 0; font-size: 28px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.5px;">
+                                            Verify Your Identity
+                                        </h1>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 32px;">
+                                        <p style="margin: 0; font-size: 14px; color: #94A3B8; font-weight: 500;">
+                                            Secure verification powered by ResumeWise AI
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Greeting & Context -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                                <tr>
+                                    <td style="font-size: 15px; color: #CBD5E1; line-height: 1.6;">
+                                        <p style="margin: 0 0 12px 0; font-weight: 600; color: #FFFFFF; font-size: 16px;">Hello {{ user_name }},</p>
+                                        <p style="margin: 0 0 16px 0;">Welcome to ResumeWise AI. To continue setting up or updating your account, please verify your identity using the verification code below.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- OTP HERO CARD -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 32px; background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid #312E81; border-radius: 20px; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); text-align: center;">
+                                <tr>
+                                    <td style="padding: 32px 20px;">
+                                        <span style="font-size: 10px; font-weight: 800; color: #818CF8; letter-spacing: 2px;">
+                                            ONE-TIME CODE
+                                        </span>
+                                        
+                                        <!-- Huge OTP Value -->
+                                        <div style="font-family: 'Plus Jakarta Sans', monospace; font-size: 44px; font-weight: 800; color: #10B981; letter-spacing: 12px; margin: 16px 0; padding-left: 12px; text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);">
+                                            {{ otp }}
+                                        </div>
+                                        
+                                        <!-- Validity Clock Badge -->
+                                        <table align="center" border="0" cellpadding="0" cellspacing="0" style="background-color: rgba(239, 68, 68, 0.1); border-radius: 20px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                                            <tr>
+                                                <td style="padding: 6px 14px; font-size: 11px; font-weight: 700; color: #F87171; letter-spacing: 0.5px; vertical-align: middle;">
+                                                    <span style="margin-right: 4px;">⏱</span> Valid for 5 minutes
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Security Alert / Warning Box -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 32px; background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-left: 3px solid #8B5CF6; border-radius: 12px;">
+                                <tr>
+                                    <td style="padding: 18px 20px;">
+                                        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td width="24" valign="top" style="font-size: 16px; padding-top: 2px;">🛡️</td>
+                                                <td style="padding-left: 12px; font-size: 12px; color: #94A3B8; line-height: 1.5; font-weight: 500;">
+                                                    <strong style="color: #F1F5F9; display: block; margin-bottom: 2px;">Security Protocol Advice</strong>
+                                                    Never share this code. ResumeWise AI representatives will never ask for your OTP. If you did not request this verification, please ignore this transmission.
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Call to Action Button -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="text-align: center; margin-bottom: 32px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="http://localhost:3000" class="btn-cta" style="display: inline-block; background: linear-gradient(135deg, #4F46E5 0%, #8B5CF6 100%); color: #FFFFFF; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 14px 32px; border-radius: 30px; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); transition: all 0.2s ease-in-out;">
+                                            Return to ResumeWise AI
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Brief Explanation of Request -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-top: 1px solid #1E293B; padding-top: 24px; margin-bottom: 8px;">
+                                <tr>
+                                    <td style="font-size: 11px; color: #64748B; line-height: 1.5;">
+                                        <strong>Why did I receive this?</strong> This security validation transaction was initiated because an active session requested {{ purpose_text }} validation for the account linked to {{ recipient_email }}.
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Premium Footer -->
+                <table width="100%" max-width="600" border="0" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; text-align: center; margin-top: 24px;">
+                    <tr>
+                        <td style="padding: 0 20px; font-size: 12px; color: #475569; line-height: 1.6;">
+                            <div style="font-size: 13px; font-weight: 700; color: #94A3B8; margin-bottom: 4px;">ResumeWise AI</div>
+                            <div style="margin-bottom: 16px; font-size: 11px; color: #64748B;">Your AI Career Copilot</div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <a href="mailto:support@resumewise.ai" style="color: #6366F1; margin: 0 10px;">Support</a>
+                                <span style="color: #334155;">&bull;</span>
+                                <a href="http://www.resumewise.ai" target="_blank" style="color: #6366F1; margin: 0 10px;">Website</a>
+                            </div>
+                            
+                            <div style="margin-bottom: 20px; font-size: 11px; color: #64748B;">
+                                <a href="https://github.com" target="_blank" style="color: #64748B; text-decoration: none; margin: 0 8px;">GitHub</a>
+                                <span style="color: #1E293B;">|</span>
+                                <a href="https://linkedin.com" target="_blank" style="color: #64748B; text-decoration: none; margin: 0 8px;">LinkedIn</a>
+                                <span style="color: #1E293B;">|</span>
+                                <a href="https://x.com" target="_blank" style="color: #64748B; text-decoration: none; margin: 0 8px;">X</a>
+                            </div>
+                            
+                            <div style="font-size: 10px; color: #475569;">
+                                &copy; 2026 ResumeWise AI. All Rights Reserved.
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

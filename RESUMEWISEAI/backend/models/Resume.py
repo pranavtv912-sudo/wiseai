@@ -100,6 +100,12 @@ class Analysis(db.Model):
     salary_data = db.Column(db.JSON, nullable=True)
     required_skills = db.Column(db.JSON, nullable=True, default=[])
     
+    # Job Description & Payment Fields
+    job_description = db.Column(db.Text, nullable=True)
+    payment_status = db.Column(db.String(50), default='unpaid')
+    payment_hash = db.Column(db.String(255), nullable=True)
+    payment_preimage = db.Column(db.String(255), nullable=True)
+    
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -139,6 +145,10 @@ class Analysis(db.Model):
                 'salary_data': self.salary_data,
                 'required_skills': self.required_skills,
             },
+            'job_description': self.job_description,
+            'payment_status': self.payment_status,
+            'payment_hash': self.payment_hash,
+            'payment_preimage': self.payment_preimage,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -181,6 +191,11 @@ class Analysis(db.Model):
             'job_trends': self.job_trends,
             'salary_data': self.salary_data,
             'required_skills': self.required_skills,
+            'job_description': self.job_description,
+            'payment_status': self.payment_status,
+            'payment_hash': self.payment_hash,
+            'payment_preimage': self.payment_preimage,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }
+

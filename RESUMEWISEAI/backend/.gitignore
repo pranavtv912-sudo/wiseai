@@ -100,3 +100,32 @@ secret_key*
 private_key*
 *.pem
 *.key
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# React
+node_modules/
+dist/
+
+# Vite
+.vite/
+
+# Coverage
+coverage/
+
+node_modules
+.env
+.env.local
+dist
+build
+__pycache__
+*.pyc
+.vscode
+
+node_modules/
+dist/
+frontend/node_modules/
+frontend/dist/
+.vite/

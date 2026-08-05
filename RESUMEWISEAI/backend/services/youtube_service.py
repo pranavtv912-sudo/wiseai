@@ -18,7 +18,7 @@ class YouTubeService:
     
     def search_skill_tutorials(self, skill: str, max_results: int = 10) -> List[Dict]:
         """
-        Search for YouTube tutorials for a specific skill
+        Search for YouTube tutorials for a specific skill and ensure they are embeddable
         
         Args:
             skill: Skill name to search
@@ -31,14 +31,14 @@ class YouTubeService:
             return self._get_fallback_tutorials(skill)
 
         try:
-            # Search for tutorials
+            # Search for tutorials - fetch up to 50 to ensure we have enough embeddable ones after filtering
             search_query = f'{skill} tutorial for beginners'
 
             request = self.youtube.search().list(
                 q=search_query,
                 part='snippet',
                 type='video',
-                maxResults=min(max_results, 50),
+                maxResults=50,
                 order='relevance',
                 videoCategoryId='27',  # Education category
                 relevanceLanguage='en',
@@ -47,23 +47,86 @@ class YouTubeService:
 
             response = request.execute()
             video_ids = [item['id']['videoId'] for item in response.get('items', []) if item.get('id', {}).get('videoId')]
-            durations = self._get_video_durations(video_ids) if video_ids else {}
+            
+            # Fetch video details (durations, privacy, upload status, region restrictions, age ratings, and embeddable status)
+            durations = {}
+            embeddable_status = {}
+            if video_ids:
+                try:
+                    video_request = self.youtube.videos().list(
+                        part='status,contentDetails',
+                        id=','.join(video_ids)
+                    )
+                    video_response = video_request.execute()
+                    for item in video_response.get('items', []):
+                        vid = item.get('id')
+                        status = item.get('status', {})
+                        content_details = item.get('contentDetails', {})
+                        
+                        # 1. Check if embeddable
+                        is_embeddable = status.get('embeddable', True)
+                        
+                        # 2. Check privacy status (must be public)
+                        is_public = status.get('privacyStatus', 'public') == 'public'
+                        
+                        # 3. Check upload status (must be processed)
+                        is_processed = status.get('uploadStatus', 'processed') == 'processed'
+                        
+                        # 4. Check age restrictions
+                        content_rating = content_details.get('contentRating', {})
+                        is_age_restricted = content_rating.get('ytRating') == 'ytAgeRestricted' if content_rating else False
+                        
+                        # 5. Check region restrictions
+                        region_restriction = content_details.get('regionRestriction', {})
+                        is_region_blocked = False
+                        if region_restriction:
+                            # If there is a blocked list containing 'US' or 'IN', or if allowed is specified but doesn't contain them
+                            blocked_regions = region_restriction.get('blocked', [])
+                            allowed_regions = region_restriction.get('allowed', [])
+                            if 'US' in blocked_regions or 'IN' in blocked_regions:
+                                is_region_blocked = True
+                            elif allowed_regions and 'US' not in allowed_regions and 'IN' not in allowed_regions:
+                                is_region_blocked = True
+
+                        embeddable_status[vid] = is_embeddable and is_public and is_processed and not is_age_restricted and not is_region_blocked
+                        
+                        duration = content_details.get('duration')
+                        durations[vid] = self._parse_youtube_duration(duration)
+                except Exception as ve:
+                    print(f'Error fetching video details: {str(ve)}')
 
             tutorials = []
             for item in response.get('items', []):
                 snippet = item['snippet']
                 video_id = item.get('id', {}).get('videoId', '')
+                
+                # Skip if video is not embeddable or has restrictions
+                if video_id and not embeddable_status.get(video_id, False):
+                    continue
+                    
                 tutorials.append({
                     'videoId': video_id,
                     'video_id': video_id,
                     'title': snippet.get('title', ''),
                     'description': snippet.get('description', '')[:200],
                     'channel': snippet.get('channelTitle', ''),
-                    'url': f"https://www.youtube.com/watch?v={video_id}" if video_id else snippet.get('thumbnails', {}).get('default', {}).get('url', ''),
+                    'url': f"https://www.youtube.com/embed/{video_id}" if video_id else snippet.get('thumbnails', {}).get('default', {}).get('url', ''),
                     'thumbnail': snippet.get('thumbnails', {}).get('medium', {}).get('url') or snippet.get('thumbnails', {}).get('default', {}).get('url', ''),
                     'duration': durations.get(video_id),
                     'published_at': snippet.get('publishedAt', '')
                 })
+                
+                if len(tutorials) >= max_results:
+                    break
+
+            # Fallback: if we have fewer than max_results, fill remaining slots using local fallbacks
+            if len(tutorials) < max_results:
+                fallbacks = self._get_fallback_tutorials(skill)
+                for fb in fallbacks:
+                    if not any(t['video_id'] == fb['video_id'] for t in tutorials):
+                        tutorials.append(fb)
+                        if len(tutorials) >= max_results:
+                            break
 
             return tutorials
 

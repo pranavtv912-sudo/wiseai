@@ -6,8 +6,9 @@ Handles comprehensive resume analysis with ATS scoring and feedback
 from flask import Blueprint, current_app, request
 from models import User, Resume, Analysis, db
 from utils import token_required, success_response, error_response
-from services import ResumeParser, ATSScoreCalculator, GeminiAIService, AdzunaService, EmailService
+from services import ResumeParser, ATSScoreCalculator, GeminiAIService, AdzunaService, EmailService, PaymentService
 from datetime import datetime
+import hashlib
 
 analysis_routes = Blueprint('analysis', __name__, url_prefix='/api/analyze')
 
@@ -16,23 +17,13 @@ analysis_routes = Blueprint('analysis', __name__, url_prefix='/api/analyze')
 @token_required
 def analyze_resume(user, payload):
     """
-    Comprehensive resume analysis endpoint
+    Comprehensive resume analysis endpoint with L402 payment wall
     
     Expected JSON:
     {
         "resumeId": "resume-id",
-        "targetRole": "Python Developer"
-    }
-    
-    Returns:
-    {
-        "atsScore": 84,
-        "skills": ["Python", "Flask", "MySQL"],
-        "missingSkills": ["Docker", "Git", "React"],
-        "strengths": [...],
-        "weaknesses": [...],
-        "suggestions": [...],
-        "marketData": {...}
+        "targetRole": "Python Developer",
+        "jobDescription": "Full Job Description Text..."
     }
     """
     try:
@@ -43,9 +34,12 @@ def analyze_resume(user, payload):
         
         resume_id = data.get('resumeId')
         target_role = data.get('targetRole')
+        job_description = data.get('jobDescription')
+        preimage = data.get('preimage')
         
         if not resume_id:
             return error_response('resumeId is required', status_code=400)
+
         
         # Get resume
         resume = Resume.query.filter_by(id=resume_id, user_id=user.id).first()
@@ -68,6 +62,17 @@ def analyze_resume(user, payload):
             resume.extracted_certifications = parsed_data.get('certifications', [])
             resume.extracted_projects = parsed_data.get('projects', [])
         
+        # --- Handle Job Description Matching ---
+        jd_skills = None
+        gemini = GeminiAIService()
+        
+        if job_description:
+            print("[DEBUG] Job Description provided. Extracting skills via Gemini...")
+            jd_skills = gemini.extract_skills_from_jd(job_description)
+            print(f"[DEBUG] Extracted skills from JD: {jd_skills}")
+            if jd_skills and jd_skills.get('role_name'):
+                target_role = jd_skills['role_name']
+        
         # Calculate ATS score
         ats_calculator = ATSScoreCalculator()
         ats_data = ats_calculator.calculate_ats_score(
@@ -78,21 +83,20 @@ def analyze_resume(user, payload):
                 'keywords': [],
                 'raw_text': resume.extracted_text
             },
-            target_role
+            target_role,
+            jd_skills
         )
         
         # Get skill gap analysis
         skill_gap = ats_calculator.get_skill_gap_analysis(
             resume.extracted_skills,
-            target_role or 'Python Developer'
+            target_role or 'Python Developer',
+            jd_skills
         )
         
         # Get market data
         adzuna = AdzunaService()
         market_data = adzuna.get_job_market_data(target_role or 'Developer')
-        
-        # Generate AI feedback
-        gemini = GeminiAIService()
         
         resume_data = {
             'skills': resume.extracted_skills,
@@ -147,6 +151,12 @@ def analyze_resume(user, payload):
         analysis.salary_data = market_data.get('salary_data', {})
         analysis.required_skills = adzuna.get_required_skills(target_role or 'Developer')
         
+        # Save Job Description & Payment Data
+        analysis.job_description = job_description
+        analysis.payment_status = 'paid'
+        analysis.payment_hash = hashlib.sha256(bytes.fromhex(preimage)).hexdigest() if preimage else None
+        analysis.payment_preimage = preimage
+        
         # Update resume
         resume.ats_score = ats_data['total_score']
         resume.target_role = target_role
@@ -156,7 +166,7 @@ def analyze_resume(user, payload):
         
         db.session.add(analysis)
         db.session.commit()
-
+ 
         # ================= DEBUG LOGS =================
         
         print("\n========== SKILL GAP DEBUG ==========")
@@ -210,6 +220,8 @@ def analyze_resume(user, payload):
     
     except Exception as e:
         db.session.rollback()
+        import traceback
+        traceback.print_exc()
         return error_response(f'Analysis error: {str(e)}', status_code=500)
 
 

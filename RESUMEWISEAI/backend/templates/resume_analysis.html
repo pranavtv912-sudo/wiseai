@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis Report - ResumeWise AI</title>
+</head>
+<body style="font-family: 'Plus Jakarta Sans', sans-serif; background-color: #05070C; color: #E2E8F0; padding: 40px; text-align: left;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #0B0F19; border: 1px solid #1E293B; border-radius: 20px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+        <h2 style="color: #FFFFFF; font-size: 24px; font-weight: 800; margin-bottom: 8px;">Resume Analysis Report</h2>
+        <p style="color: #94A3B8; font-size: 14px; margin-bottom: 30px;">Prepared for {{ user_name }}</p>
+        
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 30px; background: rgba(99, 102, 241, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(99, 102, 241, 0.1);">
+            <tr>
+                <td>
+                    <span style="font-size: 11px; font-weight: 700; color: #818CF8; uppercase; letter-spacing: 0.5px;">ATS MATCH SCORE</span>
+                    <div style="font-size: 32px; font-weight: 800; color: #10B981; margin-top: 5px;">{{ ats_score }}%</div>
+                </td>
+                <td align="center">
+                    <span style="font-size: 11px; font-weight: 700; color: #818CF8; uppercase; letter-spacing: 0.5px;">SKILL COVERAGE</span>
+                    <div style="font-size: 32px; font-weight: 800; color: #818CF8; margin-top: 5px;">{{ skill_coverage }}%</div>
+                </td>
+                <td align="right" style="font-size: 12px; color: #CBD5E1; line-height: 1.4;">
+                    <strong>Target Focus:</strong><br>{{ target_role }}
+                </td>
+            </tr>
+        </table>
+
+        <div style="margin-bottom: 24px;">
+            <h3 style="color: #FFFFFF; font-size: 16px; font-weight: 700; margin-bottom: 8px;">🚀 Key Strengths</h3>
+            <p style="color: #CBD5E1; font-size: 14px; line-height: 1.6; margin: 0;">{{ strengths }}</p>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+            <h3 style="color: #FFFFFF; font-size: 16px; font-weight: 700; margin-bottom: 8px;">🎯 Missing Skills</h3>
+            <p style="color: #CBD5E1; font-size: 14px; line-height: 1.6; margin: 0;">{{ missing_skills }}</p>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: #FFFFFF; font-size: 16px; font-weight: 700; margin-bottom: 8px;">💡 Actionable Suggestions</h3>
+            <p style="color: #CBD5E1; font-size: 14px; line-height: 1.6; margin: 0;">{{ suggestions }}</p>
+        </div>
+
+        <div style="border-top: 1px solid #1E293B; padding-top: 20px; text-align: center; font-size: 11px; color: #475569;">
+            &copy; 2026 ResumeWise AI. All tactical career engineering rights reserved.
+        </div>
+    </div>
+</body>
+</html>
