@@ -5,6 +5,7 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:50
 // Create Axios Instance
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
 });
 
 // Request Interceptor: Attach JWT and L402 Payment Headers
