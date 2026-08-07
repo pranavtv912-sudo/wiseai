@@ -3,9 +3,18 @@
  * Handles JWT authentication and communication with the Flask backend
  */
 
-const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) 
-    ? import.meta.env.VITE_API_URL 
-    : 'https://wiseai-production.up.railway.app/api';
+function getApiBaseUrl() {
+    let envUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) 
+        ? import.meta.env.VITE_API_URL 
+        : 'https://wiseai-production.up.railway.app/api';
+    envUrl = envUrl.trim().replace(/\/+$/, '');
+    if (!envUrl.endsWith('/api')) {
+        envUrl += '/api';
+    }
+    return envUrl;
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ResumeWiseAPI {
     static getHeaders(isMultipart = false) {
