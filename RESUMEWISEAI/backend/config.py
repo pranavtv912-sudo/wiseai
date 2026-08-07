@@ -168,11 +168,8 @@ class Config:
     ADZUNA_API_ID = os.getenv("ADZUNA_API_ID", "")
     ADZUNA_API_KEY = os.getenv("ADZUNA_API_KEY", "")
 
-    # SMTP Configuration for Email/OTP Services
-    SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
-    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-    SMTP_USER = os.getenv("SMTP_USER", "")
-    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+    # Resend Email API Configuration
+    RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 
     # CORS Configuration
     CORS_ORIGINS = os.getenv(
