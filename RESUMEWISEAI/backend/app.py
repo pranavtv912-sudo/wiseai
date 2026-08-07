@@ -102,17 +102,18 @@ def create_app(config_name=None):
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
         "https://resumewiseai.vercel.app",
-        "https://wiseai-ruby.vercel.app"
+        "https://wiseai-ruby.vercel.app",
+        r"https://.*\.vercel\.app"
     ]
     for origin in default_allowed_origins:
         if origin not in cors_origins:
             cors_origins.append(origin)
 
     CORS(app, resources={
-        r"/api/*": {
+        r"/*": {
             "origins": cors_origins,
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "Accept"],
+            "allow_headers": ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
             "supports_credentials": True
         }
     })
