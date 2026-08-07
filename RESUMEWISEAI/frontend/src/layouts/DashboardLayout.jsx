@@ -11,14 +11,14 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen text-white bg-[#050505] relative flex flex-col font-sans overflow-x-hidden">
-      {/* Background Interactive Shader */}
-      <WebGLBackground />
+      {/* Background Interactive Shader (hide on landing so HTML video is visible) */}
+      {!isLanding && <WebGLBackground />}
       
       {/* Shared Navigation Header */}
       <Navbar />
 
-      {/* Page Content with dynamic top padding to clear the floating navbar */}
-      <main className="flex-1 flex flex-col relative z-10" style={{ paddingTop: isLanding ? '0px' : 'var(--navbar-height)' }}>
+      {/* Page Content */}
+      <main className="flex-1 flex flex-col relative z-10 pt-24">
         <Outlet />
       </main>
 
@@ -27,4 +27,3 @@ export default function DashboardLayout() {
     </div>
   )
 }
-

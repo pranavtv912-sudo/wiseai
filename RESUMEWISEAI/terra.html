@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TERRA — Living Goods & Botanical Wellness</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=Inter:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* RESET & CORE VARIABLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #070b12;
+      --ink: #f3f5fa;
+      --muted: rgba(243, 245, 250, 0.62);
+      --border: rgba(243, 245, 250, 0.18);
+      --accent: #4D7CFF;
+      --accent-glow: rgba(77, 124, 255, 0.4);
+      --accent-bg: rgba(77, 124, 255, 0.08);
+      --font-display: 'Manrope', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* BACKGROUND VIDEO */
+    .bg-video {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      filter: saturate(1.1) brightness(0.85);
+    }
+
+    /* VIGNETTE & SCRIM */
+    .vignette {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(120% 100% at 50% 42%, transparent 40%, rgba(6, 9, 15, 0.55) 100%),
+        linear-gradient(180deg, rgba(6, 9, 15, 0.5) 0%, transparent 22%, transparent 58%, rgba(6, 9, 15, 0.5) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .scrim {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(1100px, 92vw);
+      height: min(560px, 72vh);
+      background: radial-gradient(60% 55% at 50% 50%, rgba(6, 9, 15, 0.55) 0%, transparent 72%);
+      filter: blur(8px);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* LAYOUT SHELL */
+    .layout-shell {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      justify-content: space-between;
+    }
+
+    /* TOP NAVIGATION */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 26px clamp(24px, 5vw, 64px);
+    }
+
+    .wordmark {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 24px;
+      letter-spacing: 0.14em;
+      color: var(--ink);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 38px;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--ink);
+    }
+
+    .nav-cta {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--ink);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-cta:hover {
+      color: var(--accent);
+    }
+
+    .nav-cta .arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .nav-cta:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    /* CENTER HERO */
+    .hero-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transform: translateY(-2vh);
+      padding: 0 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.32em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 30px;
+    }
+
+    .glow-dot {
+      width: 5px;
+      height: 5px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    .hero-h1 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: clamp(72px, 15vw, 188px);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      max-width: 1200px;
+    }
+
+    .hero-h1 em {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: clamp(15px, 1.6vw, 18px);
+      color: var(--muted);
+      margin-top: 30px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 34px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 15px;
+      text-decoration: none;
+      margin-top: 40px;
+      transition: all 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .hero-cta:hover {
+      border-color: var(--accent);
+      background: var(--accent-bg);
+      color: #FFFFFF;
+    }
+
+    .hero-cta .arrow {
+      transition: transform 0.35s ease;
+    }
+
+    .hero-cta:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    /* BOTTOM CAPTION */
+    .bottom-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(24px, 5vw, 64px) 30px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .caption-dim {
+      opacity: 0.7;
+    }
+
+    /* ENTRANCE MOTION */
+    @keyframes blurFadeUp {
+      from {
+        opacity: 0;
+        filter: blur(18px);
+        transform: translateY(34px);
+      }
+      to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+      }
+    }
+
+    .rise {
+      opacity: 0;
+      animation: blurFadeUp 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+
+    /* RESPONSIVE & ACCESSIBILITY */
+    @media (max-width: 720px) {
+      .nav-links {
+        display: none;
+      }
+      .caption-dim {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .rise {
+        animation: none;
+        opacity: 1;
+        filter: none;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BACKGROUND VIDEO -->
+  <video class="bg-video" autoplay muted loop playsinline>
+    <source src="https://zxdefgavgwfxastwmmjm.supabase.co/storage/v1/object/public/assets/terra.mp4" type="video/mp4">
+  </video>
+
+  <!-- VIGNETTE + SCRIM -->
+  <div class="vignette"></div>
+  <div class="scrim"></div>
+
+  <!-- LAYOUT SHELL -->
+  <div class="layout-shell">
+    
+    <!-- NAV TOP -->
+    <header class="top-nav">
+      <a href="#" class="wordmark rise" style="animation-delay: 0ms;">TERRA</a>
+
+      <ul class="nav-links">
+        <li><a href="#" class="nav-link rise" style="animation-delay: 80ms;">Science</a></li>
+        <li><a href="#" class="nav-link rise" style="animation-delay: 140ms;">Products</a></li>
+        <li><a href="#" class="nav-link rise" style="animation-delay: 200ms;">Journal</a></li>
+      </ul>
+
+      <a href="#" class="nav-cta rise" style="animation-delay: 260ms;">
+        Shop <span class="arrow">-></span>
+      </a>
+    </header>
+
+    <!-- HERO CENTER -->
+    <main class="hero-center">
+      <div class="eyebrow rise" style="animation-delay: 340ms;">
+        <span class="glow-dot"></span>
+        LIVING WELLNESS
+      </div>
+
+      <h1 class="hero-h1 rise" style="animation-delay: 420ms;">
+        Grow <em>quietly.</em>
+      </h1>
+
+      <p class="hero-sub rise" style="animation-delay: 600ms;">
+        Living wellness, cultivated slowly.
+      </p>
+
+      <a href="#" class="hero-cta rise" style="animation-delay: 720ms;">
+        Explore Terra <span class="arrow">-></span>
+      </a>
+    </main>
+
+    <!-- BOTTOM CAPTION -->
+    <footer class="bottom-caption rise" style="animation-delay: 900ms;">
+      <div>TERRA · Living Goods</div>
+      <div class="caption-dim">Cultivated in glass — No. 001</div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

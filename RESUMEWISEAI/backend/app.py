@@ -240,10 +240,11 @@ if __name__ == '__main__':
     print(f'Database: {app.config.get("SQLALCHEMY_DATABASE_URI")}')
     print()
     
+    port = int(os.getenv('PORT', 5000))
     try:
         app.run(
             host='0.0.0.0',
-            port=5000,
+            port=port,
             debug=debug,
             use_reloader=debug
         )

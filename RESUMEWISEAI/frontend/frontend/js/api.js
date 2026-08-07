@@ -3,7 +3,9 @@
  * Handles JWT authentication and communication with the Flask backend
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) 
+    ? import.meta.env.VITE_API_URL 
+    : 'https://wiseai-production.up.railway.app/api';
 
 class ResumeWiseAPI {
     static getHeaders(isMultipart = false) {
