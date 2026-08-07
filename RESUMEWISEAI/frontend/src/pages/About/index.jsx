@@ -1,9 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-// Import founder image
-import founderImage from '../../assets/team/member1.jpg';
-
 export default function About() {
   const cardVariants = {
     hidden: { opacity: 0, y: 40 },
@@ -67,12 +64,10 @@ export default function About() {
             {/* Profile Image Column */}
             <div className="relative flex-shrink-0">
               <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full p-[3px] bg-gradient-to-tr from-[#3B82F6] via-purple-500 to-[#3B82F6] shadow-[0_0_30px_rgba(59,130,246,0.25)] group-hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] transition-all duration-500">
-                <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0a]">
-                  <img 
-                    src={founderImage} 
-                    alt="Tiriveedhi Venkata Pranav" 
-                    className="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition-transform duration-500"
-                  />
+                <div className="w-full h-full rounded-full overflow-hidden bg-[#0a0a0a] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[#3B82F6] text-6xl select-none">
+                    person
+                  </span>
                 </div>
               </div>
               
