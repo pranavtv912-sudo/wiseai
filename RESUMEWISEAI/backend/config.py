@@ -172,6 +172,7 @@ class Config:
     EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID", "")
     EMAILJS_TEMPLATE_ID = os.getenv("EMAILJS_TEMPLATE_ID", "")
     EMAILJS_PUBLIC_KEY = os.getenv("EMAILJS_PUBLIC_KEY", "")
+    EMAILJS_ANALYSIS_TEMPLATE_ID = os.getenv("EMAILJS_ANALYSIS_TEMPLATE_ID", "")
 
     # CORS Configuration
     CORS_ORIGINS = os.getenv(

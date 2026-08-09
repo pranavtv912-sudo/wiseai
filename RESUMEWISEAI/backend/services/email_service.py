@@ -9,13 +9,16 @@ class EmailService:
         self.service_id = os.getenv("EMAILJS_SERVICE_ID", "")
         self.template_id = os.getenv("EMAILJS_TEMPLATE_ID", "")
         self.public_key = os.getenv("EMAILJS_PUBLIC_KEY", "")
+        self.analysis_template_id = os.getenv("EMAILJS_ANALYSIS_TEMPLATE_ID", "")
 
-    def send_email(self, recipient, subject, template_params=None, html_body=None):
+    def send_email(self, recipient, subject, template_params=None, html_body=None, override_template_id=None):
         """
         Reusable email dispatcher using EmailJS REST API.
         Accepts template_params dict and optional html_body for backwards compatibility.
         """
-        if not self.service_id or not self.template_id or not self.public_key:
+        target_template_id = override_template_id or self.template_id
+
+        if not self.service_id or not target_template_id or not self.public_key:
             print(
                 "[EMAILJS ERROR] Missing EmailJS configuration (EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, or EMAILJS_PUBLIC_KEY). Email sending aborted.",
                 flush=True
@@ -25,6 +28,10 @@ class EmailService:
         if template_params is None:
             template_params = {}
 
+        if "name" not in template_params:
+            template_params["name"] = recipient.split("@")[0]
+        if "email" not in template_params:
+            template_params["email"] = recipient
         if "recipient_email" not in template_params:
             template_params["recipient_email"] = recipient
         if "to_email" not in template_params:
@@ -37,7 +44,7 @@ class EmailService:
 
         payload = {
             "service_id": self.service_id,
-            "template_id": self.template_id,
+            "template_id": target_template_id,
             "user_id": self.public_key,
             "template_params": template_params
         }
@@ -49,27 +56,27 @@ class EmailService:
                 "https://api.emailjs.com/api/v1.0/email/send",
                 json=payload,
                 headers={"Content-Type": "application/json"},
-                timeout=15
+                timeout=20
             )
 
             if response.status_code == 200:
-                print(f"[EMAILJS SUCCESS] Email request accepted for {recipient}", flush=True)
+                print(f"[EMAILJS SUCCESS] Email request accepted for recipient", flush=True)
                 return True
             else:
                 print(
-                    f"[EMAILJS ERROR] Failed to send email to {recipient}. Status: {response.status_code}, Response: {response.text}",
+                    f"[EMAILJS ERROR] Failed to send email. Status: {response.status_code}",
                     flush=True
                 )
                 return False
 
         except requests.exceptions.Timeout:
-            print(f"[EMAILJS ERROR] Connection timed out while sending email to {recipient}", flush=True)
+            print(f"[EMAILJS ERROR] Connection timed out while sending email", flush=True)
             return False
         except requests.exceptions.RequestException as e:
-            print(f"[EMAILJS ERROR] Network error sending email to {recipient}: {type(e).__name__}", flush=True)
+            print(f"[EMAILJS ERROR] Network error sending email: {type(e).__name__}", flush=True)
             return False
         except Exception as e:
-            print(f"[EMAILJS ERROR] Unexpected error sending email to {recipient}: {type(e).__name__}", flush=True)
+            print(f"[EMAILJS ERROR] Unexpected error sending email: {type(e).__name__}", flush=True)
             return False
 
     def send_analysis_email(
@@ -84,6 +91,11 @@ class EmailService:
         skill_coverage
     ):
         try:
+            target_template = self.analysis_template_id or self.template_id
+            if not target_template:
+                print("[EMAILJS NOTICE] OTP email system is ready, but a separate EmailJS template for resume analysis is not configured.", flush=True)
+                return False
+
             print("Template Name: resume_analysis.html", flush=True)
             print(f"Recipient: {to_email}", flush=True)
             print("Email Type: Resume Analysis Report", flush=True)
@@ -113,7 +125,9 @@ class EmailService:
             subject = f"ResumeWise AI - Resume Analysis Report for {name}"
             
             template_params = {
+                "name": name,
                 "user_name": name,
+                "email": to_email,
                 "target_role": target_role,
                 "ats_score": str(ats_score),
                 "strengths": ", ".join(strengths) if isinstance(strengths, list) else str(strengths),
@@ -125,7 +139,13 @@ class EmailService:
                 "subject": subject
             }
 
-            return self.send_email(to_email, subject, template_params=template_params, html_body=html_content)
+            return self.send_email(
+                to_email,
+                subject,
+                template_params=template_params,
+                html_body=html_content,
+                override_template_id=self.analysis_template_id or None
+            )
 
         except Exception as e:
             print(f"[EMAIL SERVICE ERROR] Unexpected failure in send_analysis_email: {type(e).__name__}", flush=True)
@@ -176,11 +196,15 @@ class EmailService:
             subject = f"ResumeWise AI - {purpose_text} Verification Code"
 
             template_params = {
+                "name": user_name,
                 "user_name": user_name,
-                "otp": str(otp_code),
-                "purpose_text": purpose_text,
+                "email": recipient_email,
                 "recipient_email": recipient_email,
                 "to_email": recipient_email,
+                "otp": str(otp_code),
+                "purpose": purpose_text,
+                "purpose_text": purpose_text,
+                "time": "5 minutes",
                 "subject": subject
             }
 
