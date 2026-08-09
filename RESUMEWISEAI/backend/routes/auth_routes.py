@@ -382,7 +382,9 @@ def forgot_password():
         db.session.commit()
         
         # Send OTP email
-        EmailService().send_otp_email(email, otp_code, 'forgot_password')
+        email_sent = EmailService().send_otp_email(email, otp_code, 'forgot_password')
+        if not email_sent:
+            return error_response('Failed to send verification email. (Resend sandbox limit: emails can only be sent to account owner until a custom domain is verified)', status_code=500)
         
         return success_response('Password recovery code sent to your email')
         
@@ -493,7 +495,9 @@ def change_password_otp(user, payload):
         db.session.commit()
         
         # Send OTP email
-        EmailService().send_otp_email(user.email, otp_code, 'change_password')
+        email_sent = EmailService().send_otp_email(user.email, otp_code, 'change_password')
+        if not email_sent:
+            return error_response('Failed to send verification email. (Resend sandbox limit: emails can only be sent to account owner until a custom domain is verified)', status_code=500)
         
         return success_response('Verification code sent to your email')
         
@@ -557,7 +561,9 @@ def resend_otp():
         db.session.commit()
         
         # Send OTP email
-        EmailService().send_otp_email(email, otp_code, purpose)
+        email_sent = EmailService().send_otp_email(email, otp_code, purpose)
+        if not email_sent:
+            return error_response('Failed to send verification email. (Resend sandbox limit: emails can only be sent to account owner until a custom domain is verified)', status_code=500)
         
         return success_response('Verification code resent successfully')
         

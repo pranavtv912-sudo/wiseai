@@ -168,8 +168,10 @@ class Config:
     ADZUNA_API_ID = os.getenv("ADZUNA_API_ID", "")
     ADZUNA_API_KEY = os.getenv("ADZUNA_API_KEY", "")
 
-    # Resend Email API Configuration
-    RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+    # EmailJS API Configuration
+    EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID", "")
+    EMAILJS_TEMPLATE_ID = os.getenv("EMAILJS_TEMPLATE_ID", "")
+    EMAILJS_PUBLIC_KEY = os.getenv("EMAILJS_PUBLIC_KEY", "")
 
     # CORS Configuration
     CORS_ORIGINS = os.getenv(

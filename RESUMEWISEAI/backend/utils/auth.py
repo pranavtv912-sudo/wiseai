@@ -103,8 +103,6 @@ def token_required(f):
         
         try:
             payload = verify_token(token)
-            print("TOKEN RECEIVED:", token)
-            print("PAYLOAD:", payload)
             
             # Verify token type is 'access'
             if payload.get('type') != 'access':
@@ -115,11 +113,6 @@ def token_required(f):
             
             # Get user from database
             user = User.query.get(payload['user_id'])
-
-            print("USER:", user)
-            
-            if user:
-                print("ACTIVE:", user.is_active)
                
             if not user or not user.is_active:
                 return {

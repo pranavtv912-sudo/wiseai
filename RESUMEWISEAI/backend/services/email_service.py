@@ -1,51 +1,75 @@
 import os
-import traceback
-import resend
+import requests
 
 
 class EmailService:
-    """Resend API Email Service for ResumeWise AI"""
+    """EmailJS REST API Email Service for ResumeWise AI"""
 
     def __init__(self):
-        self.api_key = os.getenv("RESEND_API_KEY", "")
-        if self.api_key:
-            resend.api_key = self.api_key
-        self.from_email = "ResumeWise <onboarding@resend.dev>"
+        self.service_id = os.getenv("EMAILJS_SERVICE_ID", "")
+        self.template_id = os.getenv("EMAILJS_TEMPLATE_ID", "")
+        self.public_key = os.getenv("EMAILJS_PUBLIC_KEY", "")
 
-    def send_email(self, recipient, subject, html_body):
+    def send_email(self, recipient, subject, template_params=None, html_body=None):
         """
-        Reusable email dispatcher using Resend Python SDK
+        Reusable email dispatcher using EmailJS REST API.
+        Accepts template_params dict and optional html_body for backwards compatibility.
         """
-        if not self.api_key:
+        if not self.service_id or not self.template_id or not self.public_key:
             print(
-                f"[WARNING] RESEND_API_KEY missing in environment variables. Email to {recipient} simulated in console log.",
+                "[EMAILJS ERROR] Missing EmailJS configuration (EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, or EMAILJS_PUBLIC_KEY). Email sending aborted.",
                 flush=True
             )
-            print("==========================================", flush=True)
-            print("  [EMULATOR MODE - RESEND EMAIL DISPATCH]")
-            print(f"  Recipient: {recipient}", flush=True)
-            print(f"  Subject: {subject}", flush=True)
-            print("==========================================\n", flush=True)
-            return True
+            return False
+
+        if template_params is None:
+            template_params = {}
+
+        if "recipient_email" not in template_params:
+            template_params["recipient_email"] = recipient
+        if "to_email" not in template_params:
+            template_params["to_email"] = recipient
+        if "subject" not in template_params:
+            template_params["subject"] = subject
+
+        if html_body and "html_content" not in template_params:
+            template_params["html_content"] = html_body
+
+        payload = {
+            "service_id": self.service_id,
+            "template_id": self.template_id,
+            "user_id": self.public_key,
+            "template_params": template_params
+        }
 
         try:
-            print(f"[RESEND DISPATCH] Dispatching email to {recipient} with subject '{subject}'...", flush=True)
+            print(f"[EMAILJS DISPATCH] Dispatching email to {recipient} with subject '{subject}'...", flush=True)
             
-            params = {
-                "from": self.from_email,
-                "to": [recipient],
-                "subject": subject,
-                "html": html_body,
-            }
+            response = requests.post(
+                "https://api.emailjs.com/api/v1.0/email/send",
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=15
+            )
 
-            response = resend.Emails.send(params)
-            
-            print(f"[RESEND SUCCESS] Email sent successfully to {recipient}. Response: {response}", flush=True)
-            return True
+            if response.status_code == 200:
+                print(f"[EMAILJS SUCCESS] Email request accepted for {recipient}", flush=True)
+                return True
+            else:
+                print(
+                    f"[EMAILJS ERROR] Failed to send email to {recipient}. Status: {response.status_code}, Response: {response.text}",
+                    flush=True
+                )
+                return False
 
+        except requests.exceptions.Timeout:
+            print(f"[EMAILJS ERROR] Connection timed out while sending email to {recipient}", flush=True)
+            return False
+        except requests.exceptions.RequestException as e:
+            print(f"[EMAILJS ERROR] Network error sending email to {recipient}: {type(e).__name__}", flush=True)
+            return False
         except Exception as e:
-            print(f"[RESEND ERROR] Failed to send email to {recipient} via Resend: {str(e)}", flush=True)
-            traceback.print_exc()
+            print(f"[EMAILJS ERROR] Unexpected error sending email to {recipient}: {type(e).__name__}", flush=True)
             return False
 
     def send_analysis_email(
@@ -70,32 +94,46 @@ class EmailService:
             )
             template_path = os.path.join(templates_dir, "resume_analysis.html")
             
+            html_content = ""
             try:
                 with open(template_path, "r", encoding="utf-8") as f:
                     html_content = f.read()
+                
+                html_content = html_content \
+                    .replace("{{ user_name }}", name) \
+                    .replace("{{ target_role }}", target_role) \
+                    .replace("{{ ats_score }}", str(ats_score)) \
+                    .replace("{{ strengths }}", ", ".join(strengths) if isinstance(strengths, list) else str(strengths)) \
+                    .replace("{{ missing_skills }}", ", ".join(missing_skills) if isinstance(missing_skills, list) else str(missing_skills)) \
+                    .replace("{{ suggestions }}", ", ".join(suggestions) if isinstance(suggestions, list) else str(suggestions)) \
+                    .replace("{{ skill_coverage }}", str(skill_coverage))
             except Exception as file_err:
-                print(f"[ERROR] Failed to load resume_analysis.html template: {str(file_err)}", flush=True)
-                raise file_err
-
-            html_content = html_content \
-                .replace("{{ user_name }}", name) \
-                .replace("{{ target_role }}", target_role) \
-                .replace("{{ ats_score }}", str(ats_score)) \
-                .replace("{{ strengths }}", ", ".join(strengths) if isinstance(strengths, list) else str(strengths)) \
-                .replace("{{ missing_skills }}", ", ".join(missing_skills) if isinstance(missing_skills, list) else str(missing_skills)) \
-                .replace("{{ suggestions }}", ", ".join(suggestions) if isinstance(suggestions, list) else str(suggestions)) \
-                .replace("{{ skill_coverage }}", str(skill_coverage))
+                print(f"[WARNING] Failed to load resume_analysis.html template: {str(file_err)}", flush=True)
 
             subject = f"ResumeWise AI - Resume Analysis Report for {name}"
-            return self.send_email(to_email, subject, html_content)
+            
+            template_params = {
+                "user_name": name,
+                "target_role": target_role,
+                "ats_score": str(ats_score),
+                "strengths": ", ".join(strengths) if isinstance(strengths, list) else str(strengths),
+                "missing_skills": ", ".join(missing_skills) if isinstance(missing_skills, list) else str(missing_skills),
+                "suggestions": ", ".join(suggestions) if isinstance(suggestions, list) else str(suggestions),
+                "skill_coverage": str(skill_coverage),
+                "recipient_email": to_email,
+                "to_email": to_email,
+                "subject": subject
+            }
+
+            return self.send_email(to_email, subject, template_params=template_params, html_body=html_content)
 
         except Exception as e:
-            print(f"[EMAIL SERVICE ERROR] Unexpected failure in send_analysis_email: {str(e)}", flush=True)
+            print(f"[EMAIL SERVICE ERROR] Unexpected failure in send_analysis_email: {type(e).__name__}", flush=True)
             return False
 
     def send_otp_email(self, recipient_email, otp_code, purpose):
         """
-        Send a secure OTP email using Resend API and standalone templates/otp_email.html file.
+        Send a secure OTP email using EmailJS REST API.
         """
         try:
             email_type = "OTP Verification"
@@ -122,22 +160,32 @@ class EmailService:
             )
             template_path = os.path.join(templates_dir, "otp_email.html")
             
+            html_content = ""
             try:
                 with open(template_path, "r", encoding="utf-8") as f:
                     html_content = f.read()
-            except Exception as file_err:
-                print(f"[ERROR] Failed to load otp_email.html template: {str(file_err)}", flush=True)
-                raise file_err
 
-            html_content = html_content \
-                .replace("{{ user_name }}", user_name) \
-                .replace("{{ otp }}", str(otp_code)) \
-                .replace("{{ purpose_text }}", purpose_text) \
-                .replace("{{ recipient_email }}", recipient_email)
+                html_content = html_content \
+                    .replace("{{ user_name }}", user_name) \
+                    .replace("{{ otp }}", str(otp_code)) \
+                    .replace("{{ purpose_text }}", purpose_text) \
+                    .replace("{{ recipient_email }}", recipient_email)
+            except Exception as file_err:
+                print(f"[WARNING] Failed to load otp_email.html template: {str(file_err)}", flush=True)
 
             subject = f"ResumeWise AI - {purpose_text} Verification Code"
-            return self.send_email(recipient_email, subject, html_content)
+
+            template_params = {
+                "user_name": user_name,
+                "otp": str(otp_code),
+                "purpose_text": purpose_text,
+                "recipient_email": recipient_email,
+                "to_email": recipient_email,
+                "subject": subject
+            }
+
+            return self.send_email(recipient_email, subject, template_params=template_params, html_body=html_content)
 
         except Exception as e:
-            print("[EMAIL SERVICE ERROR] Unexpected failure in send_otp_email:", str(e), flush=True)
+            print(f"[EMAIL SERVICE ERROR] Unexpected failure in send_otp_email: {type(e).__name__}", flush=True)
             return False
