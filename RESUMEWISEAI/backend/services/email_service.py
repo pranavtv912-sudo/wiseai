@@ -16,42 +16,29 @@ class EmailService:
     EMAILJS_URL = "https://api.emailjs.com/api/v1.0/email/send"
 
     def __init__(self):
-        # ---------------------------------------------------------
-        # EmailJS configuration
-        # ---------------------------------------------------------
+
+        # =========================================================
+        # EMAILJS CONFIGURATION
+        # =========================================================
 
         self.service_id = os.getenv(
-            "EMAILJS_SERVICE_ID",
-            ""
+            "EMAILJS_SERVICE_ID", ""
         ).strip()
 
         self.template_id = os.getenv(
-            "EMAILJS_TEMPLATE_ID",
-            ""
+            "EMAILJS_TEMPLATE_ID", ""
         ).strip()
 
         self.public_key = os.getenv(
-            "EMAILJS_PUBLIC_KEY",
-            ""
+            "EMAILJS_PUBLIC_KEY", ""
+        ).strip()
+
+        self.private_key = os.getenv(
+            "EMAILJS_PRIVATE_KEY", ""
         ).strip()
 
         self.analysis_template_id = os.getenv(
-            "EMAILJS_ANALYSIS_TEMPLATE_ID",
-            ""
-        ).strip()
-
-        # ---------------------------------------------------------
-        # DO NOT use the private key for now.
-        #
-        # Your EmailJS dashboard test is working with the
-        # Service + Template + Public Key configuration.
-        #
-        # We will first make Python behave exactly the same way.
-        # ---------------------------------------------------------
-
-        self.private_key = os.getenv(
-            "EMAILJS_PRIVATE_KEY",
-            ""
+            "EMAILJS_ANALYSIS_TEMPLATE_ID", ""
         ).strip()
 
     # =============================================================
@@ -59,9 +46,6 @@ class EmailService:
     # =============================================================
 
     def _check_configuration(self, template_id):
-        """
-        Check whether the required EmailJS configuration exists.
-        """
 
         print(
             "========== EMAILJS CONFIGURATION ==========",
@@ -69,26 +53,22 @@ class EmailService:
         )
 
         print(
-            f"Service ID configured: "
-            f"{bool(self.service_id)}",
+            f"Service ID configured: {bool(self.service_id)}",
             flush=True
         )
 
         print(
-            f"Template ID configured: "
-            f"{bool(template_id)}",
+            f"Template ID configured: {bool(template_id)}",
             flush=True
         )
 
         print(
-            f"Public Key configured: "
-            f"{bool(self.public_key)}",
+            f"Public Key configured: {bool(self.public_key)}",
             flush=True
         )
 
         print(
-            f"Private Key configured: "
-            f"{bool(self.private_key)}",
+            f"Private Key configured: {bool(self.private_key)}",
             flush=True
         )
 
@@ -109,24 +89,21 @@ class EmailService:
 
         if not self.service_id:
             print(
-                "[EMAILJS ERROR] "
-                "EMAILJS_SERVICE_ID is missing.",
+                "[EMAILJS ERROR] EMAILJS_SERVICE_ID is missing.",
                 flush=True
             )
             return False
 
         if not template_id:
             print(
-                "[EMAILJS ERROR] "
-                "EMAILJS_TEMPLATE_ID is missing.",
+                "[EMAILJS ERROR] EMAILJS_TEMPLATE_ID is missing.",
                 flush=True
             )
             return False
 
         if not self.public_key:
             print(
-                "[EMAILJS ERROR] "
-                "EMAILJS_PUBLIC_KEY is missing.",
+                "[EMAILJS ERROR] EMAILJS_PUBLIC_KEY is missing.",
                 flush=True
             )
             return False
@@ -145,21 +122,13 @@ class EmailService:
         html_body=None,
         override_template_id=None
     ):
-        """
-        Send an email using EmailJS REST API.
-        """
-
-        # ---------------------------------------------------------
-        # Select template
-        # ---------------------------------------------------------
 
         target_template_id = (
-            override_template_id
-            or self.template_id
+            override_template_id or self.template_id
         ).strip()
 
         # ---------------------------------------------------------
-        # Validate configuration
+        # Check configuration
         # ---------------------------------------------------------
 
         if not self._check_configuration(
@@ -168,49 +137,43 @@ class EmailService:
             return False
 
         # ---------------------------------------------------------
-        # Prepare template parameters
+        # Template parameters
         # ---------------------------------------------------------
 
         if template_params is None:
             template_params = {}
 
-        # Make a copy so the caller's dictionary isn't modified.
         template_params = dict(template_params)
 
-        # ---------------------------------------------------------
-        # Default parameters
-        # ---------------------------------------------------------
+        template_params.setdefault(
+            "name",
+            recipient.split("@")[0]
+        )
 
-        if "name" not in template_params:
-            template_params["name"] = (
-                recipient.split("@")[0]
-            )
+        template_params.setdefault(
+            "user_name",
+            recipient.split("@")[0]
+        )
 
-        if "user_name" not in template_params:
-            template_params["user_name"] = (
-                recipient.split("@")[0]
-            )
+        template_params.setdefault(
+            "email",
+            recipient
+        )
 
-        if "email" not in template_params:
-            template_params["email"] = recipient
+        template_params.setdefault(
+            "recipient_email",
+            recipient
+        )
 
-        if "recipient_email" not in template_params:
-            template_params["recipient_email"] = recipient
+        template_params.setdefault(
+            "to_email",
+            recipient
+        )
 
-        if "to_email" not in template_params:
-            template_params["to_email"] = recipient
-
-        if "subject" not in template_params:
-            template_params["subject"] = subject
-
-        # ---------------------------------------------------------
-        # IMPORTANT
-        #
-        # We don't need to send HTML from Python because the HTML
-        # already exists inside the EmailJS template.
-        #
-        # html_body is kept only for compatibility with older code.
-        # ---------------------------------------------------------
+        template_params.setdefault(
+            "subject",
+            subject
+        )
 
         if html_body:
             template_params.setdefault(
@@ -218,9 +181,9 @@ class EmailService:
                 html_body
             )
 
-        # ---------------------------------------------------------
-        # EmailJS REST API payload
-        # ---------------------------------------------------------
+        # =========================================================
+        # EMAILJS PAYLOAD
+        # =========================================================
 
         payload = {
             "service_id": self.service_id,
@@ -229,14 +192,18 @@ class EmailService:
             "template_params": template_params
         }
 
-        # ---------------------------------------------------------
         # IMPORTANT:
+        # EmailJS REST API supports accessToken as the
+        # account private key.
         #
-        # Do NOT send EMAILJS_PRIVATE_KEY for this test.
-        #
-        # Your EmailJS dashboard test succeeds, so we want Python
-        # to reproduce the same basic request.
-        # ---------------------------------------------------------
+        # Do NOT print the private key.
+
+        if self.private_key:
+            payload["accessToken"] = self.private_key
+
+        # =========================================================
+        # SEND REQUEST
+        # =========================================================
 
         try:
 
@@ -251,32 +218,32 @@ class EmailService:
             )
 
             print(
-                f"[EMAILJS DISPATCH] "
-                f"Service: {self.service_id}",
+                f"[EMAILJS DISPATCH] Service: {self.service_id}",
                 flush=True
             )
 
             print(
-                f"[EMAILJS DISPATCH] "
-                f"Template: {target_template_id}",
+                f"[EMAILJS DISPATCH] Template: "
+                f"{target_template_id}",
                 flush=True
             )
 
             print(
-                f"[EMAILJS DISPATCH] "
-                f"Recipient: {recipient}",
+                f"[EMAILJS DISPATCH] Recipient: "
+                f"{recipient}",
                 flush=True
             )
 
             print(
-                f"[EMAILJS DISPATCH] "
-                f"Subject: {subject}",
+                f"[EMAILJS DISPATCH] Subject: {subject}",
                 flush=True
             )
 
-            # -----------------------------------------------------
-            # NEVER print the Public/Private key.
-            # -----------------------------------------------------
+            print(
+                f"[EMAILJS DISPATCH] Private key included: "
+                f"{bool(self.private_key)}",
+                flush=True
+            )
 
             response = requests.post(
                 self.EMAILJS_URL,
@@ -292,8 +259,8 @@ class EmailService:
             ).strip()
 
             print(
-                f"[EMAILJS RESPONSE] "
-                f"HTTP {response.status_code}",
+                f"[EMAILJS RESPONSE] HTTP "
+                f"{response.status_code}",
                 flush=True
             )
 
@@ -327,15 +294,14 @@ class EmailService:
             # -----------------------------------------------------
 
             print(
-                "[EMAILJS ERROR] "
-                f"EmailJS returned HTTP "
+                "[EMAILJS ERROR] EmailJS returned HTTP "
                 f"{response.status_code}.",
                 flush=True
             )
 
             print(
-                "[EMAILJS ERROR] "
-                f"Response: {response_text[:2000]}",
+                f"[EMAILJS ERROR] Response: "
+                f"{response_text[:2000]}",
                 flush=True
             )
 
@@ -346,29 +312,20 @@ class EmailService:
 
             return False
 
-        # ---------------------------------------------------------
-        # Timeout
-        # ---------------------------------------------------------
-
         except requests.exceptions.Timeout:
 
             print(
-                "[EMAILJS ERROR] "
-                "EmailJS request timed out.",
+                "[EMAILJS ERROR] EmailJS request timed out.",
                 flush=True
             )
 
             return False
 
-        # ---------------------------------------------------------
-        # Network error
-        # ---------------------------------------------------------
-
         except requests.exceptions.RequestException as e:
 
             print(
-                "[EMAILJS ERROR] "
-                f"Network error: {type(e).__name__}",
+                "[EMAILJS ERROR] Network error: "
+                f"{type(e).__name__}",
                 flush=True
             )
 
@@ -379,15 +336,11 @@ class EmailService:
 
             return False
 
-        # ---------------------------------------------------------
-        # Unexpected error
-        # ---------------------------------------------------------
-
         except Exception as e:
 
             print(
-                "[EMAILJS ERROR] "
-                f"Unexpected error: {type(e).__name__}",
+                "[EMAILJS ERROR] Unexpected error: "
+                f"{type(e).__name__}",
                 flush=True
             )
 
@@ -408,9 +361,6 @@ class EmailService:
         otp_code,
         purpose
     ):
-        """
-        Send OTP verification email through EmailJS.
-        """
 
         try:
 
@@ -441,8 +391,7 @@ class EmailService:
             # -----------------------------------------------------
 
             user_name = (
-                recipient_email
-                .split("@")[0]
+                recipient_email.split("@")[0]
             )
 
             # -----------------------------------------------------
@@ -488,12 +437,9 @@ class EmailService:
                 flush=True
             )
 
-            # -----------------------------------------------------
-            # IMPORTANT
-            #
-            # These parameter names MUST match the variables
-            # inside your EmailJS template.
-            # -----------------------------------------------------
+            # =====================================================
+            # EMAILJS TEMPLATE PARAMETERS
+            # =====================================================
 
             template_params = {
 
@@ -528,19 +474,15 @@ class EmailService:
                     subject
             }
 
-            # -----------------------------------------------------
-            # Send email
-            # -----------------------------------------------------
+            # =====================================================
+            # SEND
+            # =====================================================
 
             result = self.send_email(
                 recipient_email,
                 subject,
                 template_params=template_params
             )
-
-            # -----------------------------------------------------
-            # Result logging
-            # -----------------------------------------------------
 
             if result:
 
@@ -591,15 +533,8 @@ class EmailService:
         suggestions,
         skill_coverage
     ):
-        """
-        Send resume analysis report through EmailJS.
-        """
 
         try:
-
-            # -----------------------------------------------------
-            # Select analysis template
-            # -----------------------------------------------------
 
             target_template = (
                 self.analysis_template_id
@@ -615,10 +550,6 @@ class EmailService:
                 )
 
                 return False
-
-            # -----------------------------------------------------
-            # Subject
-            # -----------------------------------------------------
 
             subject = (
                 "ResumeWise AI - "
@@ -668,9 +599,9 @@ class EmailService:
                     suggestions
                 )
 
-            # -----------------------------------------------------
-            # Template parameters
-            # -----------------------------------------------------
+            # =====================================================
+            # TEMPLATE PARAMETERS
+            # =====================================================
 
             template_params = {
 
@@ -711,10 +642,6 @@ class EmailService:
                     subject
             }
 
-            # -----------------------------------------------------
-            # Logging
-            # -----------------------------------------------------
-
             print(
                 "===========================================",
                 flush=True
@@ -745,9 +672,9 @@ class EmailService:
                 flush=True
             )
 
-            # -----------------------------------------------------
-            # Send
-            # -----------------------------------------------------
+            # =====================================================
+            # SEND
+            # =====================================================
 
             return self.send_email(
                 to_email,
