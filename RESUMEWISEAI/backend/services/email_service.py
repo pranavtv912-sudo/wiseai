@@ -6,21 +6,19 @@ class EmailService:
     """
     EmailJS REST API Email Service for ResumeWise AI.
 
-    Used for:
-    1. Registration OTP
-    2. Forgot Password OTP
-    3. Change Password OTP
-    4. Resume Analysis Email
+    Handles:
+    - Registration OTP emails
+    - Forgot password OTP emails
+    - Change password OTP emails
+    - Resume analysis emails
     """
 
     EMAILJS_URL = "https://api.emailjs.com/api/v1.0/email/send"
 
     def __init__(self):
-
-        # =========================================================
-        # EMAILJS CONFIGURATION
-        # =========================================================
-
+        # ---------------------------------------------------------
+        # EmailJS configuration
+        # ---------------------------------------------------------
         self.service_id = os.getenv(
             "EMAILJS_SERVICE_ID", ""
         ).strip()
@@ -41,16 +39,11 @@ class EmailService:
             "EMAILJS_ANALYSIS_TEMPLATE_ID", ""
         ).strip()
 
-    # =============================================================
-    # CONFIGURATION CHECK
-    # =============================================================
-
-    def _check_configuration(self, template_id):
-
-        print(
-            "========== EMAILJS CONFIGURATION ==========",
-            flush=True
-        )
+        # ---------------------------------------------------------
+        # Debug configuration
+        # DO NOT PRINT ACTUAL PRIVATE KEY
+        # ---------------------------------------------------------
+        print("========== EMAILJS CONFIGURATION ==========", flush=True)
 
         print(
             f"Service ID configured: {bool(self.service_id)}",
@@ -58,7 +51,7 @@ class EmailService:
         )
 
         print(
-            f"Template ID configured: {bool(template_id)}",
+            f"Template ID configured: {bool(self.template_id)}",
             flush=True
         )
 
@@ -72,43 +65,19 @@ class EmailService:
             flush=True
         )
 
-        print(
-            f"Service ID: {self.service_id}",
-            flush=True
-        )
-
-        print(
-            f"Template ID: {template_id}",
-            flush=True
-        )
-
-        print(
-            "===========================================",
-            flush=True
-        )
-
-        if not self.service_id:
+        if self.service_id:
             print(
-                "[EMAILJS ERROR] EMAILJS_SERVICE_ID is missing.",
+                f"Service ID: {self.service_id}",
                 flush=True
             )
-            return False
 
-        if not template_id:
+        if self.template_id:
             print(
-                "[EMAILJS ERROR] EMAILJS_TEMPLATE_ID is missing.",
+                f"Template ID: {self.template_id}",
                 flush=True
             )
-            return False
 
-        if not self.public_key:
-            print(
-                "[EMAILJS ERROR] EMAILJS_PUBLIC_KEY is missing.",
-                flush=True
-            )
-            return False
-
-        return True
+        print("===========================================", flush=True)
 
     # =============================================================
     # GENERIC EMAIL SENDER
@@ -122,28 +91,70 @@ class EmailService:
         html_body=None,
         override_template_id=None
     ):
+        """
+        Send an email through EmailJS REST API.
+
+        EmailJS REST API requires:
+            service_id
+            template_id
+            user_id = public key
+
+        accessToken is optional and contains the private key.
+        """
+
+        # ---------------------------------------------------------
+        # Select template
+        # ---------------------------------------------------------
 
         target_template_id = (
             override_template_id or self.template_id
         ).strip()
 
         # ---------------------------------------------------------
-        # Check configuration
+        # Validate configuration
         # ---------------------------------------------------------
 
-        if not self._check_configuration(
-            target_template_id
-        ):
+        if not self.service_id:
+            print(
+                "[EMAILJS ERROR] EMAILJS_SERVICE_ID is missing.",
+                flush=True
+            )
+            return False
+
+        if not target_template_id:
+            print(
+                "[EMAILJS ERROR] EMAILJS_TEMPLATE_ID is missing.",
+                flush=True
+            )
+            return False
+
+        if not self.public_key:
+            print(
+                "[EMAILJS ERROR] EMAILJS_PUBLIC_KEY is missing.",
+                flush=True
+            )
+            return False
+
+        if not recipient:
+            print(
+                "[EMAILJS ERROR] Recipient email is empty.",
+                flush=True
+            )
             return False
 
         # ---------------------------------------------------------
-        # Template parameters
+        # Prepare template parameters
         # ---------------------------------------------------------
 
         if template_params is None:
             template_params = {}
 
+        # Copy dictionary so the original object is not modified
         template_params = dict(template_params)
+
+        # ---------------------------------------------------------
+        # Default parameters
+        # ---------------------------------------------------------
 
         template_params.setdefault(
             "name",
@@ -175,15 +186,19 @@ class EmailService:
             subject
         )
 
+        # ---------------------------------------------------------
+        # Optional HTML content
+        # ---------------------------------------------------------
+
         if html_body:
             template_params.setdefault(
                 "html_content",
                 html_body
             )
 
-        # =========================================================
-        # EMAILJS PAYLOAD
-        # =========================================================
+        # ---------------------------------------------------------
+        # EmailJS REST API payload
+        # ---------------------------------------------------------
 
         payload = {
             "service_id": self.service_id,
@@ -192,58 +207,63 @@ class EmailService:
             "template_params": template_params
         }
 
-        # IMPORTANT:
-        # EmailJS REST API supports accessToken as the
-        # account private key.
+        # ---------------------------------------------------------
+        # Private key is OPTIONAL according to EmailJS REST API.
         #
-        # Do NOT print the private key.
+        # If EMAILJS_PRIVATE_KEY exists, include it as accessToken.
+        # ---------------------------------------------------------
 
         if self.private_key:
             payload["accessToken"] = self.private_key
 
-        # =========================================================
-        # SEND REQUEST
-        # =========================================================
+        # ---------------------------------------------------------
+        # Logging
+        # ---------------------------------------------------------
+
+        print("-------------------------------------------", flush=True)
+
+        print(
+            "[EMAILJS DISPATCH] Sending email...",
+            flush=True
+        )
+
+        print(
+            f"[EMAILJS DISPATCH] Service: {self.service_id}",
+            flush=True
+        )
+
+        print(
+            f"[EMAILJS DISPATCH] Template: {target_template_id}",
+            flush=True
+        )
+
+        print(
+            f"[EMAILJS DISPATCH] Recipient: {recipient}",
+            flush=True
+        )
+
+        print(
+            f"[EMAILJS DISPATCH] Subject: {subject}",
+            flush=True
+        )
+
+        print(
+            f"[EMAILJS DISPATCH] Public key included: "
+            f"{bool(self.public_key)}",
+            flush=True
+        )
+
+        print(
+            f"[EMAILJS DISPATCH] Private key included: "
+            f"{bool(self.private_key)}",
+            flush=True
+        )
+
+        # ---------------------------------------------------------
+        # Send request
+        # ---------------------------------------------------------
 
         try:
-
-            print(
-                "-------------------------------------------",
-                flush=True
-            )
-
-            print(
-                "[EMAILJS DISPATCH] Sending email...",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS DISPATCH] Service: {self.service_id}",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS DISPATCH] Template: "
-                f"{target_template_id}",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS DISPATCH] Recipient: "
-                f"{recipient}",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS DISPATCH] Subject: {subject}",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS DISPATCH] Private key included: "
-                f"{bool(self.private_key)}",
-                flush=True
-            )
 
             response = requests.post(
                 self.EMAILJS_URL,
@@ -254,24 +274,23 @@ class EmailService:
                 timeout=20
             )
 
+            print(
+                f"[EMAILJS RESPONSE] HTTP {response.status_code}",
+                flush=True
+            )
+
             response_text = (
                 response.text or ""
             ).strip()
 
-            print(
-                f"[EMAILJS RESPONSE] HTTP "
-                f"{response.status_code}",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS RESPONSE] "
-                f"{response_text[:2000]}",
-                flush=True
-            )
+            if response_text:
+                print(
+                    f"[EMAILJS RESPONSE] {response_text}",
+                    flush=True
+                )
 
             # -----------------------------------------------------
-            # SUCCESS
+            # Success
             # -----------------------------------------------------
 
             if response.status_code == 200:
@@ -290,18 +309,17 @@ class EmailService:
                 return True
 
             # -----------------------------------------------------
-            # FAILURE
+            # Error
             # -----------------------------------------------------
 
             print(
-                "[EMAILJS ERROR] EmailJS returned HTTP "
-                f"{response.status_code}.",
+                f"[EMAILJS ERROR] "
+                f"EmailJS returned HTTP {response.status_code}.",
                 flush=True
             )
 
             print(
-                f"[EMAILJS ERROR] Response: "
-                f"{response_text[:2000]}",
+                f"[EMAILJS ERROR] Response: {response_text}",
                 flush=True
             )
 
@@ -312,207 +330,43 @@ class EmailService:
 
             return False
 
+        # ---------------------------------------------------------
+        # Timeout
+        # ---------------------------------------------------------
+
         except requests.exceptions.Timeout:
 
             print(
-                "[EMAILJS ERROR] EmailJS request timed out.",
+                "[EMAILJS ERROR] "
+                "EmailJS request timed out.",
                 flush=True
             )
 
             return False
+
+        # ---------------------------------------------------------
+        # Network error
+        # ---------------------------------------------------------
 
         except requests.exceptions.RequestException as e:
 
             print(
-                "[EMAILJS ERROR] Network error: "
-                f"{type(e).__name__}",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS ERROR] Details: {str(e)}",
+                f"[EMAILJS ERROR] "
+                f"Network error: {type(e).__name__}",
                 flush=True
             )
 
             return False
 
-        except Exception as e:
-
-            print(
-                "[EMAILJS ERROR] Unexpected error: "
-                f"{type(e).__name__}",
-                flush=True
-            )
-
-            print(
-                f"[EMAILJS ERROR] Details: {str(e)}",
-                flush=True
-            )
-
-            return False
-
-    # =============================================================
-    # OTP EMAIL
-    # =============================================================
-
-    def send_otp_email(
-        self,
-        recipient_email,
-        otp_code,
-        purpose
-    ):
-
-        try:
-
-            # -----------------------------------------------------
-            # Determine purpose
-            # -----------------------------------------------------
-
-            if purpose == "register":
-
-                purpose_text = "Account Registration"
-
-            elif purpose == "forgot_password":
-
-                purpose_text = "Password Recovery"
-
-            elif purpose == "change_password":
-
-                purpose_text = (
-                    "Password Reset Verification"
-                )
-
-            else:
-
-                purpose_text = "Verification"
-
-            # -----------------------------------------------------
-            # User name
-            # -----------------------------------------------------
-
-            user_name = (
-                recipient_email.split("@")[0]
-            )
-
-            # -----------------------------------------------------
-            # Subject
-            # -----------------------------------------------------
-
-            subject = (
-                "ResumeWise AI - "
-                f"{purpose_text} Verification Code"
-            )
-
-            # -----------------------------------------------------
-            # Logging
-            # -----------------------------------------------------
-
-            print(
-                "===========================================",
-                flush=True
-            )
-
-            print(
-                "Template Name: otp_email.html",
-                flush=True
-            )
-
-            print(
-                f"Recipient: {recipient_email}",
-                flush=True
-            )
-
-            print(
-                f"Email Type: {purpose_text}",
-                flush=True
-            )
-
-            print(
-                f"OTP: {otp_code}",
-                flush=True
-            )
-
-            print(
-                "===========================================",
-                flush=True
-            )
-
-            # =====================================================
-            # EMAILJS TEMPLATE PARAMETERS
-            # =====================================================
-
-            template_params = {
-
-                "purpose_text":
-                    purpose_text,
-
-                "user_name":
-                    user_name,
-
-                "otp":
-                    str(otp_code),
-
-                "recipient_email":
-                    recipient_email,
-
-                "name":
-                    user_name,
-
-                "email":
-                    recipient_email,
-
-                "to_email":
-                    recipient_email,
-
-                "purpose":
-                    purpose_text,
-
-                "time":
-                    "5 minutes",
-
-                "subject":
-                    subject
-            }
-
-            # =====================================================
-            # SEND
-            # =====================================================
-
-            result = self.send_email(
-                recipient_email,
-                subject,
-                template_params=template_params
-            )
-
-            if result:
-
-                print(
-                    "[OTP EMAIL] "
-                    "OTP email sent successfully.",
-                    flush=True
-                )
-
-            else:
-
-                print(
-                    "[OTP EMAIL] "
-                    "OTP email failed.",
-                    flush=True
-                )
-
-            return result
+        # ---------------------------------------------------------
+        # Unexpected error
+        # ---------------------------------------------------------
 
         except Exception as e:
 
             print(
-                "[EMAIL SERVICE ERROR] "
-                f"OTP failure: {type(e).__name__}",
-                flush=True
-            )
-
-            print(
-                f"[EMAIL SERVICE ERROR] "
-                f"Details: {str(e)}",
+                f"[EMAILJS ERROR] "
+                f"Unexpected error: {type(e).__name__}: {str(e)}",
                 flush=True
             )
 
@@ -533,13 +387,20 @@ class EmailService:
         suggestions,
         skill_coverage
     ):
+        """
+        Send ResumeWise AI resume analysis report.
+        """
 
         try:
+
+            # -----------------------------------------------------
+            # Select analysis template
+            # -----------------------------------------------------
 
             target_template = (
                 self.analysis_template_id
                 or self.template_id
-            ).strip()
+            )
 
             if not target_template:
 
@@ -550,97 +411,6 @@ class EmailService:
                 )
 
                 return False
-
-            subject = (
-                "ResumeWise AI - "
-                f"Resume Analysis Report for {name}"
-            )
-
-            # -----------------------------------------------------
-            # Convert lists to strings
-            # -----------------------------------------------------
-
-            if isinstance(strengths, list):
-
-                strengths_text = ", ".join(
-                    str(item)
-                    for item in strengths
-                )
-
-            else:
-
-                strengths_text = str(
-                    strengths
-                )
-
-            if isinstance(missing_skills, list):
-
-                missing_skills_text = ", ".join(
-                    str(item)
-                    for item in missing_skills
-                )
-
-            else:
-
-                missing_skills_text = str(
-                    missing_skills
-                )
-
-            if isinstance(suggestions, list):
-
-                suggestions_text = ", ".join(
-                    str(item)
-                    for item in suggestions
-                )
-
-            else:
-
-                suggestions_text = str(
-                    suggestions
-                )
-
-            # =====================================================
-            # TEMPLATE PARAMETERS
-            # =====================================================
-
-            template_params = {
-
-                "name":
-                    name,
-
-                "user_name":
-                    name,
-
-                "email":
-                    to_email,
-
-                "recipient_email":
-                    to_email,
-
-                "to_email":
-                    to_email,
-
-                "target_role":
-                    target_role,
-
-                "ats_score":
-                    str(ats_score),
-
-                "strengths":
-                    strengths_text,
-
-                "missing_skills":
-                    missing_skills_text,
-
-                "suggestions":
-                    suggestions_text,
-
-                "skill_coverage":
-                    str(skill_coverage),
-
-                "subject":
-                    subject
-            }
 
             print(
                 "===========================================",
@@ -662,8 +432,244 @@ class EmailService:
                 flush=True
             )
 
+            # -----------------------------------------------------
+            # Locate HTML template
+            # -----------------------------------------------------
+
+            templates_dir = os.path.join(
+                os.path.dirname(
+                    os.path.dirname(
+                        os.path.abspath(__file__)
+                    )
+                ),
+                "templates"
+            )
+
+            template_path = os.path.join(
+                templates_dir,
+                "resume_analysis.html"
+            )
+
+            html_content = ""
+
+            # -----------------------------------------------------
+            # Read HTML template
+            # -----------------------------------------------------
+
+            try:
+
+                with open(
+                    template_path,
+                    "r",
+                    encoding="utf-8"
+                ) as f:
+
+                    html_content = f.read()
+
+                # -------------------------------------------------
+                # Replace template placeholders
+                # -------------------------------------------------
+
+                html_content = (
+                    html_content
+                    .replace(
+                        "{{ user_name }}",
+                        str(name)
+                    )
+                    .replace(
+                        "{{ target_role }}",
+                        str(target_role)
+                    )
+                    .replace(
+                        "{{ ats_score }}",
+                        str(ats_score)
+                    )
+                    .replace(
+                        "{{ strengths }}",
+                        ", ".join(strengths)
+                        if isinstance(strengths, list)
+                        else str(strengths)
+                    )
+                    .replace(
+                        "{{ missing_skills }}",
+                        ", ".join(missing_skills)
+                        if isinstance(missing_skills, list)
+                        else str(missing_skills)
+                    )
+                    .replace(
+                        "{{ suggestions }}",
+                        ", ".join(suggestions)
+                        if isinstance(suggestions, list)
+                        else str(suggestions)
+                    )
+                    .replace(
+                        "{{ skill_coverage }}",
+                        str(skill_coverage)
+                    )
+                )
+
+            except Exception as file_error:
+
+                print(
+                    "[EMAILJS WARNING] "
+                    f"Could not load resume_analysis.html: "
+                    f"{type(file_error).__name__}: "
+                    f"{str(file_error)}",
+                    flush=True
+                )
+
+            # -----------------------------------------------------
+            # Subject
+            # -----------------------------------------------------
+
+            subject = (
+                f"ResumeWise AI - "
+                f"Resume Analysis Report for {name}"
+            )
+
+            # -----------------------------------------------------
+            # EmailJS parameters
+            # -----------------------------------------------------
+
+            template_params = {
+
+                "name": name,
+
+                "user_name": name,
+
+                "email": to_email,
+
+                "recipient_email": to_email,
+
+                "to_email": to_email,
+
+                "target_role": target_role,
+
+                "ats_score": str(ats_score),
+
+                "strengths": (
+                    ", ".join(strengths)
+                    if isinstance(strengths, list)
+                    else str(strengths)
+                ),
+
+                "missing_skills": (
+                    ", ".join(missing_skills)
+                    if isinstance(missing_skills, list)
+                    else str(missing_skills)
+                ),
+
+                "suggestions": (
+                    ", ".join(suggestions)
+                    if isinstance(suggestions, list)
+                    else str(suggestions)
+                ),
+
+                "skill_coverage": str(skill_coverage),
+
+                "subject": subject
+            }
+
+            # -----------------------------------------------------
+            # Send
+            # -----------------------------------------------------
+
+            return self.send_email(
+                recipient=to_email,
+                subject=subject,
+                template_params=template_params,
+                html_body=html_content,
+                override_template_id=target_template
+            )
+
+        except Exception as e:
+
             print(
-                f"Template ID: {target_template}",
+                "[EMAIL SERVICE ERROR] "
+                f"send_analysis_email failed: "
+                f"{type(e).__name__}: {str(e)}",
+                flush=True
+            )
+
+            return False
+
+    # =============================================================
+    # OTP EMAIL
+    # =============================================================
+
+    def send_otp_email(
+        self,
+        recipient_email,
+        otp_code,
+        purpose
+    ):
+        """
+        Send OTP email for:
+        - register
+        - forgot_password
+        - change_password
+        """
+
+        try:
+
+            # -----------------------------------------------------
+            # Determine purpose
+            # -----------------------------------------------------
+
+            email_type = "OTP Verification"
+
+            purpose_text = "Verification"
+
+            if purpose == "register":
+
+                purpose_text = "Account Registration"
+
+                email_type = "Account Registration"
+
+            elif purpose == "forgot_password":
+
+                purpose_text = "Password Recovery"
+
+                email_type = "Password Recovery"
+
+            elif purpose == "change_password":
+
+                purpose_text = "Password Reset Verification"
+
+                email_type = "Password Reset"
+
+            # -----------------------------------------------------
+            # Username
+            # -----------------------------------------------------
+
+            user_name = recipient_email.split("@")[0]
+
+            # -----------------------------------------------------
+            # Debug information
+            # -----------------------------------------------------
+
+            print(
+                "===========================================",
+                flush=True
+            )
+
+            print(
+                "Template Name: otp_email.html",
+                flush=True
+            )
+
+            print(
+                f"Recipient: {recipient_email}",
+                flush=True
+            )
+
+            print(
+                f"Email Type: {email_type}",
+                flush=True
+            )
+
+            print(
+                f"OTP: {otp_code}",
                 flush=True
             )
 
@@ -672,29 +678,143 @@ class EmailService:
                 flush=True
             )
 
-            # =====================================================
-            # SEND
-            # =====================================================
+            # -----------------------------------------------------
+            # Locate OTP HTML template
+            # -----------------------------------------------------
 
-            return self.send_email(
-                to_email,
-                subject,
-                template_params=template_params,
-                override_template_id=target_template
+            templates_dir = os.path.join(
+                os.path.dirname(
+                    os.path.dirname(
+                        os.path.abspath(__file__)
+                    )
+                ),
+                "templates"
             )
+
+            template_path = os.path.join(
+                templates_dir,
+                "otp_email.html"
+            )
+
+            html_content = ""
+
+            # -----------------------------------------------------
+            # Read HTML template
+            # -----------------------------------------------------
+
+            try:
+
+                with open(
+                    template_path,
+                    "r",
+                    encoding="utf-8"
+                ) as f:
+
+                    html_content = f.read()
+
+                # -------------------------------------------------
+                # Replace placeholders
+                # -------------------------------------------------
+
+                html_content = (
+                    html_content
+                    .replace(
+                        "{{ user_name }}",
+                        str(user_name)
+                    )
+                    .replace(
+                        "{{ otp }}",
+                        str(otp_code)
+                    )
+                    .replace(
+                        "{{ purpose_text }}",
+                        str(purpose_text)
+                    )
+                    .replace(
+                        "{{ recipient_email }}",
+                        str(recipient_email)
+                    )
+                )
+
+            except Exception as file_error:
+
+                print(
+                    "[EMAILJS WARNING] "
+                    f"Could not load otp_email.html: "
+                    f"{type(file_error).__name__}: "
+                    f"{str(file_error)}",
+                    flush=True
+                )
+
+            # -----------------------------------------------------
+            # Email subject
+            # -----------------------------------------------------
+
+            subject = (
+                f"ResumeWise AI - "
+                f"{purpose_text} Verification Code"
+            )
+
+            # -----------------------------------------------------
+            # EmailJS template parameters
+            # -----------------------------------------------------
+
+            template_params = {
+
+                "purpose_text": purpose_text,
+
+                "user_name": user_name,
+
+                "name": user_name,
+
+                "email": recipient_email,
+
+                "recipient_email": recipient_email,
+
+                "to_email": recipient_email,
+
+                "otp": str(otp_code),
+
+                "purpose": purpose_text,
+
+                "time": "5 minutes",
+
+                "subject": subject
+            }
+
+            # -----------------------------------------------------
+            # Send OTP
+            # -----------------------------------------------------
+
+            result = self.send_email(
+                recipient=recipient_email,
+                subject=subject,
+                template_params=template_params,
+                html_body=html_content
+            )
+
+            if result:
+
+                print(
+                    "[OTP EMAIL] OTP email sent successfully.",
+                    flush=True
+                )
+
+            else:
+
+                print(
+                    "[OTP EMAIL] OTP email failed.",
+                    flush=True
+                )
+
+            return result
 
         except Exception as e:
 
             print(
                 "[EMAIL SERVICE ERROR] "
-                f"Analysis email failure: "
-                f"{type(e).__name__}",
-                flush=True
-            )
-
-            print(
-                f"[EMAIL SERVICE ERROR] "
-                f"Details: {str(e)}",
+                f"send_otp_email failed: "
+                f"{type(e).__name__}: {str(e)}",
                 flush=True
             )
 
