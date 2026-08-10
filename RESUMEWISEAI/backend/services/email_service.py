@@ -12,8 +12,13 @@ class EmailService:
         self.template_id = os.getenv("EMAILJS_TEMPLATE_ID", "").strip()
         self.public_key = os.getenv("EMAILJS_PUBLIC_KEY", "").strip()
 
+        # EmailJS Private Key
+        # Keep this ONLY on the backend/Railway.
+        self.private_key = os.getenv("EMAILJS_PRIVATE_KEY", "").strip()
+
         self.analysis_template_id = os.getenv(
-            "EMAILJS_ANALYSIS_TEMPLATE_ID", ""
+            "EMAILJS_ANALYSIS_TEMPLATE_ID",
+            ""
         ).strip()
 
     # ============================================================
@@ -103,6 +108,18 @@ class EmailService:
             "user_id": self.public_key,
             "template_params": template_params
         }
+
+        # IMPORTANT:
+        # EmailJS REST API supports accessToken using
+        # the account Private Key.
+        #
+        # This key must remain on the backend only.
+        if self.private_key:
+            payload["accessToken"] = self.private_key
+
+        # --------------------------------------------------------
+        # Send request
+        # --------------------------------------------------------
 
         try:
 
@@ -257,11 +274,10 @@ class EmailService:
             )
 
             # ----------------------------------------------------
-            # IMPORTANT:
-            # EmailJS template already contains the HTML.
+            # IMPORTANT
             #
-            # We do NOT need to load otp_email.html here.
-            # EmailJS will render the saved template.
+            # EmailJS already stores the HTML template.
+            # We don't need to load otp_email.html here.
             # ----------------------------------------------------
 
             template_params = {
@@ -286,6 +302,10 @@ class EmailService:
 
                 "subject": subject
             }
+
+            # ----------------------------------------------------
+            # Send OTP
+            # ----------------------------------------------------
 
             return self.send_email(
                 recipient_email,
@@ -324,6 +344,10 @@ class EmailService:
 
         try:
 
+            # ----------------------------------------------------
+            # Determine template
+            # ----------------------------------------------------
+
             target_template = (
                 self.analysis_template_id
                 or self.template_id
@@ -338,6 +362,10 @@ class EmailService:
                 )
 
                 return False
+
+            # ----------------------------------------------------
+            # Subject
+            # ----------------------------------------------------
 
             subject = (
                 f"ResumeWise AI - "
@@ -396,6 +424,10 @@ class EmailService:
 
                 "subject": subject
             }
+
+            # ----------------------------------------------------
+            # Send analysis email
+            # ----------------------------------------------------
 
             return self.send_email(
                 to_email,
