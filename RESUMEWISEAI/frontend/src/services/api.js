@@ -88,7 +88,11 @@ export const getUser = () => {
 // ----------------------------------------------------
 
 export const register = async (name, email, password) => {
-  return axiosClient.post('/auth/register', { name, email, password });
+  const result = await axiosClient.post('/auth/register', { name, email, password });
+  if (result.success && result.data?.tokens) {
+    setSession(result.data.tokens.access_token, result.data.user);
+  }
+  return result;
 };
 
 export const verifySignupOtp = async (email, otp) => {

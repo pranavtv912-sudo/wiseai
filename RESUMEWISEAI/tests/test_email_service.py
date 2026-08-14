@@ -53,7 +53,7 @@ def test_send_analysis_email_builds_emailjs_payload_and_returns_true(monkeypatch
         )
 
     assert result is True
-    assert captured["url"] == email_service.endpoint
+    assert captured["url"] == email_service.EMAILJS_URL
 
     payload = captured["json"]
     assert payload["service_id"] == "service_74mzuuu"

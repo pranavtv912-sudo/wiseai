@@ -40,8 +40,9 @@ export default function Register() {
     const fullName = `${firstName} ${lastName}`.trim()
     try {
       const result = await register(fullName, email, password)
-      if (result.success) {
-        navigate(`/verify-otp?email=${encodeURIComponent(email)}&purpose=register`)
+      if (result.success && result.data?.user) {
+        loginUser(result.data.user)
+        navigate('/dashboard')
       } else {
         setError(result.message || 'Registration failed')
       }

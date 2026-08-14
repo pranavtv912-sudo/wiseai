@@ -23,7 +23,7 @@ def generate_numeric_otp():
 @auth_routes.route('/register', methods=['POST'])
 def register():
     """
-    User registration endpoint (initiates OTP flow)
+    User registration endpoint (direct account creation without OTP)
     
     Expected JSON:
     {
@@ -61,41 +61,23 @@ def register():
         if existing_user:
             return error_response('Email already registered', status_code=409)
         
-        # Invalidate previous OTPs for this email and purpose 'register'
-        Otp.query.filter_by(email=email, purpose='register', is_used=False).update({'is_used': True})
-        
-        # Generate 6-digit OTP code
-        otp_code = generate_numeric_otp()
-        
-        # Hash password securely before saving to MySQL / Otp table
-        password_hash = generate_password_hash(password)
-        signup_data = {
-            'name': name,
-            'email': email,
-            'password_hash': password_hash
-        }
-        
-        # Save OTP to database
-        otp_entry = Otp(
+        # Create user directly
+        user = User(
+            name=name,
             email=email,
-            purpose='register',
-            signup_data=json.dumps(signup_data),
-            expires_at=datetime.utcnow() + timedelta(minutes=5)
+            password_hash=generate_password_hash(password)
         )
-        otp_entry.set_otp(otp_code)
         
-        db.session.add(otp_entry)
+        db.session.add(user)
         db.session.commit()
         
-        # Send OTP email
-        email_sent = EmailService().send_otp_email(email, otp_code, 'register')
-        if not email_sent:
-            return error_response('Failed to send verification email', status_code=500)
-            
-        return success_response('Verification OTP sent successfully. Please check your email.', {
-            'email': email,
-            'redirect_to': 'verify-otp'
-        }, status_code=200)
+        # Generate tokens
+        tokens = generate_tokens(user.id)
+        
+        return success_response('User registered successfully', {
+            'user': user.to_dict(),
+            'tokens': tokens
+        }, status_code=201)
     
     except Exception as e:
         db.session.rollback()
